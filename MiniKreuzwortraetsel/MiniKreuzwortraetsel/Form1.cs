@@ -19,6 +19,7 @@ namespace MiniKreuzwortraetsel
         Random random = new Random();
         int questionCounter = 0;
         int ts = 30;
+        // Used to determine empty space in grid
         List<int> xCoords = new List<int>();
         List<int> yCoords = new List<int>();
 
@@ -57,7 +58,7 @@ namespace MiniKreuzwortraetsel
 
             // Put the base word vertically
             Point baseQuestionTilePos = new Point(longestWord, 0);
-            FillAnswer(baseQuestionTilePos, new Point(0, 1), ("", baseWord));
+            FillAnswer(baseQuestionTilePos, new Point(0, 1), ("", baseWord), IsBaseWord: true);
 
             // Try crossing each letter of the base word
             for (int i = 0; i < baseWord.Length; i++)
@@ -68,10 +69,15 @@ namespace MiniKreuzwortraetsel
             // Shrink the grid to minimum by moving it to the top-left corner            
             gridOrigin.X = -xCoords.Min() * ts;
             gridOrigin.Y = -yCoords.Min() * ts;
+            // Resize window
+            Width = (xCoords.Max() + 1 - xCoords.Min()) * ts + 16 + UIPanel.Width;
+            Height = (yCoords.Max() + 1 - yCoords.Min()) * ts + 39;
+            // Minimum size?
+
             xCoords.Clear();
             yCoords.Clear();
-
             questionCounter = 0;
+
 
             Refresh();
         }
@@ -97,14 +103,22 @@ namespace MiniKreuzwortraetsel
                     X = baseQuestionTilePos.X - 1 - matchIndex,
                     Y = baseQuestionTilePos.Y + baseLetterIndex + 1 };
 
-                FillAnswer(newQuestionTilePos, new Point(1, 0), tuple);
+                FillAnswer(newQuestionTilePos, new Point(1, 0), tuple, IsBaseWord: false);
             }
         }
-        private void FillAnswer(Point questionTilePos, Point direction, (string Question, string Answer) tuple)
+        private void FillAnswer(Point questionTilePos, Point direction, (string Question, string Answer) tuple, bool IsBaseWord)
         {
             // Fill the question indicator into the tile
             string arrow = (direction.X == 1) ? "►" : "\n▼";
-            grid[questionTilePos.Y, questionTilePos.X] = (questionCounter + 1) + arrow;
+            string questionTileText = "";
+            if (IsBaseWord)
+            {
+                questionTileText = arrow;
+                questionCounter--;
+            }
+            else
+                questionTileText = (questionCounter + 1) + arrow;
+            grid[questionTilePos.Y, questionTilePos.X] = questionTileText;
             xCoords.Add(questionTilePos.X);
             yCoords.Add(questionTilePos.Y);
 

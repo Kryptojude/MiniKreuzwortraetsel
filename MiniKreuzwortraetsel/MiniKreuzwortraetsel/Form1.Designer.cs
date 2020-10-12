@@ -31,46 +31,65 @@
             this.GenerateCrosswordBTN = new System.Windows.Forms.Button();
             this.baseWordTB = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.UIPanel = new System.Windows.Forms.Panel();
+            this.UIPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // GenerateCrosswordBTN
             // 
-            this.GenerateCrosswordBTN.Location = new System.Drawing.Point(364, 255);
+            this.GenerateCrosswordBTN.Location = new System.Drawing.Point(73, 149);
+            this.GenerateCrosswordBTN.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.GenerateCrosswordBTN.Name = "GenerateCrosswordBTN";
-            this.GenerateCrosswordBTN.Size = new System.Drawing.Size(90, 40);
+            this.GenerateCrosswordBTN.Size = new System.Drawing.Size(135, 58);
             this.GenerateCrosswordBTN.TabIndex = 0;
-            this.GenerateCrosswordBTN.Text = "Kreuzworträtsel machen!";
+            this.GenerateCrosswordBTN.Text = "Mach Kreuzworträtsel!";
             this.GenerateCrosswordBTN.UseVisualStyleBackColor = true;
             this.GenerateCrosswordBTN.Click += new System.EventHandler(this.GenerateCrossword);
             // 
             // baseWordTB
             // 
-            this.baseWordTB.Location = new System.Drawing.Point(354, 209);
+            this.baseWordTB.Location = new System.Drawing.Point(63, 82);
+            this.baseWordTB.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.baseWordTB.Name = "baseWordTB";
-            this.baseWordTB.Size = new System.Drawing.Size(100, 20);
+            this.baseWordTB.Size = new System.Drawing.Size(148, 26);
             this.baseWordTB.TabIndex = 1;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(370, 180);
+            this.label1.Location = new System.Drawing.Point(87, 39);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(70, 13);
+            this.label1.Size = new System.Drawing.Size(99, 19);
             this.label1.TabIndex = 2;
             this.label1.Text = "Lösungswort:";
             // 
+            // UIPanel
+            // 
+            this.UIPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.UIPanel.Controls.Add(this.label1);
+            this.UIPanel.Controls.Add(this.GenerateCrosswordBTN);
+            this.UIPanel.Controls.Add(this.baseWordTB);
+            this.UIPanel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.UIPanel.Location = new System.Drawing.Point(931, 0);
+            this.UIPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.UIPanel.Name = "UIPanel";
+            this.UIPanel.Size = new System.Drawing.Size(269, 658);
+            this.UIPanel.TabIndex = 3;
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.baseWordTB);
-            this.Controls.Add(this.GenerateCrosswordBTN);
+            this.ClientSize = new System.Drawing.Size(1200, 658);
+            this.Controls.Add(this.UIPanel);
+            this.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.UIPanel.ResumeLayout(false);
+            this.UIPanel.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -79,6 +98,7 @@
         private System.Windows.Forms.Button GenerateCrosswordBTN;
         private System.Windows.Forms.TextBox baseWordTB;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel UIPanel;
     }
 }
 
