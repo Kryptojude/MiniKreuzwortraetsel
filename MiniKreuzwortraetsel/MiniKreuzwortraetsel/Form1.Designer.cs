@@ -44,7 +44,7 @@
             this.GenerateCrosswordBTN.TabIndex = 0;
             this.GenerateCrosswordBTN.Text = "Mach Kreuzworträtsel!";
             this.GenerateCrosswordBTN.UseVisualStyleBackColor = true;
-            this.GenerateCrosswordBTN.Click += new System.EventHandler(this.GenerateCrossword);
+            this.GenerateCrosswordBTN.Click += new System.EventHandler(this.ReadBaseWord);
             // 
             // baseWordTB
             // 

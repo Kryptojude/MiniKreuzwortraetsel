@@ -23,15 +23,30 @@ namespace MiniKreuzwortraetsel
         List<int> xCoords = new List<int>();
         List<int> yCoords = new List<int>();
 
+        // TODO: Mark the base word visually
+        // TODO: Minimum height and width?
+        // TODO: disallow empty base word
+        // TODO: integrate database somehow?
+        // TODO: export to docx
+
         public Form1()
         {
             InitializeComponent();
             Paint += Draw;
         }
 
-        private void GenerateCrossword(object sender, EventArgs e)
+        private void ReadBaseWord(object sender, EventArgs e)
         {
             string baseWord = baseWordTB.Text.ToUpper();
+            bool wrongInput = true;
+            while (wrongInput)
+                if (!string.IsNullOrEmpty(baseWord))
+                    GenerateCrossword
+
+        }
+
+        private void GenerateCrossword()
+        {
 
             // Fetch and scramble database
             FetchDatabase();
