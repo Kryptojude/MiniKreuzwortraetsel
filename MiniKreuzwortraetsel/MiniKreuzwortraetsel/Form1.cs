@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using Xceed.Words.NET;
+using System.Diagnostics;
 
 namespace MiniKreuzwortraetsel
 {
@@ -18,14 +20,12 @@ namespace MiniKreuzwortraetsel
         List<(string, string)> database = new List<(string, string)>();
         List<string> questions = new List<string>();
         Random random = new Random();
-        int questionCounter = 0;
         int ts = 30;
         // Used to determine empty space in grid
         List<int> xCoords = new List<int>();
         List<int> yCoords = new List<int>();
 
         // TODO: Mark the base word visually
-        // TODO: Hover effect for question
         // TODO: integrate database somehow?
         // TODO: export to docx
 
@@ -56,6 +56,7 @@ namespace MiniKreuzwortraetsel
             // Fetch and scramble database
             FetchDatabase();
             ScrambleDatabase();
+            questions.Clear();
 
             // Find longest word
             int longestWord = 0;
@@ -98,7 +99,6 @@ namespace MiniKreuzwortraetsel
 
             xCoords.Clear();
             yCoords.Clear();
-            questionCounter = 0;
 
             Refresh();
         }
@@ -124,7 +124,6 @@ namespace MiniKreuzwortraetsel
                     X = baseQuestionTilePos.X - 1 - matchIndex,
                     Y = baseQuestionTilePos.Y + baseLetterIndex + 1 };
 
-                questions.Add(tuple.Question);
                 FillAnswer(newQuestionTilePos, new Point(1, 0), tuple, IsBaseWord: false);
             }
         }
@@ -134,12 +133,12 @@ namespace MiniKreuzwortraetsel
             string arrow = (direction.X == 1) ? "►" : "\n▼";
             string questionTileText = "";
             if (IsBaseWord)
-            {
                 questionTileText = arrow;
-                questionCounter --;
-            }
             else
-                questionTileText = (questionCounter + 1) + arrow;
+            {
+                questions.Add(tuple.Question);
+                questionTileText = questions.Count + arrow;
+            }
             grid[questionTilePos.Y, questionTilePos.X] = questionTileText;
             xCoords.Add(questionTilePos.X);
             yCoords.Add(questionTilePos.Y);
@@ -157,7 +156,6 @@ namespace MiniKreuzwortraetsel
                 yCoords.Add(letterY);
             }
             database.Remove(tuple);
-            questionCounter++;
         }
         private void FetchDatabase()
         {
@@ -224,6 +222,11 @@ namespace MiniKreuzwortraetsel
                     }
                 }
         }
+        /// <summary>
+        /// Hover effect
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
             // The tile the mouse is hovering over: 
@@ -242,6 +245,22 @@ namespace MiniKreuzwortraetsel
                 }
                 else
                     popupLBL.Visible = false;
+        }
+
+        private void ExportToDocx(object sender, EventArgs e)
+        {
+            if (grid != null)
+            {
+                string fileName = "output.docx";
+                var doc = DocX.Create(fileName);
+
+                var blub = doc.AddTable(grid.GetLength(0), grid.GetLength(1));
+                //for (int col = 0; col < grid.GetLength(1); col++)
+                //    blub.SetColumnWidth(col, 3);
+
+                doc.Save();
+                Process.Start("WINWORD.EXE", fileName);
+            }
         }
     }
 }

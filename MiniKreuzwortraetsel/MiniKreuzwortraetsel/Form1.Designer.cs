@@ -32,6 +32,7 @@
             this.baseWordTB = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.UIPanel = new System.Windows.Forms.Panel();
+            this.exportBTN = new System.Windows.Forms.Button();
             this.errorMessageLBL = new System.Windows.Forms.Label();
             this.popupLBL = new System.Windows.Forms.Label();
             this.UIPanel.SuspendLayout();
@@ -70,6 +71,7 @@
             // UIPanel
             // 
             this.UIPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.UIPanel.Controls.Add(this.exportBTN);
             this.UIPanel.Controls.Add(this.errorMessageLBL);
             this.UIPanel.Controls.Add(this.label1);
             this.UIPanel.Controls.Add(this.GenerateCrosswordBTN);
@@ -80,6 +82,16 @@
             this.UIPanel.Name = "UIPanel";
             this.UIPanel.Size = new System.Drawing.Size(269, 658);
             this.UIPanel.TabIndex = 3;
+            // 
+            // exportBTN
+            // 
+            this.exportBTN.Location = new System.Drawing.Point(70, 214);
+            this.exportBTN.Name = "exportBTN";
+            this.exportBTN.Size = new System.Drawing.Size(135, 54);
+            this.exportBTN.TabIndex = 4;
+            this.exportBTN.Text = "Als .docx exportieren";
+            this.exportBTN.UseVisualStyleBackColor = true;
+            this.exportBTN.Click += new System.EventHandler(this.ExportToDocx);
             // 
             // errorMessageLBL
             // 
@@ -126,6 +138,7 @@
         private System.Windows.Forms.Panel UIPanel;
         private System.Windows.Forms.Label errorMessageLBL;
         private System.Windows.Forms.Label popupLBL;
+        private System.Windows.Forms.Button exportBTN;
     }
 }
 
