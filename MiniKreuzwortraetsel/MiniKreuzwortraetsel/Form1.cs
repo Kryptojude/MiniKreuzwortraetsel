@@ -16,6 +16,7 @@ namespace MiniKreuzwortraetsel
         string[,] grid;
         Point gridOrigin = new Point();
         List<(string, string)> database = new List<(string, string)>();
+        List<string> questions = new List<string>();
         Random random = new Random();
         int questionCounter = 0;
         int ts = 30;
@@ -123,6 +124,7 @@ namespace MiniKreuzwortraetsel
                     X = baseQuestionTilePos.X - 1 - matchIndex,
                     Y = baseQuestionTilePos.Y + baseLetterIndex + 1 };
 
+                questions.Add(tuple.Question);
                 FillAnswer(newQuestionTilePos, new Point(1, 0), tuple, IsBaseWord: false);
             }
         }
@@ -134,7 +136,7 @@ namespace MiniKreuzwortraetsel
             if (IsBaseWord)
             {
                 questionTileText = arrow;
-                questionCounter--;
+                questionCounter --;
             }
             else
                 questionTileText = (questionCounter + 1) + arrow;
@@ -224,13 +226,22 @@ namespace MiniKreuzwortraetsel
         }
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (grid[e.Y / ts, e.X / ts].Contains('►'))
-            {
-                popupLBL.Text = "asdf";
-                popupLBL.Visible = true;
-            }
-            else
-                popupLBL.Visible = false;
+            // The tile the mouse is hovering over: 
+            int tileX = (e.X - gridOrigin.X) / ts;
+            int tileY = (e.Y - gridOrigin.Y) / ts;
+            // Out of bounds check
+            if (tileX >= 0 && tileY >= 0 &&
+                tileX <= grid?.GetUpperBound(1) && tileY <= grid?.GetUpperBound(0) )
+                if (grid?[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts]?.Contains('►') == true)
+                {
+                    int questionIndex = Convert.ToInt32(grid[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts][0].ToString()) - 1;
+                    string popupText = questions[questionIndex];
+                    popupLBL.Text = popupText;
+                    popupLBL.Location = new Point(e.X + ts/2, e.Y - ts/2);
+                    popupLBL.Visible = true;
+                }
+                else
+                    popupLBL.Visible = false;
         }
     }
 }
