@@ -24,8 +24,7 @@ namespace MiniKreuzwortraetsel
         List<int> yCoords = new List<int>();
 
         // TODO: Mark the base word visually
-        // TODO: Minimum height and width?
-        // TODO: disallow empty base word
+        // TODO: Hover effect for question
         // TODO: integrate database somehow?
         // TODO: export to docx
 
@@ -33,19 +32,24 @@ namespace MiniKreuzwortraetsel
         {
             InitializeComponent();
             Paint += Draw;
+            MouseMove += Form1_MouseMove;
         }
+
 
         private void ReadBaseWord(object sender, EventArgs e)
         {
             string baseWord = baseWordTB.Text.ToUpper();
-            bool wrongInput = true;
-            while (wrongInput)
-                if (!string.IsNullOrEmpty(baseWord))
-                    GenerateCrossword
+            if (!string.IsNullOrEmpty(baseWord))
+            {
+                GenerateCrossword(baseWord);
+                errorMessageLBL.Text = "";
+            }
+            else
+                errorMessageLBL.Text = "Lösungswort angeben";
 
         }
 
-        private void GenerateCrossword()
+        private void GenerateCrossword(string baseWord)
         {
 
             // Fetch and scramble database
@@ -85,14 +89,15 @@ namespace MiniKreuzwortraetsel
             gridOrigin.X = -xCoords.Min() * ts;
             gridOrigin.Y = -yCoords.Min() * ts;
             // Resize window
+            int minHeight = ts * 8 + 39;
             Width = (xCoords.Max() + 1 - xCoords.Min()) * ts + 16 + UIPanel.Width;
             Height = (yCoords.Max() + 1 - yCoords.Min()) * ts + 39;
-            // Minimum size?
+            if (Height < minHeight)
+                Height = minHeight;
 
             xCoords.Clear();
             yCoords.Clear();
             questionCounter = 0;
-
 
             Refresh();
         }
@@ -216,6 +221,16 @@ namespace MiniKreuzwortraetsel
                         }
                     }
                 }
+        }
+        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (grid[e.Y / ts, e.X / ts].Contains('►'))
+            {
+                popupLBL.Text = "asdf";
+                popupLBL.Visible = true;
+            }
+            else
+                popupLBL.Visible = false;
         }
     }
 }
