@@ -252,14 +252,30 @@ namespace MiniKreuzwortraetsel
             if (grid != null)
             {
                 string fileName = "output.docx";
-                var doc = DocX.Create(fileName);
+                using (var doc = DocX.Create(fileName))
+                {
+                    doc.MarginBottom = 0;
+                    doc.MarginTop = 0;
+                    doc.MarginLeft = 0;
+                    doc.MarginRight = 0;
 
-                var blub = doc.AddTable(grid.GetLength(0), grid.GetLength(1));
-                //for (int col = 0; col < grid.GetLength(1); col++)
-                //    blub.SetColumnWidth(col, 3);
+                    var table = doc.AddTable(12, 15);
+                    //var table = doc.AddTable(grid.GetLength(0), grid.GetLength(1) + gridOrigin.X / ts);
+                    table.AutoFit = Xceed.Document.NET.AutoFit.Contents;
+                    for (int col = 0; col < table.ColumnCount; col++)
+                    {
+                        for (int row = 0; row < table.RowCount; row++)
+                        {
+                            string gridString = "A";
+                            //string gridString = grid[row - gridOrigin.Y / ts, col - gridOrigin.X / ts];
+                            table.Rows[row].Cells[col].Paragraphs[0].Append(gridString);
+                        }
+                    }
+                    doc.InsertTable(table);
 
-                doc.Save();
-                Process.Start("WINWORD.EXE", fileName);
+                    doc.Save();
+                    Process.Start("WINWORD.EXE", fileName);
+                }
             }
         }
     }
