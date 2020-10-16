@@ -259,18 +259,25 @@ namespace MiniKreuzwortraetsel
                     doc.MarginLeft = 0;
                     doc.MarginRight = 0;
 
-                    var table = doc.AddTable(12, 15);
-                    //var table = doc.AddTable(grid.GetLength(0), grid.GetLength(1) + gridOrigin.X / ts);
-                    table.AutoFit = Xceed.Document.NET.AutoFit.Contents;
+                    var table = doc.AddTable(grid.GetLength(0), grid.GetLength(1) + gridOrigin.X / ts);
+                    float[] floatArray = new float[table.ColumnCount];
+                    for (int i = 0; i < table.ColumnCount; i++)
+                    {
+                        floatArray[i] = 25f;
+                    }
+                    table.SetWidths(floatArray);
+                    table.AutoFit = Xceed.Document.NET.AutoFit.Fixed;
                     for (int col = 0; col < table.ColumnCount; col++)
                     {
                         for (int row = 0; row < table.RowCount; row++)
                         {
-                            string gridString = "A";
-                            //string gridString = grid[row - gridOrigin.Y / ts, col - gridOrigin.X / ts];
+                            //string gridString = "A";
+                            string gridString = grid[row - gridOrigin.Y / ts, col - gridOrigin.X / ts];
                             table.Rows[row].Cells[col].Paragraphs[0].Append(gridString);
                         }
                     }
+
+
                     doc.InsertTable(table);
 
                     doc.Save();
