@@ -28,14 +28,28 @@ namespace MiniKreuzwortraetsel
         // TODO: Mark the base word visually
         // TODO: integrate database somehow?
         // TODO: export to docx
+        // TODO: choose different databases
+        // TODO: add question/answer pair from interface
+        // TODO: show content of current database
+        // TODO: Fill an answer into crossword at will
+        // TODO: thumbnail
 
         public Form1()
         {
             InitializeComponent();
+            FetchDatabase();
+            // TODO: Scan (or integrate) databases
+            databaseMenu.SelectedIndex = 0;
             Paint += Draw;
             MouseMove += Form1_MouseMove;
         }
 
+        private void PutAnswerIntoCrossword(object sender, EventArgs e)
+        {
+            ListBox box = sender as ListBox;
+            (string, string) tuple = database[box.SelectedIndex];
+            
+        }
 
         private void ReadBaseWord(object sender, EventArgs e)
         {
@@ -52,10 +66,6 @@ namespace MiniKreuzwortraetsel
 
         private void GenerateCrossword(string baseWord)
         {
-
-            // Fetch and scramble database
-            FetchDatabase();
-            ScrambleDatabase();
             questions.Clear();
 
             // Find longest word
@@ -130,7 +140,7 @@ namespace MiniKreuzwortraetsel
         private void FillAnswer(Point questionTilePos, Point direction, (string Question, string Answer) tuple, bool IsBaseWord)
         {
             // Fill the question indicator into the tile
-            string arrow = (direction.X == 1) ? "►" : "\n▼";
+            string arrow = (direction.X == 1) ? "►" : "▼";
             string questionTileText = "";
             if (IsBaseWord)
                 questionTileText = arrow;
@@ -225,8 +235,6 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Hover effect
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
             // The tile the mouse is hovering over: 
@@ -263,26 +271,35 @@ namespace MiniKreuzwortraetsel
                     float[] floatArray = new float[table.ColumnCount];
                     for (int i = 0; i < table.ColumnCount; i++)
                     {
-                        floatArray[i] = 25f;
+                        floatArray[i] = 15f;
                     }
                     table.SetWidths(floatArray);
-                    table.AutoFit = Xceed.Document.NET.AutoFit.Fixed;
+                    //table.AutoFit = Xceed.Document.NET.AutoFit.Fixed;
                     for (int col = 0; col < table.ColumnCount; col++)
                     {
                         for (int row = 0; row < table.RowCount; row++)
                         {
-                            //string gridString = "A";
                             string gridString = grid[row - gridOrigin.Y / ts, col - gridOrigin.X / ts];
                             table.Rows[row].Cells[col].Paragraphs[0].Append(gridString);
                         }
                     }
-
 
                     doc.InsertTable(table);
 
                     doc.Save();
                     Process.Start("WINWORD.EXE", fileName);
                 }
+            }
+            else errorMessageLBL.Text = "Zuerst Kreuzworträtsel machen";
+        }
+
+        private void databaseMenu_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Display question/answer pairs in list
+            databaseContentListBox.Items.Clear();
+            foreach ((string Question, string Answer) tuple in database)
+            {
+                databaseContentListBox.Items.Add(tuple.Answer.ToLower() + " <---> " + tuple.Question);
             }
         }
     }

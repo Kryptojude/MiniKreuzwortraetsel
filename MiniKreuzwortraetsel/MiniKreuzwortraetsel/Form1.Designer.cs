@@ -35,6 +35,9 @@
             this.exportBTN = new System.Windows.Forms.Button();
             this.errorMessageLBL = new System.Windows.Forms.Label();
             this.popupLBL = new System.Windows.Forms.Label();
+            this.databaseMenu = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.databaseContentListBox = new System.Windows.Forms.ListBox();
             this.UIPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -61,16 +64,19 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(87, 39);
+            this.label1.Location = new System.Drawing.Point(97, 39);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(99, 19);
+            this.label1.Size = new System.Drawing.Size(75, 19);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Lösungswort:";
+            this.label1.Text = "Hilfswort:";
             // 
             // UIPanel
             // 
             this.UIPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.UIPanel.Controls.Add(this.databaseContentListBox);
+            this.UIPanel.Controls.Add(this.label2);
+            this.UIPanel.Controls.Add(this.databaseMenu);
             this.UIPanel.Controls.Add(this.exportBTN);
             this.UIPanel.Controls.Add(this.errorMessageLBL);
             this.UIPanel.Controls.Add(this.label1);
@@ -112,6 +118,40 @@
             this.popupLBL.TabIndex = 4;
             this.popupLBL.Visible = false;
             // 
+            // databaseMenu
+            // 
+            this.databaseMenu.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.databaseMenu.FormattingEnabled = true;
+            this.databaseMenu.Items.AddRange(new object[] {
+            "Physik",
+            "Geschichte",
+            "Lavie",
+            "Biologie"});
+            this.databaseMenu.Location = new System.Drawing.Point(70, 317);
+            this.databaseMenu.Name = "databaseMenu";
+            this.databaseMenu.Size = new System.Drawing.Size(121, 27);
+            this.databaseMenu.TabIndex = 5;
+            this.databaseMenu.SelectedIndexChanged += new System.EventHandler(this.databaseMenu_SelectedIndexChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(70, 292);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(88, 19);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Datenbank:";
+            // 
+            // databaseContentListBox
+            // 
+            this.databaseContentListBox.FormattingEnabled = true;
+            this.databaseContentListBox.ItemHeight = 19;
+            this.databaseContentListBox.Location = new System.Drawing.Point(14, 359);
+            this.databaseContentListBox.Name = "databaseContentListBox";
+            this.databaseContentListBox.Size = new System.Drawing.Size(241, 289);
+            this.databaseContentListBox.TabIndex = 7;
+            this.databaseContentListBox.DoubleClick += new System.EventHandler(this.PutAnswerIntoCrossword);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
@@ -139,6 +179,9 @@
         private System.Windows.Forms.Label errorMessageLBL;
         private System.Windows.Forms.Label popupLBL;
         private System.Windows.Forms.Button exportBTN;
+        private System.Windows.Forms.ComboBox databaseMenu;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ListBox databaseContentListBox;
     }
 }
 
