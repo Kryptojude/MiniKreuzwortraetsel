@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO;
 using Xceed.Words.NET;
 using System.Diagnostics;
+using System.Data.SqlClient;
 
 namespace MiniKreuzwortraetsel
 {
@@ -25,8 +26,9 @@ namespace MiniKreuzwortraetsel
         List<int> xCoords = new List<int>();
         List<int> yCoords = new List<int>();
 
+
         // TODO: Mark the base word visually
-        // TODO: integrate database somehow?
+        // TODO: integrate database somehow SQL?
         // TODO: export to docx
         // TODO: choose different databases
         // TODO: add question/answer pair from interface
@@ -42,6 +44,12 @@ namespace MiniKreuzwortraetsel
             databaseMenu.SelectedIndex = 0;
             Paint += Draw;
             MouseMove += Form1_MouseMove;
+            
+            SqlConnection conn = new SqlConnection();
+            conn.ConnectionString =
+                 @"Data Source = (LocalDB)\MSSQLLocalDB; AttachDbFilename =| DataDirectory |\Database1.mdf; Integrated Security = True";
+            conn.Open();
+
         }
 
         private void PutAnswerIntoCrossword(object sender, EventArgs e)
@@ -301,6 +309,24 @@ namespace MiniKreuzwortraetsel
             {
                 databaseContentListBox.Items.Add(tuple.Answer.ToLower() + " <---> " + tuple.Question);
             }
+        }
+        /// <summary>
+        /// Called by either new collection or edit collection button, 
+        /// opens the editCollectionForm and disables form1
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void editCollectionBTN_Click(object sender, EventArgs e)
+        {
+            Button senderButton = sender as Button;
+            Enabled = false;
+            string mode = "";
+            if (senderButton.Name == "editCollectionButton")
+                mode = "edit";
+            else
+                mode = "create";
+            EditCollectionForm editCollectionForm = new EditCollectionForm(this, mode);
+            editCollectionForm.Show();
         }
     }
 }
