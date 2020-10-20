@@ -44,10 +44,9 @@ namespace MiniKreuzwortraetsel
             databaseMenu.SelectedIndex = 0;
             Paint += Draw;
             MouseMove += Form1_MouseMove;
-            
+
             SqlConnection conn = new SqlConnection();
-            conn.ConnectionString =
-                 @"Data Source = (LocalDB)\MSSQLLocalDB; AttachDbFilename =| DataDirectory |\Database1.mdf; Integrated Security = True";
+            conn.ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
             conn.Open();
 
         }
