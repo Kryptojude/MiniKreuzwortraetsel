@@ -13,19 +13,10 @@ namespace MiniKreuzwortraetsel
     public partial class EditCollectionForm : Form
     {
         Form mainForm;
-        public EditCollectionForm(Form mainForm, string mode)
+        public EditCollectionForm(Form mainForm)
         {
             InitializeComponent();
             this.mainForm = mainForm;
-
-            if (mode == "edit")
-            {
-                Text = "Sammlung bearbeiten";
-            }
-            else
-            {
-                Text = "Neue Sammlung erstellen";
-            }
         }
 
         private void EditCollectionForm_FormClosed(object sender, FormClosedEventArgs e)

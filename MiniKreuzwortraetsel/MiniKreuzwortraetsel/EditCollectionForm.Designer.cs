@@ -36,6 +36,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Name = "EditCollectionForm";
+            this.Text = "Sammlung bearbeiten";
             this.TopMost = true;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.EditCollectionForm_FormClosed);
             this.ResumeLayout(false);

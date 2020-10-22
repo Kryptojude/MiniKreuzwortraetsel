@@ -10,7 +10,6 @@ using System.Windows.Forms;
 using System.IO;
 using Xceed.Words.NET;
 using System.Diagnostics;
-using System.Data.SqlClient;
 
 namespace MiniKreuzwortraetsel
 {
@@ -26,7 +25,6 @@ namespace MiniKreuzwortraetsel
         List<int> xCoords = new List<int>();
         List<int> yCoords = new List<int>();
 
-
         // TODO: Mark the base word visually
         // TODO: integrate database somehow SQL?
         // TODO: export to docx
@@ -40,37 +38,43 @@ namespace MiniKreuzwortraetsel
         {
             InitializeComponent();
             FetchDatabase();
-            // TODO: Scan (or integrate) databases
-            databaseMenu.SelectedIndex = 0;
-            Paint += Draw;
-            MouseMove += Form1_MouseMove;
 
-            SqlConnection conn = new SqlConnection();
-            conn.ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True";
-            conn.Open();
-
+            // Some UI Settings
+            UpdateTableMenu();
         }
-
+        public void UpdateTableMenu()
+        {
+            tableMenu.Items.Clear();
+            foreach (var item in MySqlQueries.SHOW_TABLES())
+            {
+                tableMenu.Items.Add(item);
+            }
+            if (tableMenu.Items.Count > 0)
+            {
+                tableMenu.SelectedIndex = 0;
+                editCollectionBTN.Enabled = true;
+            }
+        }
         private void PutAnswerIntoCrossword(object sender, EventArgs e)
         {
-            ListBox box = sender as ListBox;
-            (string, string) tuple = database[box.SelectedIndex];
-            
+            // Extract answer and question from the listBox
+            ListBox senderListBox = sender as ListBox;
+            string selectedItem = senderListBox.SelectedItem.ToString();
+            string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
+            (string Question, string Answer) tuple = (array[1], array[0]);
         }
-
         private void ReadBaseWord(object sender, EventArgs e)
         {
             string baseWord = baseWordTB.Text.ToUpper();
             if (!string.IsNullOrEmpty(baseWord))
             {
                 GenerateCrossword(baseWord);
-                errorMessageLBL.Text = "";
+                errorMessageLBL.Visible = false;
             }
             else
-                errorMessageLBL.Text = "Lösungswort angeben";
+                errorMessageLBL.Visible = true;
 
         }
-
         private void GenerateCrossword(string baseWord)
         {
             questions.Clear();
@@ -261,7 +265,6 @@ namespace MiniKreuzwortraetsel
                 else
                     popupLBL.Visible = false;
         }
-
         private void ExportToDocx(object sender, EventArgs e)
         {
             if (grid != null)
@@ -299,14 +302,13 @@ namespace MiniKreuzwortraetsel
             }
             else errorMessageLBL.Text = "Zuerst Kreuzworträtsel machen";
         }
-
-        private void databaseMenu_SelectedIndexChanged(object sender, EventArgs e)
+        private void TableMenu_SelectedIndexChanged(object sender, EventArgs e)
         {
             // Display question/answer pairs in list
-            databaseContentListBox.Items.Clear();
+            tableContentListBox1.Items.Clear();
             foreach ((string Question, string Answer) tuple in database)
             {
-                databaseContentListBox.Items.Add(tuple.Answer.ToLower() + " <---> " + tuple.Question);
+                tableContentListBox1.Items.Add(tuple.Answer.ToLower() + " <---> " + tuple.Question);
             }
         }
         /// <summary>
@@ -317,15 +319,20 @@ namespace MiniKreuzwortraetsel
         /// <param name="e"></param>
         private void editCollectionBTN_Click(object sender, EventArgs e)
         {
-            Button senderButton = sender as Button;
             Enabled = false;
-            string mode = "";
-            if (senderButton.Name == "editCollectionButton")
-                mode = "edit";
-            else
-                mode = "create";
-            EditCollectionForm editCollectionForm = new EditCollectionForm(this, mode);
+            EditCollectionForm editCollectionForm = new EditCollectionForm(this);
             editCollectionForm.Show();
+        }
+        private void newCollectionBTN_Click(object sender, EventArgs e)
+        {
+            Enabled = false;
+            NewCollectionForm newCollectionForm = new NewCollectionForm(this);
+            newCollectionForm.Show();
+        }
+
+        private void DeleteCollectionBTN_Click(object sender, EventArgs e)
+        {
+            MySqlQueries.DROP_TABLE();
         }
     }
 }

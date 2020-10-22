@@ -35,12 +35,13 @@
             this.button3 = new System.Windows.Forms.Button();
             this.newCollectionBTN = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.databaseContentListBox = new System.Windows.Forms.ListBox();
+            this.tableContentListBox1 = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.databaseMenu = new System.Windows.Forms.ComboBox();
+            this.tableMenu = new System.Windows.Forms.ComboBox();
             this.exportBTN = new System.Windows.Forms.Button();
             this.errorMessageLBL = new System.Windows.Forms.Label();
             this.popupLBL = new System.Windows.Forms.Label();
+            this.DeleteCollectionBTN = new System.Windows.Forms.Button();
             this.UIPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,26 +67,28 @@
             // UIPanel
             // 
             this.UIPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.UIPanel.Controls.Add(this.DeleteCollectionBTN);
             this.UIPanel.Controls.Add(this.editCollectionBTN);
             this.UIPanel.Controls.Add(this.button3);
             this.UIPanel.Controls.Add(this.newCollectionBTN);
             this.UIPanel.Controls.Add(this.button1);
-            this.UIPanel.Controls.Add(this.databaseContentListBox);
+            this.UIPanel.Controls.Add(this.tableContentListBox1);
             this.UIPanel.Controls.Add(this.label2);
-            this.UIPanel.Controls.Add(this.databaseMenu);
+            this.UIPanel.Controls.Add(this.tableMenu);
             this.UIPanel.Controls.Add(this.exportBTN);
             this.UIPanel.Controls.Add(this.errorMessageLBL);
             this.UIPanel.Controls.Add(this.label1);
             this.UIPanel.Controls.Add(this.baseWordTB);
             this.UIPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.UIPanel.Location = new System.Drawing.Point(931, 0);
+            this.UIPanel.Location = new System.Drawing.Point(762, 0);
             this.UIPanel.Margin = new System.Windows.Forms.Padding(4);
             this.UIPanel.Name = "UIPanel";
-            this.UIPanel.Size = new System.Drawing.Size(269, 658);
+            this.UIPanel.Size = new System.Drawing.Size(438, 658);
             this.UIPanel.TabIndex = 3;
             // 
             // editCollectionBTN
             // 
+            this.editCollectionBTN.Enabled = false;
             this.editCollectionBTN.Location = new System.Drawing.Point(144, 457);
             this.editCollectionBTN.Name = "editCollectionBTN";
             this.editCollectionBTN.Size = new System.Drawing.Size(117, 48);
@@ -105,13 +108,13 @@
             // 
             // newCollectionBTN
             // 
-            this.newCollectionBTN.Location = new System.Drawing.Point(132, 117);
+            this.newCollectionBTN.Location = new System.Drawing.Point(146, 117);
             this.newCollectionBTN.Name = "newCollectionBTN";
             this.newCollectionBTN.Size = new System.Drawing.Size(129, 29);
             this.newCollectionBTN.TabIndex = 5;
             this.newCollectionBTN.Text = "Neue Sammlung";
             this.newCollectionBTN.UseVisualStyleBackColor = true;
-            this.newCollectionBTN.Click += new System.EventHandler(this.editCollectionBTN_Click);
+            this.newCollectionBTN.Click += new System.EventHandler(this.newCollectionBTN_Click);
             // 
             // button1
             // 
@@ -122,15 +125,15 @@
             this.button1.Text = "Einfügen";
             this.button1.UseVisualStyleBackColor = true;
             // 
-            // databaseContentListBox
+            // tableContentListBox1
             // 
-            this.databaseContentListBox.FormattingEnabled = true;
-            this.databaseContentListBox.ItemHeight = 19;
-            this.databaseContentListBox.Location = new System.Drawing.Point(11, 153);
-            this.databaseContentListBox.Name = "databaseContentListBox";
-            this.databaseContentListBox.Size = new System.Drawing.Size(250, 289);
-            this.databaseContentListBox.TabIndex = 7;
-            this.databaseContentListBox.DoubleClick += new System.EventHandler(this.PutAnswerIntoCrossword);
+            this.tableContentListBox1.FormattingEnabled = true;
+            this.tableContentListBox1.ItemHeight = 19;
+            this.tableContentListBox1.Location = new System.Drawing.Point(10, 153);
+            this.tableContentListBox1.Name = "tableContentListBox1";
+            this.tableContentListBox1.Size = new System.Drawing.Size(418, 289);
+            this.tableContentListBox1.TabIndex = 7;
+            this.tableContentListBox1.DoubleClick += new System.EventHandler(this.PutAnswerIntoCrossword);
             // 
             // label2
             // 
@@ -141,20 +144,15 @@
             this.label2.TabIndex = 6;
             this.label2.Text = "Sammlung auswählen:";
             // 
-            // databaseMenu
+            // tableMenu
             // 
-            this.databaseMenu.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.databaseMenu.FormattingEnabled = true;
-            this.databaseMenu.Items.AddRange(new object[] {
-            "Physik",
-            "Geschichte",
-            "Lavie",
-            "Biologie"});
-            this.databaseMenu.Location = new System.Drawing.Point(11, 117);
-            this.databaseMenu.Name = "databaseMenu";
-            this.databaseMenu.Size = new System.Drawing.Size(112, 27);
-            this.databaseMenu.TabIndex = 5;
-            this.databaseMenu.SelectedIndexChanged += new System.EventHandler(this.databaseMenu_SelectedIndexChanged);
+            this.tableMenu.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tableMenu.FormattingEnabled = true;
+            this.tableMenu.Location = new System.Drawing.Point(11, 117);
+            this.tableMenu.Name = "tableMenu";
+            this.tableMenu.Size = new System.Drawing.Size(129, 27);
+            this.tableMenu.TabIndex = 5;
+            this.tableMenu.SelectedIndexChanged += new System.EventHandler(this.TableMenu_SelectedIndexChanged);
             // 
             // exportBTN
             // 
@@ -172,9 +170,11 @@
             this.errorMessageLBL.ForeColor = System.Drawing.Color.Red;
             this.errorMessageLBL.Location = new System.Drawing.Point(11, 61);
             this.errorMessageLBL.Name = "errorMessageLBL";
-            this.errorMessageLBL.Size = new System.Drawing.Size(256, 23);
+            this.errorMessageLBL.Size = new System.Drawing.Size(165, 23);
             this.errorMessageLBL.TabIndex = 3;
-            this.errorMessageLBL.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.errorMessageLBL.Text = "Lösungswort eingeben";
+            this.errorMessageLBL.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.errorMessageLBL.Visible = false;
             // 
             // popupLBL
             // 
@@ -184,6 +184,16 @@
             this.popupLBL.Size = new System.Drawing.Size(0, 19);
             this.popupLBL.TabIndex = 4;
             this.popupLBL.Visible = false;
+            // 
+            // DeleteCollectionBTN
+            // 
+            this.DeleteCollectionBTN.Location = new System.Drawing.Point(281, 118);
+            this.DeleteCollectionBTN.Name = "DeleteCollectionBTN";
+            this.DeleteCollectionBTN.Size = new System.Drawing.Size(146, 28);
+            this.DeleteCollectionBTN.TabIndex = 9;
+            this.DeleteCollectionBTN.Text = "Sammlung löschen";
+            this.DeleteCollectionBTN.UseVisualStyleBackColor = true;
+            this.DeleteCollectionBTN.Click += new System.EventHandler(this.DeleteCollectionBTN_Click);
             // 
             // Form1
             // 
@@ -196,6 +206,8 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "KreuzworträtselMacher";
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.Draw);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
             this.UIPanel.ResumeLayout(false);
             this.UIPanel.PerformLayout();
             this.ResumeLayout(false);
@@ -210,13 +222,14 @@
         private System.Windows.Forms.Label errorMessageLBL;
         private System.Windows.Forms.Label popupLBL;
         private System.Windows.Forms.Button exportBTN;
-        private System.Windows.Forms.ComboBox databaseMenu;
+        private System.Windows.Forms.ComboBox tableMenu;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ListBox databaseContentListBox;
+        private System.Windows.Forms.ListBox tableContentListBox1;
         private System.Windows.Forms.Button editCollectionBTN;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button newCollectionBTN;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button DeleteCollectionBTN;
     }
 }
 
