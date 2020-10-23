@@ -37,10 +37,31 @@ namespace MiniKreuzwortraetsel
             cmd.ExecuteNonQuery();
             conn.Close();
         }
-
-        public static void DROP_TABLE()
+        public static void DROP_TABLE(string table)
         {
-            throw new NotImplementedException();
+            conn.Open();
+            string query = " DROP TABLE " + table;
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            cmd.ExecuteNonQuery();
+            conn.Close();
+        }
+        public static List<string[]> SELECT(string table)
+        {
+            conn.Open();
+            string query = " SELECT * FROM " + table;
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            List<string[]> rows = new List<string[]>();
+            while (reader.Read())
+            {
+                rows.Add(new string[reader.FieldCount]);
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    rows.Last()[i] = reader.GetString(i);
+                }
+            }
+            conn.Close();
+            return rows;
         }
     }
 }

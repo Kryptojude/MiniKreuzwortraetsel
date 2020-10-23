@@ -26,13 +26,11 @@ namespace MiniKreuzwortraetsel
         List<int> yCoords = new List<int>();
 
         // TODO: Mark the base word visually
-        // TODO: integrate database somehow SQL?
         // TODO: export to docx
-        // TODO: choose different databases
         // TODO: add question/answer pair from interface
-        // TODO: show content of current database
         // TODO: Fill an answer into crossword at will
         // TODO: thumbnail
+        // TODO: Make general form class for a dialog window that returns a string from a text box (adapt newCollectionForm)
 
         public Form1()
         {
@@ -59,9 +57,12 @@ namespace MiniKreuzwortraetsel
         {
             // Extract answer and question from the listBox
             ListBox senderListBox = sender as ListBox;
-            string selectedItem = senderListBox.SelectedItem.ToString();
-            string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
-            (string Question, string Answer) tuple = (array[1], array[0]);
+            if (senderListBox.Items.Count > 0)
+            {
+                string selectedItem = senderListBox.SelectedItem.ToString();
+                string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
+                (string Question, string Answer) tuple = (array[1], array[0]);
+            }
         }
         private void ReadBaseWord(object sender, EventArgs e)
         {
@@ -304,19 +305,12 @@ namespace MiniKreuzwortraetsel
         }
         private void TableMenu_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Display question/answer pairs in list
             tableContentListBox1.Items.Clear();
-            foreach ((string Question, string Answer) tuple in database)
+            foreach (string[] row in MySqlQueries.SELECT((string)tableMenu.SelectedItem))
             {
-                tableContentListBox1.Items.Add(tuple.Answer.ToLower() + " <---> " + tuple.Question);
+                tableContentListBox1.Items.Add(row[1] + " <---> " + row[2]);
             }
         }
-        /// <summary>
-        /// Called by either new collection or edit collection button, 
-        /// opens the editCollectionForm and disables form1
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void editCollectionBTN_Click(object sender, EventArgs e)
         {
             Enabled = false;
@@ -329,10 +323,15 @@ namespace MiniKreuzwortraetsel
             NewCollectionForm newCollectionForm = new NewCollectionForm(this);
             newCollectionForm.Show();
         }
-
         private void DeleteCollectionBTN_Click(object sender, EventArgs e)
         {
-            MySqlQueries.DROP_TABLE();
+            string selectedTable = tableMenu.SelectedItem.ToString();
+            DialogResult result = MessageBox.Show("Sammlung '" + selectedTable + "' unwiderruflich löschen?", "Sammlung löschen", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+            if (result == DialogResult.Yes)
+            {
+                MySqlQueries.DROP_TABLE(selectedTable);
+                UpdateTableMenu();
+            }
         }
     }
 }

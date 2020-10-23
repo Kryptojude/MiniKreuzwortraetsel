@@ -31,6 +31,7 @@
             this.baseWordTB = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.UIPanel = new System.Windows.Forms.Panel();
+            this.DeleteCollectionBTN = new System.Windows.Forms.Button();
             this.editCollectionBTN = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.newCollectionBTN = new System.Windows.Forms.Button();
@@ -41,7 +42,6 @@
             this.exportBTN = new System.Windows.Forms.Button();
             this.errorMessageLBL = new System.Windows.Forms.Label();
             this.popupLBL = new System.Windows.Forms.Label();
-            this.DeleteCollectionBTN = new System.Windows.Forms.Button();
             this.UIPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -86,14 +86,24 @@
             this.UIPanel.Size = new System.Drawing.Size(438, 658);
             this.UIPanel.TabIndex = 3;
             // 
+            // DeleteCollectionBTN
+            // 
+            this.DeleteCollectionBTN.Location = new System.Drawing.Point(281, 118);
+            this.DeleteCollectionBTN.Name = "DeleteCollectionBTN";
+            this.DeleteCollectionBTN.Size = new System.Drawing.Size(146, 28);
+            this.DeleteCollectionBTN.TabIndex = 9;
+            this.DeleteCollectionBTN.Text = "Sammlung löschen";
+            this.DeleteCollectionBTN.UseVisualStyleBackColor = true;
+            this.DeleteCollectionBTN.Click += new System.EventHandler(this.DeleteCollectionBTN_Click);
+            // 
             // editCollectionBTN
             // 
             this.editCollectionBTN.Enabled = false;
             this.editCollectionBTN.Location = new System.Drawing.Point(144, 457);
             this.editCollectionBTN.Name = "editCollectionBTN";
-            this.editCollectionBTN.Size = new System.Drawing.Size(117, 48);
+            this.editCollectionBTN.Size = new System.Drawing.Size(73, 48);
             this.editCollectionBTN.TabIndex = 5;
-            this.editCollectionBTN.Text = "Sammlung bearbeiten";
+            this.editCollectionBTN.Text = "Neuer Eintrag";
             this.editCollectionBTN.UseVisualStyleBackColor = true;
             this.editCollectionBTN.Click += new System.EventHandler(this.editCollectionBTN_Click);
             // 
@@ -184,16 +194,6 @@
             this.popupLBL.Size = new System.Drawing.Size(0, 19);
             this.popupLBL.TabIndex = 4;
             this.popupLBL.Visible = false;
-            // 
-            // DeleteCollectionBTN
-            // 
-            this.DeleteCollectionBTN.Location = new System.Drawing.Point(281, 118);
-            this.DeleteCollectionBTN.Name = "DeleteCollectionBTN";
-            this.DeleteCollectionBTN.Size = new System.Drawing.Size(146, 28);
-            this.DeleteCollectionBTN.TabIndex = 9;
-            this.DeleteCollectionBTN.Text = "Sammlung löschen";
-            this.DeleteCollectionBTN.UseVisualStyleBackColor = true;
-            this.DeleteCollectionBTN.Click += new System.EventHandler(this.DeleteCollectionBTN_Click);
             // 
             // Form1
             // 
