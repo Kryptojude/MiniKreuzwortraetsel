@@ -32,7 +32,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.UIPanel = new System.Windows.Forms.Panel();
             this.DeleteCollectionBTN = new System.Windows.Forms.Button();
-            this.editCollectionBTN = new System.Windows.Forms.Button();
+            this.newTupleBTN = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.newCollectionBTN = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
@@ -68,7 +68,7 @@
             // 
             this.UIPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.UIPanel.Controls.Add(this.DeleteCollectionBTN);
-            this.UIPanel.Controls.Add(this.editCollectionBTN);
+            this.UIPanel.Controls.Add(this.newTupleBTN);
             this.UIPanel.Controls.Add(this.button3);
             this.UIPanel.Controls.Add(this.newCollectionBTN);
             this.UIPanel.Controls.Add(this.button1);
@@ -96,16 +96,16 @@
             this.DeleteCollectionBTN.UseVisualStyleBackColor = true;
             this.DeleteCollectionBTN.Click += new System.EventHandler(this.DeleteCollectionBTN_Click);
             // 
-            // editCollectionBTN
+            // newTupleBTN
             // 
-            this.editCollectionBTN.Enabled = false;
-            this.editCollectionBTN.Location = new System.Drawing.Point(144, 457);
-            this.editCollectionBTN.Name = "editCollectionBTN";
-            this.editCollectionBTN.Size = new System.Drawing.Size(73, 48);
-            this.editCollectionBTN.TabIndex = 5;
-            this.editCollectionBTN.Text = "Neuer Eintrag";
-            this.editCollectionBTN.UseVisualStyleBackColor = true;
-            this.editCollectionBTN.Click += new System.EventHandler(this.editCollectionBTN_Click);
+            this.newTupleBTN.Enabled = false;
+            this.newTupleBTN.Location = new System.Drawing.Point(144, 457);
+            this.newTupleBTN.Name = "newTupleBTN";
+            this.newTupleBTN.Size = new System.Drawing.Size(73, 48);
+            this.newTupleBTN.TabIndex = 5;
+            this.newTupleBTN.Text = "Neuer Eintrag";
+            this.newTupleBTN.UseVisualStyleBackColor = true;
+            this.newTupleBTN.Click += new System.EventHandler(this.newTupleBTN_Click);
             // 
             // button3
             // 
@@ -225,7 +225,7 @@
         private System.Windows.Forms.ComboBox tableMenu;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ListBox tableContentListBox1;
-        private System.Windows.Forms.Button editCollectionBTN;
+        private System.Windows.Forms.Button newTupleBTN;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button newCollectionBTN;
         private System.Windows.Forms.Button button1;

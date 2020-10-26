@@ -30,12 +30,11 @@ namespace MiniKreuzwortraetsel
         // TODO: add question/answer pair from interface
         // TODO: Fill an answer into crossword at will
         // TODO: thumbnail
-        // TODO: Make general form class for a dialog window that returns a string from a text box (adapt newCollectionForm)
 
         public Form1()
         {
             InitializeComponent();
-            FetchDatabase();
+
 
             // Some UI Settings
             UpdateTableMenu();
@@ -50,7 +49,7 @@ namespace MiniKreuzwortraetsel
             if (tableMenu.Items.Count > 0)
             {
                 tableMenu.SelectedIndex = 0;
-                editCollectionBTN.Enabled = true;
+                newTupleBTN.Enabled = true;
             }
         }
         private void PutAnswerIntoCrossword(object sender, EventArgs e)
@@ -305,23 +304,76 @@ namespace MiniKreuzwortraetsel
         }
         private void TableMenu_SelectedIndexChanged(object sender, EventArgs e)
         {
+            UpdateTableContentListBox();
+        }
+        private void UpdateTableContentListBox()
+        {
             tableContentListBox1.Items.Clear();
             foreach (string[] row in MySqlQueries.SELECT((string)tableMenu.SelectedItem))
             {
                 tableContentListBox1.Items.Add(row[1] + " <---> " + row[2]);
             }
         }
-        private void editCollectionBTN_Click(object sender, EventArgs e)
+        private void newTupleBTN_Click(object sender, EventArgs e)
         {
-            Enabled = false;
-            EditCollectionForm editCollectionForm = new EditCollectionForm(this);
-            editCollectionForm.Show();
+            TextDialogForm textDialogForm = new TextDialogForm(2, "Eintrag in \"" + (string)tableMenu.SelectedItem +  "\" hinzufügen", new string[] { "Frage eingeben: ", "Antwort eingeben: " }, "Eintrag hinzufügen", "");
+            bool error = true;
+            while (error)
+                if (textDialogForm.ShowDialog() == DialogResult.OK)
+                {
+                    if (textDialogForm.userInputs[0] != "" && textDialogForm.userInputs[0] != "")
+                    {
+                        MySqlQueries.INSERT( (string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, new string[] { textDialogForm.userInputs[0], textDialogForm.userInputs[1] } );
+                        error = false;
+                        UpdateTableContentListBox();
+                    }
+                    // error
+                    else
+                        textDialogForm.errorLBL.Text = "Beide Felder ausfüllen";
+                }
+                // Exited dialog
+                else
+                    error = false;
         }
+        /// <summary>
+        /// Show user dialog and create new collection
+        /// </summary>
         private void newCollectionBTN_Click(object sender, EventArgs e)
         {
-            Enabled = false;
-            NewCollectionForm newCollectionForm = new NewCollectionForm(this);
-            newCollectionForm.Show();
+            TextDialogForm textDialogForm = new TextDialogForm(1, "Neue Sammlung erstellen", new string[] { "Name der Sammlung:" }, "Erstellen", "");
+            bool error = true;
+            while (error)
+                if (textDialogForm.ShowDialog(this) == DialogResult.OK)
+                {
+                    string userInput = textDialogForm.userInputs[0];
+                    if (userInput != "")
+                    {
+                        // Check if name is available
+                        bool available = true;
+                        foreach (var item in MySqlQueries.SHOW_TABLES())
+                        {
+                            if (item == userInput)
+                                available = false;
+                        }
+
+                        if (available)
+                        {
+                            // success
+                            MySqlQueries.CREATE_TABLE(userInput);
+                            UpdateTableMenu();
+                            error = false;
+                        }
+                        // error
+                        else
+                            textDialogForm.errorLBL.Text = "Existiert bereits";
+                    }
+                    // error
+                    else
+                        textDialogForm.errorLBL.Text = "Name eingeben";
+                }
+                // Exited dialog
+                else
+                    error = false;
         }
         private void DeleteCollectionBTN_Click(object sender, EventArgs e)
         {
