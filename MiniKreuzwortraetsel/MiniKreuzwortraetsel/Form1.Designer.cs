@@ -34,10 +34,10 @@
             this.deleteTupleBTN = new System.Windows.Forms.Button();
             this.deleteCollectionBTN = new System.Windows.Forms.Button();
             this.newTupleBTN = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
+            this.insertTupleBTN = new System.Windows.Forms.Button();
             this.newCollectionBTN = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.tableContentListBox1 = new System.Windows.Forms.ListBox();
+            this.tuplesListBox = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tableMenu = new System.Windows.Forms.ComboBox();
             this.exportBTN = new System.Windows.Forms.Button();
@@ -71,10 +71,10 @@
             this.UIPanel.Controls.Add(this.deleteTupleBTN);
             this.UIPanel.Controls.Add(this.deleteCollectionBTN);
             this.UIPanel.Controls.Add(this.newTupleBTN);
-            this.UIPanel.Controls.Add(this.button3);
+            this.UIPanel.Controls.Add(this.insertTupleBTN);
             this.UIPanel.Controls.Add(this.newCollectionBTN);
             this.UIPanel.Controls.Add(this.button1);
-            this.UIPanel.Controls.Add(this.tableContentListBox1);
+            this.UIPanel.Controls.Add(this.tuplesListBox);
             this.UIPanel.Controls.Add(this.label2);
             this.UIPanel.Controls.Add(this.tableMenu);
             this.UIPanel.Controls.Add(this.exportBTN);
@@ -121,14 +121,15 @@
             this.newTupleBTN.UseVisualStyleBackColor = true;
             this.newTupleBTN.Click += new System.EventHandler(this.NewTupleBTN_Click);
             // 
-            // button3
+            // insertTupleBTN
             // 
-            this.button3.Location = new System.Drawing.Point(15, 457);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(111, 48);
-            this.button3.TabIndex = 5;
-            this.button3.Text = "Auswahl einfügen";
-            this.button3.UseVisualStyleBackColor = true;
+            this.insertTupleBTN.Location = new System.Drawing.Point(15, 457);
+            this.insertTupleBTN.Name = "insertTupleBTN";
+            this.insertTupleBTN.Size = new System.Drawing.Size(111, 48);
+            this.insertTupleBTN.TabIndex = 5;
+            this.insertTupleBTN.Text = "Auswahl einfügen";
+            this.insertTupleBTN.UseVisualStyleBackColor = true;
+            this.insertTupleBTN.Click += new System.EventHandler(this.PutAnswerIntoCrossword);
             // 
             // newCollectionBTN
             // 
@@ -151,13 +152,13 @@
             // 
             // tableContentListBox1
             // 
-            this.tableContentListBox1.FormattingEnabled = true;
-            this.tableContentListBox1.ItemHeight = 19;
-            this.tableContentListBox1.Location = new System.Drawing.Point(10, 153);
-            this.tableContentListBox1.Name = "tableContentListBox1";
-            this.tableContentListBox1.Size = new System.Drawing.Size(418, 289);
-            this.tableContentListBox1.TabIndex = 7;
-            this.tableContentListBox1.DoubleClick += new System.EventHandler(this.PutAnswerIntoCrossword);
+            this.tuplesListBox.FormattingEnabled = true;
+            this.tuplesListBox.ItemHeight = 19;
+            this.tuplesListBox.Location = new System.Drawing.Point(10, 153);
+            this.tuplesListBox.Name = "tableContentListBox1";
+            this.tuplesListBox.Size = new System.Drawing.Size(418, 289);
+            this.tuplesListBox.TabIndex = 7;
+            this.tuplesListBox.DoubleClick += new System.EventHandler(this.PutAnswerIntoCrossword);
             // 
             // label2
             // 
@@ -238,9 +239,9 @@
         private System.Windows.Forms.Button exportBTN;
         private System.Windows.Forms.ComboBox tableMenu;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ListBox tableContentListBox1;
+        private System.Windows.Forms.ListBox tuplesListBox;
         private System.Windows.Forms.Button newTupleBTN;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button insertTupleBTN;
         private System.Windows.Forms.Button newCollectionBTN;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button deleteCollectionBTN;

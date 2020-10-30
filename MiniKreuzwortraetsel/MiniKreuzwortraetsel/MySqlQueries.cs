@@ -132,5 +132,21 @@ namespace MiniKreuzwortraetsel
 
             conn.Close();
         }
+        /// <summary>
+        /// Deletes entire row where column has certain value
+        /// </summary>
+        /// <param name="table">Which table to query</param>
+        /// <param name="column">Which column to look for value</param>
+        /// <param name="value">Row with this value in column will be deleted</param>
+        public static void DELETE(string table, string column, string value)
+        {
+            conn.Open();
+            string query = "DELETE FROM " + table + "\n" +
+                           "WHERE " + column + " = '" + value + "'";
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
+        }
     }
 }

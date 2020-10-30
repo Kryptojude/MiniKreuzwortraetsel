@@ -61,6 +61,7 @@ namespace MiniKreuzwortraetsel
                 deleteCollectionBTN.Enabled = false;
             }
         }
+        // TODO: This is called by button as well as listbox, so catch the different senders
         private void PutAnswerIntoCrossword(object sender, EventArgs e)
         {
             // Extract answer and question from the listBox
@@ -226,12 +227,12 @@ namespace MiniKreuzwortraetsel
         }
         private void UpdateTuples(object sender, EventArgs e)
         {
-            tableContentListBox1.Items.Clear();
+            tuplesListBox.Items.Clear();
             foreach (string[] row in MySqlQueries.SELECT((string)tableMenu.SelectedItem, "Question", true))
             {
-                tableContentListBox1.Items.Add(row[1] + " <---> " + row[2]);
+                tuplesListBox.Items.Add(row[1] + " <---> " + row[2]);
             }
-            if (tableContentListBox1.Items.Count > 0)
+            if (tuplesListBox.Items.Count > 0)
                 deleteTupleBTN.Enabled = true;
             else
                 deleteTupleBTN.Enabled = false;
@@ -257,10 +258,10 @@ namespace MiniKreuzwortraetsel
                 else
                     error = false;
         }
-        // TODO: When entry is deleted, the ID of that entry is missing
+        // TODO: Ids are not continuous
         private void DeleteTupleBTN_Click(object sender, EventArgs e)
         {
-            MySqlQueries.DELETE((string)tableMenu.SelectedItem, "ID", tableMenu.SelectedIndex + 1);
+            MySqlQueries.DELETE((string)tableMenu.SelectedItem, "Question", tuplesListBox.SelectedItem.ToString().Split(new string[] { " <---> " }, StringSplitOptions.None)[0]);
             UpdateTuples(null, null);
         }
         /// <summary>
