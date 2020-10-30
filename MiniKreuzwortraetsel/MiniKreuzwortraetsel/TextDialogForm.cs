@@ -25,8 +25,14 @@ namespace MiniKreuzwortraetsel
         public TextDialogForm(int numberOfTextBoxes, string title, string[] messages, string buttonText, string errorMsg)
         {
             InitializeComponent();
+            Location = new Point(0,0);
             Text = title;
+            button1.Text = buttonText;
+            errorLBL.Text = errorMsg;
 
+            int controlMargin = 5;
+            int windowMargin = 12;
+            int windowBorderHeight = 39;
 
             // Create textBoxes and labels
             textBoxes = new TextBox[numberOfTextBoxes];
@@ -37,18 +43,18 @@ namespace MiniKreuzwortraetsel
                 textBoxes[i] = new TextBox();
                 labels[i] = new Label {
                     Text = messages[i],
-                    Location = new Point(12, i * (5 + 19 + 26) + 12),
+                    Width = this.Width,
                 };
-                textBoxes[i].Location = new Point(labels[i].Location.X, labels[i].Location.Y + labels[i].Height);
+                labels[i].Location = new Point(windowMargin, i * (labels[0].Height + controlMargin + textBoxes[0].Height + controlMargin) + windowMargin);
+                textBoxes[i].Location = new Point(windowMargin, labels[i].Location.Y + labels[0].Height + controlMargin);
                 
                 Controls.Add(textBoxes[i]);
                 Controls.Add(labels[i]);
             }
 
-            button1.Text = buttonText;
-            errorLBL.Text = errorMsg;
+            errorLBL.Location = new Point(windowMargin, textBoxes.Last().Location.Y + textBoxes[0].Height + controlMargin);
 
-            Height = numberOfTextBoxes * (textBoxes[0].Height + labels[0].Height) + errorLBL.Height + 39 + 12 + 12;
+            Height = windowBorderHeight + windowMargin + numberOfTextBoxes * (labels[0].Height + controlMargin + textBoxes[0].Height + controlMargin) + controlMargin + errorLBL.Height + windowMargin;
             ActiveControl = textBoxes[0];
         }
         /// <summary>

@@ -28,15 +28,13 @@ namespace MiniKreuzwortraetsel
         // TODO: Mark the base word visually
         // TODO: export to docx
         // TODO: add question/answer pair from interface
-        // TODO: Fill an answer into crossword at will
         // TODO: thumbnail
 
         public Form1()
         {
             InitializeComponent();
 
-
-            // Some UI Settings
+            // Fill tableMenu with the tables in database
             UpdateTableMenu();
         }
         public void UpdateTableMenu()
@@ -46,10 +44,21 @@ namespace MiniKreuzwortraetsel
             {
                 tableMenu.Items.Add(item);
             }
+            // At least 1 table
             if (tableMenu.Items.Count > 0)
             {
                 tableMenu.SelectedIndex = 0;
+                // Event UpdateTuples() is called
+
                 newTupleBTN.Enabled = true;
+                deleteCollectionBTN.Enabled = true;
+            }
+            // No tables
+            else
+            {
+                newTupleBTN.Enabled = false;
+                deleteTupleBTN.Enabled = false;
+                deleteCollectionBTN.Enabled = false;
             }
         }
         private void PutAnswerIntoCrossword(object sender, EventArgs e)
@@ -178,93 +187,6 @@ namespace MiniKreuzwortraetsel
             }
             database.Remove(tuple);
         }
-        private void FetchDatabase()
-        {
-            StreamReader reader = new StreamReader("database.txt");
-            string line = reader.ReadLine();
-            while (line != null)
-            {
-                string question = line.Substring(0, line.IndexOf(';'));
-                string answer = line.Substring(line.IndexOf(';') + 1);
-                database.Add((question, answer));
-                line = reader.ReadLine();
-            }
-        }
-        private void ScrambleDatabase()
-        {
-            List<(string Question, string Answer)> database2 = new List<(string Question, string Answer)>();
-            for (int i = 0; i < database.Count; i++)
-            {
-                database2.Add(("", ""));
-            }
-
-            for (int i = 0; i < database.Count; i++)
-            {
-                while (true)
-                {
-                    int randomSpot = random.Next(database2.Count);
-                    if (database2[randomSpot].Answer == "")
-                    {
-                        database2[randomSpot] = database[i];
-                        break;
-                    }
-                }
-            }
-
-            database = database2;
-        }
-        private void Draw(object sender, PaintEventArgs e)
-        {
-            e.Graphics.TranslateTransform(gridOrigin.X, gridOrigin.Y);
-            if (grid != null)
-                for (int y = 0; y < grid.GetLength(0); y++)
-                {
-                    for (int x = 0; x < grid.GetLength(1); x++)
-                    {
-                        if (grid[y, x] != null)
-                        {
-                            Size textSize = TextRenderer.MeasureText(grid[y, x], Font);
-                            if (grid[y, x].Contains("►") ||
-                                grid[y, x].Contains("▼"))
-                            { // question tile
-                                e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts, ts);
-                                e.Graphics.DrawString(grid[y, x], Font, Brushes.Red, x * ts + ts / 2 - textSize.Width / 2, y * ts + ts / 2 - textSize.Height / 2);
-                            }
-                            else if (grid[y, x] == "blocked")
-                            { // blocked tile
-                                e.Graphics.FillRectangle(Brushes.Black, x * ts, y * ts, ts, ts);
-                            }
-                            else
-                            { // letter tile
-                                e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts, ts);
-                                e.Graphics.DrawString(grid[y, x], Font, Brushes.DarkBlue, x * ts + ts / 2 - textSize.Width / 2, y * ts + ts / 2 - textSize.Height / 2);
-                            }
-                        }
-                    }
-                }
-        }
-        /// <summary>
-        /// Hover effect
-        /// </summary>
-        private void Form1_MouseMove(object sender, MouseEventArgs e)
-        {
-            // The tile the mouse is hovering over: 
-            int tileX = (e.X - gridOrigin.X) / ts;
-            int tileY = (e.Y - gridOrigin.Y) / ts;
-            // Out of bounds check
-            if (tileX >= 0 && tileY >= 0 &&
-                tileX <= grid?.GetUpperBound(1) && tileY <= grid?.GetUpperBound(0) )
-                if (grid?[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts]?.Contains('►') == true)
-                {
-                    int questionIndex = Convert.ToInt32(grid[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts][0].ToString()) - 1;
-                    string popupText = questions[questionIndex];
-                    popupLBL.Text = popupText;
-                    popupLBL.Location = new Point(e.X + ts/2, e.Y - ts/2);
-                    popupLBL.Visible = true;
-                }
-                else
-                    popupLBL.Visible = false;
-        }
         private void ExportToDocx(object sender, EventArgs e)
         {
             if (grid != null)
@@ -302,30 +224,30 @@ namespace MiniKreuzwortraetsel
             }
             else errorMessageLBL.Text = "Zuerst Kreuzworträtsel machen";
         }
-        private void TableMenu_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            UpdateTableContentListBox();
-        }
-        private void UpdateTableContentListBox()
+        private void UpdateTuples(object sender, EventArgs e)
         {
             tableContentListBox1.Items.Clear();
-            foreach (string[] row in MySqlQueries.SELECT((string)tableMenu.SelectedItem))
+            foreach (string[] row in MySqlQueries.SELECT((string)tableMenu.SelectedItem, "Question", true))
             {
                 tableContentListBox1.Items.Add(row[1] + " <---> " + row[2]);
             }
+            if (tableContentListBox1.Items.Count > 0)
+                deleteTupleBTN.Enabled = true;
+            else
+                deleteTupleBTN.Enabled = false;
         }
-        private void newTupleBTN_Click(object sender, EventArgs e)
+        private void NewTupleBTN_Click(object sender, EventArgs e)
         {
-            TextDialogForm textDialogForm = new TextDialogForm(2, "Eintrag in \"" + (string)tableMenu.SelectedItem +  "\" hinzufügen", new string[] { "Frage eingeben: ", "Antwort eingeben: " }, "Eintrag hinzufügen", "");
+            TextDialogForm textDialogForm = new TextDialogForm(2, "Eintrag in \"" + (string)tableMenu.SelectedItem + "\" hinzufügen", new string[] { "Frage eingeben: ", "Antwort eingeben: " }, "Eintrag hinzufügen", "");
             bool error = true;
             while (error)
-                if (textDialogForm.ShowDialog() == DialogResult.OK)
+                if (textDialogForm.ShowDialog(this) == DialogResult.OK)
                 {
-                    if (textDialogForm.userInputs[0] != "" && textDialogForm.userInputs[0] != "")
+                    if (textDialogForm.userInputs[0] != "" && textDialogForm.userInputs[1] != "")
                     {
                         MySqlQueries.INSERT( (string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, new string[] { textDialogForm.userInputs[0], textDialogForm.userInputs[1] } );
                         error = false;
-                        UpdateTableContentListBox();
+                        UpdateTuples(null, null);
                     }
                     // error
                     else
@@ -335,10 +257,16 @@ namespace MiniKreuzwortraetsel
                 else
                     error = false;
         }
+        // TODO: When entry is deleted, the ID of that entry is missing
+        private void DeleteTupleBTN_Click(object sender, EventArgs e)
+        {
+            MySqlQueries.DELETE((string)tableMenu.SelectedItem, "ID", tableMenu.SelectedIndex + 1);
+            UpdateTuples(null, null);
+        }
         /// <summary>
         /// Show user dialog and create new collection
         /// </summary>
-        private void newCollectionBTN_Click(object sender, EventArgs e)
+        private void NewCollectionBTN_Click(object sender, EventArgs e)
         {
             TextDialogForm textDialogForm = new TextDialogForm(1, "Neue Sammlung erstellen", new string[] { "Name der Sammlung:" }, "Erstellen", "");
             bool error = true;
@@ -384,6 +312,58 @@ namespace MiniKreuzwortraetsel
                 MySqlQueries.DROP_TABLE(selectedTable);
                 UpdateTableMenu();
             }
+        }
+        /// <summary>
+        /// Hover effect
+        /// </summary>
+        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        {
+            // The tile the mouse is hovering over: 
+            int tileX = (e.X - gridOrigin.X) / ts;
+            int tileY = (e.Y - gridOrigin.Y) / ts;
+            // Out of bounds check
+            if (tileX >= 0 && tileY >= 0 &&
+                tileX <= grid?.GetUpperBound(1) && tileY <= grid?.GetUpperBound(0) )
+                if (grid?[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts]?.Contains('►') == true)
+                {
+                    int questionIndex = Convert.ToInt32(grid[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts][0].ToString()) - 1;
+                    string popupText = questions[questionIndex];
+                    popupLBL.Text = popupText;
+                    popupLBL.Location = new Point(e.X + ts/2, e.Y - ts/2);
+                    popupLBL.Visible = true;
+                }
+                else
+                    popupLBL.Visible = false;
+        }
+        private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.TranslateTransform(gridOrigin.X, gridOrigin.Y);
+            if (grid != null)
+                for (int y = 0; y < grid.GetLength(0); y++)
+                {
+                    for (int x = 0; x < grid.GetLength(1); x++)
+                    {
+                        if (grid[y, x] != null)
+                        {
+                            Size textSize = TextRenderer.MeasureText(grid[y, x], Font);
+                            if (grid[y, x].Contains("►") ||
+                                grid[y, x].Contains("▼"))
+                            { // question tile
+                                e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts, ts);
+                                e.Graphics.DrawString(grid[y, x], Font, Brushes.Red, x * ts + ts / 2 - textSize.Width / 2, y * ts + ts / 2 - textSize.Height / 2);
+                            }
+                            else if (grid[y, x] == "blocked")
+                            { // blocked tile
+                                e.Graphics.FillRectangle(Brushes.Black, x * ts, y * ts, ts, ts);
+                            }
+                            else
+                            { // letter tile
+                                e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts, ts);
+                                e.Graphics.DrawString(grid[y, x], Font, Brushes.DarkBlue, x * ts + ts / 2 - textSize.Width / 2, y * ts + ts / 2 - textSize.Height / 2);
+                            }
+                        }
+                    }
+                }
         }
     }
 }

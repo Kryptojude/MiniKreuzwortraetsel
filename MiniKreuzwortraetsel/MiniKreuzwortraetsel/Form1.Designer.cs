@@ -31,7 +31,8 @@
             this.baseWordTB = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.UIPanel = new System.Windows.Forms.Panel();
-            this.DeleteCollectionBTN = new System.Windows.Forms.Button();
+            this.deleteTupleBTN = new System.Windows.Forms.Button();
+            this.deleteCollectionBTN = new System.Windows.Forms.Button();
             this.newTupleBTN = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.newCollectionBTN = new System.Windows.Forms.Button();
@@ -67,7 +68,8 @@
             // UIPanel
             // 
             this.UIPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.UIPanel.Controls.Add(this.DeleteCollectionBTN);
+            this.UIPanel.Controls.Add(this.deleteTupleBTN);
+            this.UIPanel.Controls.Add(this.deleteCollectionBTN);
             this.UIPanel.Controls.Add(this.newTupleBTN);
             this.UIPanel.Controls.Add(this.button3);
             this.UIPanel.Controls.Add(this.newCollectionBTN);
@@ -86,15 +88,27 @@
             this.UIPanel.Size = new System.Drawing.Size(438, 658);
             this.UIPanel.TabIndex = 3;
             // 
-            // DeleteCollectionBTN
+            // deleteTupleBTN
             // 
-            this.DeleteCollectionBTN.Location = new System.Drawing.Point(281, 118);
-            this.DeleteCollectionBTN.Name = "DeleteCollectionBTN";
-            this.DeleteCollectionBTN.Size = new System.Drawing.Size(146, 28);
-            this.DeleteCollectionBTN.TabIndex = 9;
-            this.DeleteCollectionBTN.Text = "Sammlung löschen";
-            this.DeleteCollectionBTN.UseVisualStyleBackColor = true;
-            this.DeleteCollectionBTN.Click += new System.EventHandler(this.DeleteCollectionBTN_Click);
+            this.deleteTupleBTN.Enabled = false;
+            this.deleteTupleBTN.Location = new System.Drawing.Point(234, 457);
+            this.deleteTupleBTN.Name = "deleteTupleBTN";
+            this.deleteTupleBTN.Size = new System.Drawing.Size(71, 48);
+            this.deleteTupleBTN.TabIndex = 10;
+            this.deleteTupleBTN.Text = "Eintrag löschen";
+            this.deleteTupleBTN.UseVisualStyleBackColor = true;
+            this.deleteTupleBTN.Click += new System.EventHandler(this.DeleteTupleBTN_Click);
+            // 
+            // deleteCollectionBTN
+            // 
+            this.deleteCollectionBTN.Enabled = false;
+            this.deleteCollectionBTN.Location = new System.Drawing.Point(281, 118);
+            this.deleteCollectionBTN.Name = "deleteCollectionBTN";
+            this.deleteCollectionBTN.Size = new System.Drawing.Size(146, 28);
+            this.deleteCollectionBTN.TabIndex = 9;
+            this.deleteCollectionBTN.Text = "Sammlung löschen";
+            this.deleteCollectionBTN.UseVisualStyleBackColor = true;
+            this.deleteCollectionBTN.Click += new System.EventHandler(this.DeleteCollectionBTN_Click);
             // 
             // newTupleBTN
             // 
@@ -105,7 +119,7 @@
             this.newTupleBTN.TabIndex = 5;
             this.newTupleBTN.Text = "Neuer Eintrag";
             this.newTupleBTN.UseVisualStyleBackColor = true;
-            this.newTupleBTN.Click += new System.EventHandler(this.newTupleBTN_Click);
+            this.newTupleBTN.Click += new System.EventHandler(this.NewTupleBTN_Click);
             // 
             // button3
             // 
@@ -124,7 +138,7 @@
             this.newCollectionBTN.TabIndex = 5;
             this.newCollectionBTN.Text = "Neue Sammlung";
             this.newCollectionBTN.UseVisualStyleBackColor = true;
-            this.newCollectionBTN.Click += new System.EventHandler(this.newCollectionBTN_Click);
+            this.newCollectionBTN.Click += new System.EventHandler(this.NewCollectionBTN_Click);
             // 
             // button1
             // 
@@ -162,7 +176,7 @@
             this.tableMenu.Name = "tableMenu";
             this.tableMenu.Size = new System.Drawing.Size(129, 27);
             this.tableMenu.TabIndex = 5;
-            this.tableMenu.SelectedIndexChanged += new System.EventHandler(this.TableMenu_SelectedIndexChanged);
+            this.tableMenu.SelectedIndexChanged += new System.EventHandler(this.UpdateTuples);
             // 
             // exportBTN
             // 
@@ -206,7 +220,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "KreuzworträtselMacher";
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.Draw);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
             this.UIPanel.ResumeLayout(false);
             this.UIPanel.PerformLayout();
@@ -229,7 +243,8 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button newCollectionBTN;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button DeleteCollectionBTN;
+        private System.Windows.Forms.Button deleteCollectionBTN;
+        private System.Windows.Forms.Button deleteTupleBTN;
     }
 }
 

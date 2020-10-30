@@ -46,10 +46,40 @@ namespace MiniKreuzwortraetsel
             cmd.ExecuteNonQuery();
             conn.Close();
         }
+        /// <summary>
+        /// Selects everything from table
+        /// </summary>
+        /// <param name="table">Which table to query</param>
         public static List<string[]> SELECT(string table)
         {
             conn.Open();
             string query = " SELECT * FROM " + table;
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            List<string[]> rows = new List<string[]>();
+            while (reader.Read())
+            {
+                rows.Add(new string[reader.FieldCount]);
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    rows.Last()[i] = reader.GetString(i);
+                }
+            }
+            conn.Close();
+            return rows;
+        }
+        /// <summary>
+        /// Selects everything from table, ordered by column
+        /// </summary>
+        /// <param name="table">Which table to query</param>
+        /// <param name="orderByColumn">Which column to order by</param>
+        /// <param name="ascending">true for asc, false for desc</param>
+        public static List<string[]> SELECT(string table, string orderByColumn, bool ascending)
+        {
+            conn.Open();
+            string direction = ascending == true ? " ASC":" DESC";
+            string query = " SELECT * FROM " + table + "\n" +
+                           "ORDER BY " + orderByColumn + direction;
             MySqlCommand cmd = new MySqlCommand(query, conn);
             MySqlDataReader reader = cmd.ExecuteReader();
             List<string[]> rows = new List<string[]>();
@@ -81,6 +111,22 @@ namespace MiniKreuzwortraetsel
             query = query.Substring(0, query.Length - 2); // removes last comma
             query += ")";
 
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
+        }
+        /// <summary>
+        /// Deletes entire row where column has certain value
+        /// </summary>
+        /// <param name="table">Which table to query</param>
+        /// <param name="column">Which column to look for value</param>
+        /// <param name="value">Row with this value in column will be deleted</param>
+        public static void DELETE(string table, string column, int value)
+        {
+            conn.Open();
+            string query = "DELETE FROM " + table + "\n" +
+                           "WHERE " + column + " = " + value;
             MySqlCommand cmd = new MySqlCommand(query, conn);
             cmd.ExecuteNonQuery();
 
