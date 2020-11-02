@@ -15,7 +15,7 @@ namespace MiniKreuzwortraetsel
 {
     public partial class Form1 : Form
     {
-        string[,] grid;
+        string[,] grid = new string[20,20];
         Point gridOrigin = new Point();
         List<(string, string)> database = new List<(string, string)>();
         List<string> questions = new List<string>();
@@ -27,9 +27,10 @@ namespace MiniKreuzwortraetsel
 
         // TODO: Mark the base word visually
         // TODO: export to docx
-        // TODO: add question/answer pair from interface
         // TODO: thumbnail
 
+        // TODO: Check if tile after answer is free
+        // TODO: Implement helping term
         public Form1()
         {
             InitializeComponent();
@@ -56,23 +57,128 @@ namespace MiniKreuzwortraetsel
             // No tables
             else
             {
+                insertTupleBTN.Enabled = false;
                 newTupleBTN.Enabled = false;
                 deleteTupleBTN.Enabled = false;
                 deleteCollectionBTN.Enabled = false;
             }
         }
-        // TODO: This is called by button as well as listbox, so catch the different senders
+        private void UpdateTuples(object sender, EventArgs e)
+        {
+            tuplesListBox.Items.Clear();
+            foreach (string[] row in MySqlQueries.SELECT((string)tableMenu.SelectedItem, "Question", true))
+            {
+                tuplesListBox.Items.Add(row[1] + " <---> " + row[2]);
+            }
+            // At least 1 tuple in table
+            if (tuplesListBox.Items.Count > 0)
+            {
+                tuplesListBox.SelectedIndex = 0;
+                deleteTupleBTN.Enabled = true;
+                insertTupleBTN.Enabled = true;
+            }
+            // No tuples in table
+            else
+            {
+                deleteTupleBTN.Enabled = false;
+                insertTupleBTN.Enabled = false;
+            }
+        }
         private void PutAnswerIntoCrossword(object sender, EventArgs e)
         {
             // Extract answer and question from the listBox
-            ListBox senderListBox = sender as ListBox;
-            if (senderListBox.Items.Count > 0)
+            if (tuplesListBox.SelectedItem != null)
             {
-                string selectedItem = senderListBox.SelectedItem.ToString();
+                string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
-                (string Question, string Answer) tuple = (array[1], array[0]);
+                (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
+
+                // Find all possible ways the answer can be placed
+                // and save how many letters are crossed
+                List<(Point questionTilePos, Point direction, int matches)> candidates = new List<(Point questionTilePos, Point direction, int matches)>();
+                int maxMatches = 0;
+                Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
+                foreach (Point direction in directions)
+                {
+                    for (int y = 0; y < grid.GetLength(0); y++)
+                    {
+                        for (int x = 0; x < grid.GetLength(1); x++)
+                        {
+                            Point questionTilePos = new Point(x, y);
+                            Point tileAfterAnswer = new Point(x + (direction.X * tuple.Answer.Length), y + (direction.Y * tuple.Answer.Length));
+                            // Does question tile fit? Is there free space after answer?
+                            if (grid[questionTilePos.Y, questionTilePos.X] == null && 
+                                grid[tileAfterAnswer.Y, tileAfterAnswer.X] == null)
+                            {
+                                int matches = 0;
+                                bool possible = true;
+                                Point answerStartPos = new Point(questionTilePos.X + direction.X, questionTilePos.Y + direction.Y);
+                                for (int i = 0; i < tuple.Answer.Length && possible == true; i++)
+                                {
+                                    int letterX = answerStartPos.X + i * direction.X;
+                                    int letterY = answerStartPos.Y + i * direction.Y;
+                                    // In bounds check
+                                    if (letterX >= 0 && letterX <= grid.GetUpperBound(1) && letterY >= 0 && letterY <= grid.GetUpperBound(0))
+                                    {
+                                        // not empty
+                                        if (grid[letterY, letterX] != null)
+                                        {
+                                            // question tile
+                                            if (grid[letterY, letterX].Contains('►') == true || grid[letterY, letterX].Contains('▼') == true)
+                                                possible = false;
+                                            // letter tile matches?
+                                            else if (grid[letterY, letterX] == tuple.Answer[i].ToString())
+                                                matches++;
+                                            // letter tile doesn't match
+                                            else
+                                                possible = false;
+                                        }
+                                    }
+                                    else
+                                        possible = false;
+                                }
+
+                                // Did the whole answer fit?
+                                if (possible)
+                                {
+                                    // Then save the properties for later
+                                    candidates.Add((questionTilePos, direction, matches));
+                                    // Save maxMatches number for later
+                                    if (matches >= maxMatches)
+                                        maxMatches = matches;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Keep only candidates with maximum Matches
+                for (int i = 0; i < candidates.Count; i++)
+                {
+                    if (candidates[i].matches < maxMatches)
+                    {
+                        candidates.RemoveAt(i);
+                        i--;
+                    }
+                }
+
+                // Candidate analysis
+                int finalCandidateIdx = 0;
+                if (candidates.Count == 0)
+                    MessageBox.Show("Keine passende Stelle gefunden");
+                else
+                {
+                    // Take random one if more than one candidate
+                    if (candidates.Count > 1)
+                        finalCandidateIdx = random.Next(candidates.Count);
+                    // Fill answer into that position
+                    FillAnswer(candidates[finalCandidateIdx].questionTilePos,
+                               candidates[finalCandidateIdx].direction,
+                               tuple);
+                }
             }
         }
+        // Keep bottom?
         private void ReadBaseWord(object sender, EventArgs e)
         {
             string baseWord = baseWordTB.Text.ToUpper();
@@ -110,7 +216,7 @@ namespace MiniKreuzwortraetsel
 
             // Put the base word vertically
             Point baseQuestionTilePos = new Point(longestWord, 0);
-            FillAnswer(baseQuestionTilePos, new Point(0, 1), ("", baseWord), IsBaseWord: true);
+            FillAnswer(baseQuestionTilePos, new Point(0, 1), ("", baseWord));
 
             // Try crossing each letter of the base word
             for (int i = 0; i < baseWord.Length; i++)
@@ -133,6 +239,7 @@ namespace MiniKreuzwortraetsel
 
             Refresh();
         }
+        // Delete?
         private void CrossBaseWord(int baseLetterIndex, char matchLetter, Point baseQuestionTilePos)
         {
             // Go through database till word is found with matching letter
@@ -155,15 +262,15 @@ namespace MiniKreuzwortraetsel
                     X = baseQuestionTilePos.X - 1 - matchIndex,
                     Y = baseQuestionTilePos.Y + baseLetterIndex + 1 };
 
-                FillAnswer(newQuestionTilePos, new Point(1, 0), tuple, IsBaseWord: false);
+                FillAnswer(newQuestionTilePos, new Point(1, 0), tuple);
             }
         }
-        private void FillAnswer(Point questionTilePos, Point direction, (string Question, string Answer) tuple, bool IsBaseWord)
+        private void FillAnswer(Point questionTilePos, Point direction, (string Question, string Answer) tuple)
         {
             // Fill the question indicator into the tile
             string arrow = (direction.X == 1) ? "►" : "▼";
             string questionTileText = "";
-            if (IsBaseWord)
+            if (tuple.Question == "")
                 questionTileText = arrow;
             else
             {
@@ -186,7 +293,8 @@ namespace MiniKreuzwortraetsel
                 xCoords.Add(letterX);
                 yCoords.Add(letterY);
             }
-            database.Remove(tuple);
+
+            Refresh();
         }
         private void ExportToDocx(object sender, EventArgs e)
         {
@@ -225,18 +333,6 @@ namespace MiniKreuzwortraetsel
             }
             else errorMessageLBL.Text = "Zuerst Kreuzworträtsel machen";
         }
-        private void UpdateTuples(object sender, EventArgs e)
-        {
-            tuplesListBox.Items.Clear();
-            foreach (string[] row in MySqlQueries.SELECT((string)tableMenu.SelectedItem, "Question", true))
-            {
-                tuplesListBox.Items.Add(row[1] + " <---> " + row[2]);
-            }
-            if (tuplesListBox.Items.Count > 0)
-                deleteTupleBTN.Enabled = true;
-            else
-                deleteTupleBTN.Enabled = false;
-        }
         private void NewTupleBTN_Click(object sender, EventArgs e)
         {
             TextDialogForm textDialogForm = new TextDialogForm(2, "Eintrag in \"" + (string)tableMenu.SelectedItem + "\" hinzufügen", new string[] { "Frage eingeben: ", "Antwort eingeben: " }, "Eintrag hinzufügen", "");
@@ -258,7 +354,6 @@ namespace MiniKreuzwortraetsel
                 else
                     error = false;
         }
-        // TODO: Ids are not continuous
         private void DeleteTupleBTN_Click(object sender, EventArgs e)
         {
             MySqlQueries.DELETE((string)tableMenu.SelectedItem, "Question", tuplesListBox.SelectedItem.ToString().Split(new string[] { " <---> " }, StringSplitOptions.None)[0]);

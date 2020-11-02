@@ -123,6 +123,7 @@
             // 
             // insertTupleBTN
             // 
+            this.insertTupleBTN.Enabled = false;
             this.insertTupleBTN.Location = new System.Drawing.Point(15, 457);
             this.insertTupleBTN.Name = "insertTupleBTN";
             this.insertTupleBTN.Size = new System.Drawing.Size(111, 48);
@@ -150,12 +151,12 @@
             this.button1.Text = "Einfügen";
             this.button1.UseVisualStyleBackColor = true;
             // 
-            // tableContentListBox1
+            // tuplesListBox
             // 
             this.tuplesListBox.FormattingEnabled = true;
             this.tuplesListBox.ItemHeight = 19;
             this.tuplesListBox.Location = new System.Drawing.Point(10, 153);
-            this.tuplesListBox.Name = "tableContentListBox1";
+            this.tuplesListBox.Name = "tuplesListBox";
             this.tuplesListBox.Size = new System.Drawing.Size(418, 289);
             this.tuplesListBox.TabIndex = 7;
             this.tuplesListBox.DoubleClick += new System.EventHandler(this.PutAnswerIntoCrossword);
