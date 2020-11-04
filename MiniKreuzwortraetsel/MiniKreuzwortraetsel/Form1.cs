@@ -25,12 +25,12 @@ namespace MiniKreuzwortraetsel
         List<int> xCoords = new List<int>();
         List<int> yCoords = new List<int>();
 
-        // TODO: Mark the base word visually
         // TODO: export to docx
         // TODO: thumbnail
 
-        // TODO: Check if tile after answer is free
-        // TODO: Implement helping term
+        // TODO: hover effect baseWord error
+        // IDEA: let user decide which candidate (placement option) to use before filling answer in
+        // TODO: dynamisches Vergrößern des Grids
         public Form1()
         {
             InitializeComponent();
@@ -86,13 +86,22 @@ namespace MiniKreuzwortraetsel
         }
         private void PutAnswerIntoCrossword(object sender, EventArgs e)
         {
-            // Extract answer and question from the listBox
-            if (tuplesListBox.SelectedItem != null)
+            // Extract tuple from listBox, insertTupleBTN or baseWordBTN
+            (string Question, string Answer) tuple = ("","");
+            if (sender is Button && (sender as Button).Name == "baseWordBTN")
+                    tuple = ("", baseWordTB.Text.ToUpper());
+            else if ((sender is ListBox || (sender is Button && (sender as Button).Name == "insertTupleBTN")) && tuplesListBox.SelectedItem != null)
             {
-                string selectedItem = tuplesListBox.SelectedItem.ToString();
-                string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
-                (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
+                if (tuplesListBox.SelectedItem != null)
+                {
+                    string selectedItem = tuplesListBox.SelectedItem?.ToString();
+                    string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
+                    tuple = (array[0], array[1].ToUpper());
+                }
+            }
 
+            if (tuple.Answer != "")
+            {
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed
                 List<(Point questionTilePos, Point direction, int matches)> candidates = new List<(Point questionTilePos, Point direction, int matches)>();
@@ -105,10 +114,17 @@ namespace MiniKreuzwortraetsel
                         for (int x = 0; x < grid.GetLength(1); x++)
                         {
                             Point questionTilePos = new Point(x, y);
-                            Point tileAfterAnswer = new Point(x + (direction.X * tuple.Answer.Length), y + (direction.Y * tuple.Answer.Length));
-                            // Does question tile fit? Is there free space after answer?
-                            if (grid[questionTilePos.Y, questionTilePos.X] == null && 
-                                grid[tileAfterAnswer.Y, tileAfterAnswer.X] == null)
+                            Point tileAfterAnswer = new Point(x + (direction.X * (tuple.Answer.Length + 1)), y + (direction.Y * (tuple.Answer.Length + 1)));
+                            bool ok = true;
+                            // Does question tile fit here? Can be null or reserved
+                            if (grid[questionTilePos.Y, questionTilePos.X] != null && grid[questionTilePos.Y, questionTilePos.X] != "reserved")
+                                ok = false;
+                            // Is there free space after answer? Can be null or reserved
+                            if (tileAfterAnswer.Y < grid.GetLength(0) && tileAfterAnswer.X < grid.GetLength(1))
+                                if (grid[tileAfterAnswer.Y, tileAfterAnswer.X] != null && grid[tileAfterAnswer.Y, tileAfterAnswer.X] != "reserved")
+                                    ok = false;
+
+                            if (ok)
                             {
                                 int matches = 0;
                                 bool possible = true;
@@ -125,6 +141,9 @@ namespace MiniKreuzwortraetsel
                                         {
                                             // question tile
                                             if (grid[letterY, letterX].Contains('►') == true || grid[letterY, letterX].Contains('▼') == true)
+                                                possible = false;
+                                            // reserved tile
+                                            if (grid[letterY, letterX] == "reserved")
                                                 possible = false;
                                             // letter tile matches?
                                             else if (grid[letterY, letterX] == tuple.Answer[i].ToString())
@@ -171,25 +190,18 @@ namespace MiniKreuzwortraetsel
                     // Take random one if more than one candidate
                     if (candidates.Count > 1)
                         finalCandidateIdx = random.Next(candidates.Count);
-                    // Fill answer into that position
+                    // Fill answer into that position (if there are 0 matches, then ask for approval)
+                    bool userApproved = true;
+                    if (candidates[finalCandidateIdx].matches == 0 && questions.Count > 0)
+                    {
+                        DialogResult result = MessageBox.Show("Keine Überschneidungen mit anderen Worten gefunden,\ntrotzdem einfügen?", "Sicher?", MessageBoxButtons.YesNo);
+                        userApproved = (result == DialogResult.Yes) ? true : false;
+                    }
                     FillAnswer(candidates[finalCandidateIdx].questionTilePos,
-                               candidates[finalCandidateIdx].direction,
-                               tuple);
+                                candidates[finalCandidateIdx].direction,
+                                tuple);
                 }
             }
-        }
-        // Keep bottom?
-        private void ReadBaseWord(object sender, EventArgs e)
-        {
-            string baseWord = baseWordTB.Text.ToUpper();
-            if (!string.IsNullOrEmpty(baseWord))
-            {
-                GenerateCrossword(baseWord);
-                errorMessageLBL.Visible = false;
-            }
-            else
-                errorMessageLBL.Visible = true;
-
         }
         private void GenerateCrossword(string baseWord)
         {
@@ -221,7 +233,7 @@ namespace MiniKreuzwortraetsel
             // Try crossing each letter of the base word
             for (int i = 0; i < baseWord.Length; i++)
             {
-                CrossBaseWord(i, baseWord[i], baseQuestionTilePos);
+                //CrossBaseWord(i, baseWord[i], baseQuestionTilePos);
             }
 
             // Shrink the grid to minimum by moving it to the top-left corner            
@@ -239,32 +251,6 @@ namespace MiniKreuzwortraetsel
 
             Refresh();
         }
-        // Delete?
-        private void CrossBaseWord(int baseLetterIndex, char matchLetter, Point baseQuestionTilePos)
-        {
-            // Go through database till word is found with matching letter
-            bool wordFound = false;
-            int databaseIndex = 0;
-            (string Question, string Answer) tuple = ("", "");
-            int matchIndex = 0;
-            while (!wordFound && databaseIndex < database.Count)
-            {
-                tuple = database[databaseIndex];
-                matchIndex = tuple.Answer.IndexOf(matchLetter);
-                if (matchIndex != -1)
-                    wordFound = true;
-
-                databaseIndex++;
-            }
-            if (wordFound)
-            {
-                Point newQuestionTilePos = new Point {
-                    X = baseQuestionTilePos.X - 1 - matchIndex,
-                    Y = baseQuestionTilePos.Y + baseLetterIndex + 1 };
-
-                FillAnswer(newQuestionTilePos, new Point(1, 0), tuple);
-            }
-        }
         private void FillAnswer(Point questionTilePos, Point direction, (string Question, string Answer) tuple)
         {
             // Fill the question indicator into the tile
@@ -278,6 +264,11 @@ namespace MiniKreuzwortraetsel
                 questionTileText = questions.Count + arrow;
             }
             grid[questionTilePos.Y, questionTilePos.X] = questionTileText;
+            // Reserve tile after answer
+            Point tileAfterAnswer = new Point(questionTilePos.X + (direction.X * (tuple.Answer.Length + 1)), questionTilePos.Y + (direction.Y * (tuple.Answer.Length + 1)));
+            if (tileAfterAnswer.Y < grid.GetLength(0) && tileAfterAnswer.X < grid.GetLength(1))
+                grid[tileAfterAnswer.Y, tileAfterAnswer.X] = "reserved";
+            // Save coordinates for easy grid shrinking later
             xCoords.Add(questionTilePos.X);
             yCoords.Add(questionTilePos.Y);
 
@@ -331,7 +322,7 @@ namespace MiniKreuzwortraetsel
                     Process.Start("WINWORD.EXE", fileName);
                 }
             }
-            else errorMessageLBL.Text = "Zuerst Kreuzworträtsel machen";
+            //else errorMessageLBL.Text = "Zuerst Kreuzworträtsel machen";
         }
         private void NewTupleBTN_Click(object sender, EventArgs e)
         {
@@ -356,7 +347,7 @@ namespace MiniKreuzwortraetsel
         }
         private void DeleteTupleBTN_Click(object sender, EventArgs e)
         {
-            MySqlQueries.DELETE((string)tableMenu.SelectedItem, "Question", tuplesListBox.SelectedItem.ToString().Split(new string[] { " <---> " }, StringSplitOptions.None)[0]);
+            MySqlQueries.DELETE((string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, tuplesListBox.SelectedItem.ToString().Split(new string[] { " <---> " }, StringSplitOptions.None));
             UpdateTuples(null, null);
         }
         /// <summary>
@@ -409,6 +400,13 @@ namespace MiniKreuzwortraetsel
                 UpdateTableMenu();
             }
         }
+        private void BaseWordTB_TextChanged(object sender, EventArgs e)
+        {
+            if ((sender as TextBox).Text == "")
+                baseWordBTN.Enabled = false;
+            else
+                baseWordBTN.Enabled = true;
+        }
         /// <summary>
         /// Hover effect
         /// </summary>
@@ -439,7 +437,7 @@ namespace MiniKreuzwortraetsel
                 {
                     for (int x = 0; x < grid.GetLength(1); x++)
                     {
-                        if (grid[y, x] != null)
+                        if (grid[y, x] != null && grid[y, x] != "reserved")
                         {
                             Size textSize = TextRenderer.MeasureText(grid[y, x], Font);
                             if (grid[y, x].Contains("►") ||

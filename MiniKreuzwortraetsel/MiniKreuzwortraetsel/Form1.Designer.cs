@@ -36,12 +36,11 @@
             this.newTupleBTN = new System.Windows.Forms.Button();
             this.insertTupleBTN = new System.Windows.Forms.Button();
             this.newCollectionBTN = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.baseWordBTN = new System.Windows.Forms.Button();
             this.tuplesListBox = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tableMenu = new System.Windows.Forms.ComboBox();
             this.exportBTN = new System.Windows.Forms.Button();
-            this.errorMessageLBL = new System.Windows.Forms.Label();
             this.popupLBL = new System.Windows.Forms.Label();
             this.UIPanel.SuspendLayout();
             this.SuspendLayout();
@@ -54,6 +53,7 @@
             this.baseWordTB.Size = new System.Drawing.Size(148, 26);
             this.baseWordTB.TabIndex = 1;
             this.baseWordTB.Text = "Elektron";
+            this.baseWordTB.TextChanged += new System.EventHandler(this.BaseWordTB_TextChanged);
             // 
             // label1
             // 
@@ -73,12 +73,11 @@
             this.UIPanel.Controls.Add(this.newTupleBTN);
             this.UIPanel.Controls.Add(this.insertTupleBTN);
             this.UIPanel.Controls.Add(this.newCollectionBTN);
-            this.UIPanel.Controls.Add(this.button1);
+            this.UIPanel.Controls.Add(this.baseWordBTN);
             this.UIPanel.Controls.Add(this.tuplesListBox);
             this.UIPanel.Controls.Add(this.label2);
             this.UIPanel.Controls.Add(this.tableMenu);
             this.UIPanel.Controls.Add(this.exportBTN);
-            this.UIPanel.Controls.Add(this.errorMessageLBL);
             this.UIPanel.Controls.Add(this.label1);
             this.UIPanel.Controls.Add(this.baseWordTB);
             this.UIPanel.Dock = System.Windows.Forms.DockStyle.Right;
@@ -142,14 +141,15 @@
             this.newCollectionBTN.UseVisualStyleBackColor = true;
             this.newCollectionBTN.Click += new System.EventHandler(this.NewCollectionBTN_Click);
             // 
-            // button1
+            // baseWordBTN
             // 
-            this.button1.Location = new System.Drawing.Point(164, 31);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(97, 26);
-            this.button1.TabIndex = 8;
-            this.button1.Text = "Einfügen";
-            this.button1.UseVisualStyleBackColor = true;
+            this.baseWordBTN.Location = new System.Drawing.Point(164, 31);
+            this.baseWordBTN.Name = "baseWordBTN";
+            this.baseWordBTN.Size = new System.Drawing.Size(97, 26);
+            this.baseWordBTN.TabIndex = 8;
+            this.baseWordBTN.Text = "Einfügen";
+            this.baseWordBTN.UseVisualStyleBackColor = true;
+            this.baseWordBTN.Click += new System.EventHandler(this.PutAnswerIntoCrossword);
             // 
             // tuplesListBox
             // 
@@ -190,18 +190,6 @@
             this.exportBTN.UseVisualStyleBackColor = true;
             this.exportBTN.Click += new System.EventHandler(this.ExportToDocx);
             // 
-            // errorMessageLBL
-            // 
-            this.errorMessageLBL.Font = new System.Drawing.Font("Times New Roman", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.errorMessageLBL.ForeColor = System.Drawing.Color.Red;
-            this.errorMessageLBL.Location = new System.Drawing.Point(11, 61);
-            this.errorMessageLBL.Name = "errorMessageLBL";
-            this.errorMessageLBL.Size = new System.Drawing.Size(165, 23);
-            this.errorMessageLBL.TabIndex = 3;
-            this.errorMessageLBL.Text = "Lösungswort eingeben";
-            this.errorMessageLBL.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.errorMessageLBL.Visible = false;
-            // 
             // popupLBL
             // 
             this.popupLBL.AutoSize = true;
@@ -235,7 +223,6 @@
         private System.Windows.Forms.TextBox baseWordTB;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel UIPanel;
-        private System.Windows.Forms.Label errorMessageLBL;
         private System.Windows.Forms.Label popupLBL;
         private System.Windows.Forms.Button exportBTN;
         private System.Windows.Forms.ComboBox tableMenu;
@@ -244,7 +231,7 @@
         private System.Windows.Forms.Button newTupleBTN;
         private System.Windows.Forms.Button insertTupleBTN;
         private System.Windows.Forms.Button newCollectionBTN;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button baseWordBTN;
         private System.Windows.Forms.Button deleteCollectionBTN;
         private System.Windows.Forms.Button deleteTupleBTN;
     }
