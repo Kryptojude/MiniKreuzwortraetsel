@@ -31,6 +31,7 @@ namespace MiniKreuzwortraetsel
         // TODO: hover effect baseWord error
         // IDEA: let user decide which candidate (placement option) to use before filling answer in
         // TODO: dynamisches Vergrößern des Grids
+        //       Might use different solution, simply place the first answer in the center of the grid, that reduces the chance that it reaches the border, non-matching answers should also try to be far away from the border
         public Form1()
         {
             InitializeComponent();
@@ -102,6 +103,9 @@ namespace MiniKreuzwortraetsel
 
             if (tuple.Answer != "")
             {
+                // Increase grid size to make all potential word crossings/matches possible (gets shrunken later)
+                IncreaseGridSize(tuple.Answer.Length);
+
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed
                 List<(Point questionTilePos, Point direction, int matches)> candidates = new List<(Point questionTilePos, Point direction, int matches)>();
@@ -115,16 +119,16 @@ namespace MiniKreuzwortraetsel
                         {
                             Point questionTilePos = new Point(x, y);
                             Point tileAfterAnswer = new Point(x + (direction.X * (tuple.Answer.Length + 1)), y + (direction.Y * (tuple.Answer.Length + 1)));
-                            bool ok = true;
+                            bool fits = true;
                             // Does question tile fit here? Can be null or reserved
                             if (grid[questionTilePos.Y, questionTilePos.X] != null && grid[questionTilePos.Y, questionTilePos.X] != "reserved")
-                                ok = false;
+                                fits = false;
                             // Is there free space after answer? Can be null or reserved
                             if (tileAfterAnswer.Y < grid.GetLength(0) && tileAfterAnswer.X < grid.GetLength(1))
                                 if (grid[tileAfterAnswer.Y, tileAfterAnswer.X] != null && grid[tileAfterAnswer.Y, tileAfterAnswer.X] != "reserved")
-                                    ok = false;
+                                    fits = false;
 
-                            if (ok)
+                            if (fits)
                             {
                                 int matches = 0;
                                 bool possible = true;
@@ -190,18 +194,41 @@ namespace MiniKreuzwortraetsel
                     // Take random one if more than one candidate
                     if (candidates.Count > 1)
                         finalCandidateIdx = random.Next(candidates.Count);
-                    // Fill answer into that position (if there are 0 matches, then ask for approval)
+                    // Fill answer into that position
+                    // if there are 0 matches, then ask for approval (unless first answer)
                     bool userApproved = true;
                     if (candidates[finalCandidateIdx].matches == 0 && questions.Count > 0)
                     {
                         DialogResult result = MessageBox.Show("Keine Überschneidungen mit anderen Worten gefunden,\ntrotzdem einfügen?", "Sicher?", MessageBoxButtons.YesNo);
                         userApproved = (result == DialogResult.Yes) ? true : false;
                     }
-                    FillAnswer(candidates[finalCandidateIdx].questionTilePos,
-                                candidates[finalCandidateIdx].direction,
-                                tuple);
+                    if (userApproved)
+                        FillAnswer(candidates[finalCandidateIdx].questionTilePos,
+                                    candidates[finalCandidateIdx].direction,
+                                    tuple);
+                }
+
+                // Shrink grid to minimum again
+
+            }
+        }
+        /// <summary>
+        /// Increases Grid size in all directions by length
+        /// </summary>
+        private void IncreaseGridSize(int length)
+        {
+            // Create bigger Array
+            string[,] biggerArray = new string[grid.GetLength(0) + length * 2, grid.GetLength(1) + length * 2];
+            // Copy grid into bigger array at correct position
+            for (int y = 0; y < grid.GetLength(0); y++)
+            {
+                for (int x = 0; x < grid.GetLength(1); x++)
+                {
+                    biggerArray[y + length, x + length] = grid[y, x];
                 }
             }
+
+            grid = biggerArray;
         }
         private void GenerateCrossword(string baseWord)
         {

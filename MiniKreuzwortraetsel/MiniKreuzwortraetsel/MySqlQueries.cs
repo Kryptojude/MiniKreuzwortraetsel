@@ -9,7 +9,7 @@ namespace MiniKreuzwortraetsel
 {
     class MySqlQueries
     {
-        static MySqlConnection conn = new MySqlConnection("Server=localhost;Database=minikreuzwortraetsel;Uid=root;Pwd=;");
+        static MySqlConnection conn = new MySqlConnection("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
         public static List<string> SHOW_TABLES()
         {
             conn.Open();
