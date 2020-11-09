@@ -16,8 +16,8 @@ namespace MiniKreuzwortraetsel
     public partial class Form1 : Form
     {
         string[,] grid = new string[20,20];
+        string[,] highlightedGrid = new string[20,20];
         Point gridOrigin = new Point();
-        List<(string, string)> database = new List<(string, string)>();
         List<string> questions = new List<string>();
         Random random = new Random();
         int ts = 30;
@@ -87,6 +87,7 @@ namespace MiniKreuzwortraetsel
         }
         private void PutAnswerIntoCrossword(object sender, EventArgs e)
         {
+            // Clean up?
             // Extract tuple from listBox, insertTupleBTN or baseWordBTN
             (string Question, string Answer) tuple = ("","");
             if (sender is Button && (sender as Button).Name == "baseWordBTN")
@@ -104,11 +105,11 @@ namespace MiniKreuzwortraetsel
             if (tuple.Answer != "")
             {
                 // Increase grid size to make all potential word crossings/matches possible (gets shrunken later)
-                IncreaseGridSize(tuple.Answer.Length);
+                //IncreaseGridSize(tuple.Answer.Length);
 
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed
-                List<(Point questionTilePos, Point direction, int matches)> candidates = new List<(Point questionTilePos, Point direction, int matches)>();
+                List<(Point questionTilePos, Point tileAfterAnswer, Point direction, int matches)> candidates = new List<(Point questionTilePos, Point tileAfterAnswer, Point direction, int matches)>();
                 int maxMatches = 0;
                 Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
                 foreach (Point direction in directions)
@@ -165,7 +166,7 @@ namespace MiniKreuzwortraetsel
                                 if (possible)
                                 {
                                     // Then save the properties for later
-                                    candidates.Add((questionTilePos, direction, matches));
+                                    candidates.Add((questionTilePos, tileAfterAnswer, direction, matches));
                                     // Save maxMatches number for later
                                     if (matches >= maxMatches)
                                         maxMatches = matches;
@@ -193,7 +194,15 @@ namespace MiniKreuzwortraetsel
                 {
                     // Take random one if more than one candidate
                     if (candidates.Count > 1)
-                        finalCandidateIdx = random.Next(candidates.Count);
+                    {
+                        // TODO: HIGHLIGHTING
+                        //finalCandidateIdx = random.Next(candidates.Count);
+
+                        foreach (var candidate in candidates)
+                        {
+                            highlightedGrid[candidate.questionTilePos.Y, candidate.questionTilePos.X] = "green";
+                        }
+                    }
                     // Fill answer into that position
                     // if there are 0 matches, then ask for approval (unless first answer)
                     bool userApproved = true;
@@ -211,72 +220,6 @@ namespace MiniKreuzwortraetsel
                 // Shrink grid to minimum again
 
             }
-        }
-        /// <summary>
-        /// Increases Grid size in all directions by length
-        /// </summary>
-        private void IncreaseGridSize(int length)
-        {
-            // Create bigger Array
-            string[,] biggerArray = new string[grid.GetLength(0) + length * 2, grid.GetLength(1) + length * 2];
-            // Copy grid into bigger array at correct position
-            for (int y = 0; y < grid.GetLength(0); y++)
-            {
-                for (int x = 0; x < grid.GetLength(1); x++)
-                {
-                    biggerArray[y + length, x + length] = grid[y, x];
-                }
-            }
-
-            grid = biggerArray;
-        }
-        private void GenerateCrossword(string baseWord)
-        {
-            questions.Clear();
-
-            // Find longest word
-            int longestWord = 0;
-            for (int i = 0; i < database.Count; i++)
-            {
-                (string Question, string Answer) tuple = database[i];
-                if (tuple.Answer.Length > longestWord)
-                {
-                    longestWord = tuple.Answer.Length;
-                }
-            }
-
-            // Check if baseWord is longer than longest word in db
-            if (baseWord.Length > longestWord)
-                longestWord = baseWord.Length;
-
-            // Initialize grid based on longest word
-            int maximumGridWidth = longestWord * 2;
-            grid = new string[longestWord + 1, maximumGridWidth];
-
-            // Put the base word vertically
-            Point baseQuestionTilePos = new Point(longestWord, 0);
-            FillAnswer(baseQuestionTilePos, new Point(0, 1), ("", baseWord));
-
-            // Try crossing each letter of the base word
-            for (int i = 0; i < baseWord.Length; i++)
-            {
-                //CrossBaseWord(i, baseWord[i], baseQuestionTilePos);
-            }
-
-            // Shrink the grid to minimum by moving it to the top-left corner            
-            gridOrigin.X = -xCoords.Min() * ts;
-            gridOrigin.Y = -yCoords.Min() * ts;
-            // Resize window
-            int minHeight = ts * 8 + 39;
-            Width = (xCoords.Max() + 1 - xCoords.Min()) * ts + 16 + UIPanel.Width;
-            Height = (yCoords.Max() + 1 - yCoords.Min()) * ts + 39;
-            if (Height < minHeight)
-                Height = minHeight;
-
-            xCoords.Clear();
-            yCoords.Clear();
-
-            Refresh();
         }
         private void FillAnswer(Point questionTilePos, Point direction, (string Question, string Answer) tuple)
         {
@@ -311,6 +254,40 @@ namespace MiniKreuzwortraetsel
                 xCoords.Add(letterX);
                 yCoords.Add(letterY);
             }
+
+            Refresh();
+        }
+        /// <summary>
+        /// ??? Increases Grid size in all directions by length
+        /// </summary>
+        private void IncreaseGridSize(int length)
+        {
+            // Create bigger Array
+            string[,] biggerArray = new string[grid.GetLength(0) + length * 2, grid.GetLength(1) + length * 2];
+            // Copy grid into bigger array at correct position
+            for (int y = 0; y < grid.GetLength(0); y++)
+            {
+                for (int x = 0; x < grid.GetLength(1); x++)
+                {
+                    biggerArray[y + length, x + length] = grid[y, x];
+                }
+            }
+
+            grid = biggerArray;
+        }
+        /// <summary>
+        /// ???
+        /// </summary>
+        private void RealignGrid()
+        {
+            gridOrigin.X = -xCoords.Min() * ts;
+            gridOrigin.Y = -yCoords.Min() * ts;
+            // Resize window
+            int minHeight = ts * 8 + 39;
+            Width = (xCoords.Max() + 1 - xCoords.Min()) * ts + 16 + UIPanel.Width;
+            Height = (yCoords.Max() + 1 - yCoords.Min()) * ts + 39;
+            if (Height < minHeight)
+                Height = minHeight;
 
             Refresh();
         }
@@ -351,6 +328,18 @@ namespace MiniKreuzwortraetsel
             }
             //else errorMessageLBL.Text = "Zuerst Kreuzworträtsel machen";
         }
+        private string ReplaceUmlaute(string input)
+        {
+            input = input.Replace("ß", "ss");
+            input = input.Replace("ä", "ae");
+            input = input.Replace("Ä", "Ae");
+            input = input.Replace("ö", "oe");
+            input = input.Replace("Ö", "Oe");
+            input = input.Replace("ü", "ue");
+            input = input.Replace("Ü", "Ue");
+
+            return input;
+        }
         private void NewTupleBTN_Click(object sender, EventArgs e)
         {
             TextDialogForm textDialogForm = new TextDialogForm(2, "Eintrag in \"" + (string)tableMenu.SelectedItem + "\" hinzufügen", new string[] { "Frage eingeben: ", "Antwort eingeben: " }, "Eintrag hinzufügen", "");
@@ -360,7 +349,7 @@ namespace MiniKreuzwortraetsel
                 {
                     if (textDialogForm.userInputs[0] != "" && textDialogForm.userInputs[1] != "")
                     {
-                        MySqlQueries.INSERT( (string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, new string[] { textDialogForm.userInputs[0], textDialogForm.userInputs[1] } );
+                        MySqlQueries.INSERT( (string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, new string[] { textDialogForm.userInputs[0], ReplaceUmlaute(textDialogForm.userInputs[1]) } );
                         error = false;
                         UpdateTuples(null, null);
                     }
@@ -437,7 +426,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Hover effect
         /// </summary>
-        private void Form1_MouseMove(object sender, MouseEventArgs e)
+        private void GridPanel_MouseMove(object sender, MouseEventArgs e)
         {
             // The tile the mouse is hovering over: 
             int tileX = (e.X - gridOrigin.X) / ts;
@@ -456,7 +445,7 @@ namespace MiniKreuzwortraetsel
                 else
                     popupLBL.Visible = false;
         }
-        private void Form1_Paint(object sender, PaintEventArgs e)
+        private void GridPanel_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.TranslateTransform(gridOrigin.X, gridOrigin.Y);
             if (grid != null)
@@ -464,27 +453,35 @@ namespace MiniKreuzwortraetsel
                 {
                     for (int x = 0; x < grid.GetLength(1); x++)
                     {
+                        if (highlightedGrid[y, x] == "green")
+                        {
+                            e.Graphics.FillRectangle(Brushes.LightGreen, x * ts, y * ts, ts, ts);
+                        }
                         if (grid[y, x] != null && grid[y, x] != "reserved")
                         {
                             Size textSize = TextRenderer.MeasureText(grid[y, x], Font);
+                            Brush color;
                             if (grid[y, x].Contains("►") ||
                                 grid[y, x].Contains("▼"))
                             { // question tile
-                                e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts, ts);
-                                e.Graphics.DrawString(grid[y, x], Font, Brushes.Red, x * ts + ts / 2 - textSize.Width / 2, y * ts + ts / 2 - textSize.Height / 2);
-                            }
-                            else if (grid[y, x] == "blocked")
-                            { // blocked tile
-                                e.Graphics.FillRectangle(Brushes.Black, x * ts, y * ts, ts, ts);
+                                color = Brushes.Red;
                             }
                             else
                             { // letter tile
-                                e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts, ts);
-                                e.Graphics.DrawString(grid[y, x], Font, Brushes.DarkBlue, x * ts + ts / 2 - textSize.Width / 2, y * ts + ts / 2 - textSize.Height / 2);
+                                color = Brushes.DarkBlue;
                             }
+                            e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts, ts);
+                            e.Graphics.DrawString(grid[y, x], Font, color, x * ts + ts / 2 - textSize.Width / 2, y * ts + ts / 2 - textSize.Height / 2);
                         }
                     }
                 }
+        }
+
+        private void GridPanel_MouseClick(object sender, MouseEventArgs e)
+        {
+            Point tile = new Point(e.X / ts, e.Y / ts);
+            if (highlightedGrid[tile.Y, tile.X] == "green")
+                FillAnswer();
         }
     }
 }

@@ -42,6 +42,7 @@
             this.tableMenu = new System.Windows.Forms.ComboBox();
             this.exportBTN = new System.Windows.Forms.Button();
             this.popupLBL = new System.Windows.Forms.Label();
+            this.gridPanel = new System.Windows.Forms.Panel();
             this.UIPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -199,19 +200,27 @@
             this.popupLBL.TabIndex = 4;
             this.popupLBL.Visible = false;
             // 
+            // gridPanel
+            // 
+            this.gridPanel.Location = new System.Drawing.Point(1, 0);
+            this.gridPanel.Name = "gridPanel";
+            this.gridPanel.Size = new System.Drawing.Size(764, 658);
+            this.gridPanel.TabIndex = 5;
+            this.gridPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.GridPanel_Paint);
+            this.gridPanel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GridPanel_MouseClick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 658);
+            this.Controls.Add(this.gridPanel);
             this.Controls.Add(this.popupLBL);
             this.Controls.Add(this.UIPanel);
             this.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "KreuzworträtselMacher";
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
-            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
             this.UIPanel.ResumeLayout(false);
             this.UIPanel.PerformLayout();
             this.ResumeLayout(false);
@@ -234,6 +243,7 @@
         private System.Windows.Forms.Button baseWordBTN;
         private System.Windows.Forms.Button deleteCollectionBTN;
         private System.Windows.Forms.Button deleteTupleBTN;
+        private System.Windows.Forms.Panel gridPanel;
     }
 }
 
