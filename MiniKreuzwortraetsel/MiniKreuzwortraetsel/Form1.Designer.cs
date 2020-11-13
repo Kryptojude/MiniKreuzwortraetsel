@@ -208,6 +208,7 @@
             this.gridPanel.TabIndex = 5;
             this.gridPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.GridPanel_Paint);
             this.gridPanel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GridPanel_MouseClick);
+            this.gridPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GridPanel_MouseMove);
             // 
             // Form1
             // 

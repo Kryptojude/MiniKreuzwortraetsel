@@ -403,7 +403,7 @@ namespace MiniKreuzwortraetsel
                 baseWordBTN.Enabled = true;
         }
         /// <summary>
-        /// Hover effect
+        /// Hover effects
         /// </summary>
         private void GridPanel_MouseMove(object sender, MouseEventArgs e)
         {
@@ -425,6 +425,23 @@ namespace MiniKreuzwortraetsel
                 }
                 else
                     popupLBL.Visible = false;
+
+            // Hover Highlighting
+            Point tilePos = new Point(e.X / ts, e.Y / ts);
+            if (tilePos.X < grid.GetLength(1) && tilePos.Y < grid.GetLength(1))
+            {
+                Tile tile = grid[e.Y / ts, e.X / ts];
+                if (tile.IsHighlighted())
+                {
+                    Point posRelativeToTile = new Point(e.X - ts * tile.GetPosition().X, e.Y - ts * tile.GetPosition().Y);
+                    int index = (posRelativeToTile.X > posRelativeToTile.Y) ? 0 : 1;
+                    Tile.HoverEffect = (true, new Point(tile.GetPosition().X, tile.GetPosition().Y), index);
+                }
+                else
+                    Tile.HoverEffect.Active = false;
+
+                Refresh();
+            }
         }
         private void GridPanel_Paint(object sender, PaintEventArgs e)
         {
@@ -447,6 +464,12 @@ namespace MiniKreuzwortraetsel
                     }
                 }
             }
+            // Draw Hover Effect
+            using (Brush brush = Brushes.Blue)
+            {
+                if (Tile.GetHoverTriangle(out Point[] triangle, ts))
+                    e.Graphics.FillPolygon(brush, triangle);
+            }
         }
         private void GridPanel_MouseClick(object sender, MouseEventArgs e)
         {
@@ -454,7 +477,15 @@ namespace MiniKreuzwortraetsel
             if (tile.IsHighlighted())
             {
                 int direction = 0;
-                //if (tile.HighlightDirections.Count > 1)
+                if (tile.HighlightDirections.Count > 1)
+                {
+                    // relative to upper left corner of the tile
+                    Point mouse = new Point(e.X - ts * tile.GetPosition().X, e.Y - ts * tile.GetPosition().Y);
+                    if (mouse.X > mouse.Y)
+                        direction = 0;
+                    else
+                        direction = 1;
+                }
 
                 FillAnswer(tile, tile.HighlightDirections[direction], Tile.tupleToBeFilled);
                 Tile.RemoveAllHighlights(grid);
