@@ -28,9 +28,7 @@ namespace MiniKreuzwortraetsel
         // TODO: thumbnail
 
         // TODO: hover effect baseWord error
-        // IDEA: let user decide which candidate (placement option) to use before filling answer in
-        // TODO: dynamisches Vergrößern des Grids
-        //       Might use different solution, simply place the first answer in the center of the grid, that reduces the chance that it reaches the border, non-matching answers should also try to be far away from the border
+        // TODO: reserved tiles cant be highlighted
         public Form1()
         {
             InitializeComponent();
@@ -94,7 +92,7 @@ namespace MiniKreuzwortraetsel
         private void PutAnswerIntoCrossword(object sender, EventArgs e)
         {
             // Clean up?
-            // Extract tuple from listBox, insertTupleBTN or baseWordBTN
+            // Handle different senders/sources (listBox, insertTupleBTN or baseWordBTN)
             (string Question, string Answer) tuple = ("","");
             if (sender is Button && (sender as Button).Name == "baseWordBTN")
                     tuple = ("", baseWordTB.Text.ToUpper());
@@ -124,7 +122,7 @@ namespace MiniKreuzwortraetsel
                             Tile questionTile = grid[y, x];
                             bool fits = true;
                             // Does question tile fit?
-                            if (questionTile.Text != "")
+                            if (questionTile.GetText(out _))
                                 fits = false;
                             // Free space after answer?
                             Tile tileAfterAnswer = null;
@@ -132,7 +130,7 @@ namespace MiniKreuzwortraetsel
                             if (tileAfterAnswerPoint.Y < grid.GetLength(0) && tileAfterAnswerPoint.X < grid.GetLength(1))
                             {
                                 tileAfterAnswer = grid[tileAfterAnswerPoint.Y, tileAfterAnswerPoint.X];
-                                if (tileAfterAnswer.Text != "")
+                                if (tileAfterAnswer.GetText(out _))
                                     fits = false;
                             }
 
@@ -142,15 +140,15 @@ namespace MiniKreuzwortraetsel
                                 bool possible = true;
                                 for (int i = 0; i < tuple.Answer.Length && possible == true; i++)
                                 {
-                                    int letterX = questionTile.Position.X + direction.X + i * direction.X;
-                                    int letterY = questionTile.Position.Y + direction.Y + i * direction.Y;
+                                    int letterX = questionTile.GetPosition().X + direction.X + i * direction.X;
+                                    int letterY = questionTile.GetPosition().Y + direction.Y + i * direction.Y;
                                     // In bounds check
                                     if (letterX >= 0 && letterX <= grid.GetUpperBound(1) && letterY >= 0 && letterY <= grid.GetUpperBound(0))
                                     {
                                         // obstacles found?
-                                        if ((grid[letterY, letterX].Text != "" && grid[letterY, letterX].Text != tuple.Answer[i].ToString()) ||
+                                        if ((grid[letterY, letterX].GetText(out string text) && text != tuple.Answer[i].ToString()) ||
                                             questionTile.IsQuestionTile() || 
-                                            questionTile.Reserved)
+                                            questionTile.IsReserved())
                                                 possible = false;
                                         else
                                             matches++;
@@ -194,8 +192,10 @@ namespace MiniKreuzwortraetsel
                         else
                             color = Brushes.Green;
 
-                        candidates[i].questionTile.BackgroundColor = color;
+                        candidates[i].questionTile.SetBackgroundColor(color);
+                        candidates[i].questionTile.HighlightDirections.Add(candidates[i].direction);
                     }
+                    Tile.tupleToBeFilled = tuple;
                     gridPanel.Refresh();
                 }
             }
@@ -212,24 +212,23 @@ namespace MiniKreuzwortraetsel
                 questions.Add(tuple.Question);
                 questionTileText = questions.Count + arrow;
             }
-            // TODO: Use method instead
-            questionTile.Text = questionTileText;
+            questionTile.SetText(questionTileText);
             // Reserve tile after answer
-            Tile tileAfterAnswer = grid[questionTile.Position.Y + (direction.Y * (tuple.Answer.Length + 1)), questionTile.Position.X + (direction.X * (tuple.Answer.Length + 1))];
-            if (tileAfterAnswer.Position.Y < grid.GetLength(0) && tileAfterAnswer.Position.X < grid.GetLength(1))
-                grid[tileAfterAnswer.Position.Y, tileAfterAnswer.Position.X].Reserved = true;
+            Point tileAfterAnswerPos = new Point(questionTile.GetPosition().X + (direction.X * (tuple.Answer.Length + 1)), questionTile.GetPosition().Y + (direction.Y * (tuple.Answer.Length + 1)));
+            if (tileAfterAnswerPos.Y < grid.GetLength(0) && tileAfterAnswerPos.X < grid.GetLength(1))
+                grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X].SetReserved(true);
             // Save coordinates for easy grid shrinking later
-            xCoords.Add(questionTile.Position.X);
-            yCoords.Add(questionTile.Position.Y);
+            xCoords.Add(questionTile.GetPosition().X);
+            yCoords.Add(questionTile.GetPosition().Y);
 
             int letterX = 0; // Absolute position of the current letter
             int letterY = 0;
             // Fill the answer into the grid letter by letter
             for (int c = 0; c < tuple.Answer.Length; c++)
             {
-                letterX = questionTile.Position.X + (direction.X * (c + 1));
-                letterY = questionTile.Position.Y + (direction.Y * (c + 1));
-                grid[letterY, letterX].Text = tuple.Answer[c].ToString();
+                letterX = questionTile.GetPosition().X + (direction.X * (c + 1));
+                letterY = questionTile.GetPosition().Y + (direction.Y * (c + 1));
+                grid[letterY, letterX].SetText(tuple.Answer[c].ToString());
                 // Save the letter position for easy shrinking of the grid later
                 xCoords.Add(letterX);
                 yCoords.Add(letterY);
@@ -295,7 +294,7 @@ namespace MiniKreuzwortraetsel
                     {
                         for (int row = 0; row < table.RowCount; row++)
                         {
-                            string gridString = grid[row - gridOrigin.Y / ts, col - gridOrigin.X / ts].Text;
+                            grid[row - gridOrigin.Y / ts, col - gridOrigin.X / ts].GetText(out string gridString);
                             table.Rows[row].Cells[col].Paragraphs[0].Append(gridString);
                         }
                     }
@@ -416,7 +415,9 @@ namespace MiniKreuzwortraetsel
                 tileX <= grid.GetUpperBound(1) && tileY <= grid.GetUpperBound(0) )
                 if (grid[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts].IsQuestionTile())
                 {
-                    int questionIndex = Convert.ToInt32(grid[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts].Text[0]) - 1;
+                    string tileText;
+                    grid[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts].GetText(out tileText);
+                    int questionIndex = Convert.ToInt32(tileText[0]) - 1;
                     string popupText = questions[questionIndex];
                     popupLBL.Text = popupText;
                     popupLBL.Location = new Point(e.X + ts/2, e.Y - ts/2);
@@ -434,21 +435,31 @@ namespace MiniKreuzwortraetsel
                 {
                     Tile tile = grid[y, x];
                     // Draw Background Color
-                    e.Graphics.FillRectangle(tile.BackgroundColor, x * ts, y * ts, ts, ts);
+                    e.Graphics.FillRectangle(tile.GetBackgroundColor(), x * ts, y * ts, ts, ts);
                     // Draw Rectangle
-                    if ()
-                    e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts, ts);
+                    if (tile.HasRectangle())
+                        e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts - 1, ts - 1);
                     // Draw Text
-                    Size textSize = TextRenderer.MeasureText(tile.Text, Font);
-                    e.Graphics.DrawString(tile.Text, Font, tile.ForeGroundColor, x * ts + ts / 2 - textSize.Width / 2, y * ts + ts / 2 - textSize.Height / 2);
+                    if (tile.GetText(out string text))
+                    {
+                        Size textSize = TextRenderer.MeasureText(text, Font);
+                        e.Graphics.DrawString(text, Font, tile.GetForegroundColor(), x * ts + ts / 2 - textSize.Width / 2, y * ts + ts / 2 - textSize.Height / 2);
+                    }
                 }
             }
         }
         private void GridPanel_MouseClick(object sender, MouseEventArgs e)
         {
-            //Point tile = new Point(e.X / ts, e.Y / ts);
-            //if (grid[tile.Y, tile.X].Highlight != null)
-                //FillAnswer(,);
+            Tile tile = grid[e.Y / ts, e.X / ts];
+            if (tile.IsHighlighted())
+            {
+                int direction = 0;
+                //if (tile.HighlightDirections.Count > 1)
+
+                FillAnswer(tile, tile.HighlightDirections[direction], Tile.tupleToBeFilled);
+                Tile.RemoveAllHighlights(grid);
+                gridPanel.Refresh();
+            }
         }
     }
 }
