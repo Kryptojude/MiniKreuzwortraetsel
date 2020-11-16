@@ -41,7 +41,7 @@ namespace MiniKreuzwortraetsel
                 }
             }
             // Fill tableMenu with the tables in database
-            UpdateTableMenu();
+            //UpdateTableMenu();
         }
         public void UpdateTableMenu()
         {
@@ -426,22 +426,8 @@ namespace MiniKreuzwortraetsel
                 else
                     popupLBL.Visible = false;
 
-            // Hover Highlighting
-            Point tilePos = new Point(e.X / ts, e.Y / ts);
-            if (tilePos.X < grid.GetLength(1) && tilePos.Y < grid.GetLength(1))
-            {
-                Tile tile = grid[e.Y / ts, e.X / ts];
-                if (tile.IsHighlighted())
-                {
-                    Point posRelativeToTile = new Point(e.X - ts * tile.GetPosition().X, e.Y - ts * tile.GetPosition().Y);
-                    int index = (posRelativeToTile.X > posRelativeToTile.Y) ? 0 : 1;
-                    Tile.HoverEffect = (true, new Point(tile.GetPosition().X, tile.GetPosition().Y), index);
-                }
-                else
-                    Tile.HoverEffect.Active = false;
-
-                Refresh();
-            }
+            // Call Refresh() for highlight change?
+            if (Highlight.CallRefresh(new Point(e.X, e.Y)))
         }
         private void GridPanel_Paint(object sender, PaintEventArgs e)
         {
@@ -465,11 +451,9 @@ namespace MiniKreuzwortraetsel
                 }
             }
             // Draw Hover Effect
-            using (Brush brush = Brushes.Blue)
-            {
-                if (Tile.GetHoverTriangle(out Point[] triangle, ts))
-                    e.Graphics.FillPolygon(brush, triangle);
-            }
+            Brush brush = Brushes.Blue;
+            if (Tile.GetHoverTriangle(out Point[] triangle, ts))
+                e.Graphics.FillPolygon(brush, triangle);
         }
         private void GridPanel_MouseClick(object sender, MouseEventArgs e)
         {
