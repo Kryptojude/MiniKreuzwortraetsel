@@ -10,8 +10,8 @@ namespace MiniKreuzwortraetsel
     class Highlight
     {
         static Point[][] HoverTriangles = new Point[][] { new Point[] { new Point(0, 0), new Point(1, 0), new Point(1, 1) }, new Point[] { new Point(0, 0), new Point(1, 1), new Point(0, 1) } };
-        static Point Position;
-        static int index;
+        static Point Position = new Point(-1, -1); // -1 means hover not active
+        static int subTile; // 0 means upper right subtile, 1 means lower left subtile
 
         public static bool GetHoverTriangle(out Point[] triangle, int ts)
         {
@@ -58,7 +58,7 @@ namespace MiniKreuzwortraetsel
             }
         }
 
-        public static bool CallRefresh(Point mousePosition, Tile[,] grid, int ts)
+        public static bool HasHighlightChanged(Point mousePosition, Tile[,] grid, int ts)
         {
             // Check if mouse is within grid
             Point tilePos = new Point(mousePosition.X / ts, mousePosition.Y / ts);

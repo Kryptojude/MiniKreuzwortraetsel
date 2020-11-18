@@ -427,7 +427,8 @@ namespace MiniKreuzwortraetsel
                     popupLBL.Visible = false;
 
             // Call Refresh() for highlight change?
-            if (Highlight.CallRefresh(new Point(e.X, e.Y)))
+            if (Highlight.HasHighlightChanged(new Point(e.X, e.Y), grid, ts))
+                Refresh();
         }
         private void GridPanel_Paint(object sender, PaintEventArgs e)
         {
