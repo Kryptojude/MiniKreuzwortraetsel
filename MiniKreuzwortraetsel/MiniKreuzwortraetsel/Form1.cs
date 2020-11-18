@@ -41,7 +41,7 @@ namespace MiniKreuzwortraetsel
                 }
             }
             // Fill tableMenu with the tables in database
-            //UpdateTableMenu();
+            UpdateTableMenu();
         }
         public void UpdateTableMenu()
         {
@@ -196,7 +196,7 @@ namespace MiniKreuzwortraetsel
                         candidates[i].questionTile.HighlightDirections.Add(candidates[i].direction);
                     }
                     Tile.tupleToBeFilled = tuple;
-                    gridPanel.Refresh();
+                    gridPB.Refresh();
                 }
             }
         }
@@ -234,7 +234,7 @@ namespace MiniKreuzwortraetsel
                 yCoords.Add(letterY);
             }
 
-            gridPanel.Refresh();
+            gridPB.Refresh();
         }
         /// <summary>
         /// ??? Increases Grid size in all directions by length
@@ -268,7 +268,7 @@ namespace MiniKreuzwortraetsel
             if (Height < minHeight)
                 Height = minHeight;
 
-            Refresh();
+            gridPB.Refresh();
         }
         private void ExportToDocx(object sender, EventArgs e)
         {
@@ -405,7 +405,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Hover effects
         /// </summary>
-        private void GridPanel_MouseMove(object sender, MouseEventArgs e)
+        private void GridPB_MouseMove(object sender, MouseEventArgs e)
         {
             // The tile the mouse is hovering over: 
             int tileX = (e.X - gridOrigin.X) / ts;
@@ -417,7 +417,7 @@ namespace MiniKreuzwortraetsel
                 {
                     string tileText;
                     grid[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts].GetText(out tileText);
-                    int questionIndex = Convert.ToInt32(tileText[0]) - 1;
+                    int questionIndex = Convert.ToInt32(tileText[0].ToString()) - 1;
                     string popupText = questions[questionIndex];
                     popupLBL.Text = popupText;
                     popupLBL.Location = new Point(e.X + ts/2, e.Y - ts/2);
@@ -426,11 +426,11 @@ namespace MiniKreuzwortraetsel
                 else
                     popupLBL.Visible = false;
 
-            // Call Refresh() for highlight change?
-            if (Highlight.HasHighlightChanged(new Point(e.X, e.Y), grid, ts))
-                Refresh();
+            // Call Refresh() bc of hover change?
+            if (Hover.HasHoverChanged(new Point(e.X, e.Y), grid, ts))
+                gridPB.Refresh();
         }
-        private void GridPanel_Paint(object sender, PaintEventArgs e)
+        private void GridPB_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.TranslateTransform(gridOrigin.X, gridOrigin.Y);
             for (int y = 0; y < grid.GetLength(0); y++)
@@ -452,12 +452,15 @@ namespace MiniKreuzwortraetsel
                 }
             }
             // Draw Hover Effect
-            Brush brush = Brushes.Blue;
-            if (Tile.GetHoverTriangle(out Point[] triangle, ts))
-                e.Graphics.FillPolygon(brush, triangle);
+            if (Hover.GetHoverTriangle(out Point[] triangle, out string arrow, out Point arrowPos, ts))
+            {
+                e.Graphics.FillPolygon(Brushes.Blue, triangle);
+                e.Graphics.DrawString(arrow, Font, Brushes.Red, arrowPos);
+            }
         }
-        private void GridPanel_MouseClick(object sender, MouseEventArgs e)
+        private void GridPB_MouseClick(object sender, MouseEventArgs e)
         {
+            // TODO: out of range exception if clicking outside grid
             Tile tile = grid[e.Y / ts, e.X / ts];
             if (tile.IsHighlighted())
             {
@@ -473,8 +476,8 @@ namespace MiniKreuzwortraetsel
                 }
 
                 FillAnswer(tile, tile.HighlightDirections[direction], Tile.tupleToBeFilled);
-                Tile.RemoveAllHighlights(grid);
-                gridPanel.Refresh();
+                Hover.RemoveAllHighlights(grid);
+                gridPB.Refresh();
             }
         }
     }

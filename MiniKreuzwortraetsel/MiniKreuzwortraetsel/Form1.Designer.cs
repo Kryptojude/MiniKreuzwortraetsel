@@ -42,8 +42,9 @@
             this.tableMenu = new System.Windows.Forms.ComboBox();
             this.exportBTN = new System.Windows.Forms.Button();
             this.popupLBL = new System.Windows.Forms.Label();
-            this.gridPanel = new System.Windows.Forms.Panel();
+            this.gridPB = new System.Windows.Forms.PictureBox();
             this.UIPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridPB)).BeginInit();
             this.SuspendLayout();
             // 
             // baseWordTB
@@ -200,22 +201,23 @@
             this.popupLBL.TabIndex = 4;
             this.popupLBL.Visible = false;
             // 
-            // gridPanel
+            // gridPB
             // 
-            this.gridPanel.Location = new System.Drawing.Point(1, 0);
-            this.gridPanel.Name = "gridPanel";
-            this.gridPanel.Size = new System.Drawing.Size(764, 658);
-            this.gridPanel.TabIndex = 5;
-            this.gridPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.GridPanel_Paint);
-            this.gridPanel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GridPanel_MouseClick);
-            this.gridPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GridPanel_MouseMove);
+            this.gridPB.Location = new System.Drawing.Point(0, 0);
+            this.gridPB.Name = "gridPB";
+            this.gridPB.Size = new System.Drawing.Size(755, 658);
+            this.gridPB.TabIndex = 5;
+            this.gridPB.TabStop = false;
+            this.gridPB.Paint += new System.Windows.Forms.PaintEventHandler(this.GridPB_Paint);
+            this.gridPB.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GridPB_MouseClick);
+            this.gridPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GridPB_MouseMove);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 658);
-            this.Controls.Add(this.gridPanel);
+            this.Controls.Add(this.gridPB);
             this.Controls.Add(this.popupLBL);
             this.Controls.Add(this.UIPanel);
             this.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -224,6 +226,7 @@
             this.Text = "KreuzworträtselMacher";
             this.UIPanel.ResumeLayout(false);
             this.UIPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridPB)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -244,7 +247,7 @@
         private System.Windows.Forms.Button baseWordBTN;
         private System.Windows.Forms.Button deleteCollectionBTN;
         private System.Windows.Forms.Button deleteTupleBTN;
-        private System.Windows.Forms.Panel gridPanel;
+        private System.Windows.Forms.PictureBox gridPB;
     }
 }
 

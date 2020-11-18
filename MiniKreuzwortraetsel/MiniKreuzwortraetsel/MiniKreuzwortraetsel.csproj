@@ -124,7 +124,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Highlight.cs" />
+    <Compile Include="Hover.cs" />
     <Compile Include="MySqlQueries.cs" />
     <Compile Include="TextDialogForm.cs">
       <SubType>Form</SubType>
