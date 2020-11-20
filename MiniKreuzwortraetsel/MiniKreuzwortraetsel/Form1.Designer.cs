@@ -92,7 +92,7 @@
             // deleteTupleBTN
             // 
             this.deleteTupleBTN.Enabled = false;
-            this.deleteTupleBTN.Location = new System.Drawing.Point(234, 457);
+            this.deleteTupleBTN.Location = new System.Drawing.Point(356, 457);
             this.deleteTupleBTN.Name = "deleteTupleBTN";
             this.deleteTupleBTN.Size = new System.Drawing.Size(71, 48);
             this.deleteTupleBTN.TabIndex = 10;
@@ -114,7 +114,7 @@
             // newTupleBTN
             // 
             this.newTupleBTN.Enabled = false;
-            this.newTupleBTN.Location = new System.Drawing.Point(144, 457);
+            this.newTupleBTN.Location = new System.Drawing.Point(266, 457);
             this.newTupleBTN.Name = "newTupleBTN";
             this.newTupleBTN.Size = new System.Drawing.Size(73, 48);
             this.newTupleBTN.TabIndex = 5;

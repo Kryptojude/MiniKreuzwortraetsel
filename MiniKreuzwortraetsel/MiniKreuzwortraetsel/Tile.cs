@@ -39,19 +39,22 @@ namespace MiniKreuzwortraetsel
 
             return IsQuestionTile();
         }
-        public Brush GetBackgroundColor()
+        public bool GetBackgroundPolygon(int ts, out Point[] polygon, out Brush color)
         {
-            Brush color = BackgroundColor;
-            if (BackgroundColor != null)
-                return color;
+            color = BackgroundColor;
+
+            // Triangle
+            if (HighlightDirections.Count == 1)
+                polygon = new Point[3] { new Point(), new Point(), new Point() };
+            // Rectangle
             else
-                return color;
+                polygon = new Point[4] { new Point(Position.X, Position.Y), new Point(Position.X + ts, Position.Y), new Point(Position.X + ts, Position.Y + ts), new Point(Position.X, Position.Y + ts) };
+
         }
         public void SetBackgroundColor(Brush color)
         {
             BackgroundColor = color;
         }
-        // Need to differentiate between the question tile highlight and the mouse over highlight later
         public bool IsHighlighted()
         {
             if (BackgroundColor != Brushes.White)

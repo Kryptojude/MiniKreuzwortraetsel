@@ -12,6 +12,21 @@ namespace MiniKreuzwortraetsel
         static Point[][] HoverTriangles = new Point[][] { new Point[] { new Point(0, 0), new Point(1, 0), new Point(1, 1) }, new Point[] { new Point(0, 0), new Point(1, 1), new Point(0, 1) } };
         static Point Position = new Point(-1, -1); // -1 means hover not active
         static int SubTile; // 0 means upper right subtile, 1 means lower left subtile
+        static Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
+
+        public static bool GetHoveringTile(Tile[,] grid, out Tile tile, out Point direction)
+        {
+            tile = new Tile(0 ,0);
+            direction = new Point();
+            if (Position.X != -1)
+            {
+                tile = grid[Position.Y, Position.X];
+                direction = directions[SubTile];
+                return true;
+            }
+            else
+                return false;
+        }
 
         public static bool GetHoverTriangle(out Point[] triangle, out string arrow, out Point arrowPos, int ts)
         {
@@ -62,7 +77,6 @@ namespace MiniKreuzwortraetsel
                     Point posRelativeToTile = new Point(mousePosition.X - ts * tile.GetPosition().X, mousePosition.Y - ts * tile.GetPosition().Y);
                     newSubTile = (posRelativeToTile.X > posRelativeToTile.Y) ? 0 : 1;
                     // Check if that subTile corresponds to the possible directions
-                    Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
                     Point directionPoint = directions[newSubTile];
                     bool foundDirection = false;
                     for (int i = 0; i < tile.HighlightDirections.Count; i++)

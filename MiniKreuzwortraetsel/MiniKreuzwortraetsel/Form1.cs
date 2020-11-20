@@ -28,7 +28,10 @@ namespace MiniKreuzwortraetsel
         // TODO: thumbnail
 
         // TODO: hover effect baseWord error
-        // TODO: reserved tiles cant be highlighted
+        // TODO: reserved tiles cant have question in it
+        // TODO: Filling over reserved tiles
+        // TODO: Wort ausgrauen, wenn wort nicht passen kann
+        // TODO: Only Highlight subtile
         public Form1()
         {
             InitializeComponent();
@@ -145,13 +148,20 @@ namespace MiniKreuzwortraetsel
                                     // In bounds check
                                     if (letterX >= 0 && letterX <= grid.GetUpperBound(1) && letterY >= 0 && letterY <= grid.GetUpperBound(0))
                                     {
-                                        // obstacles found?
-                                        if ((grid[letterY, letterX].GetText(out string text) && text != tuple.Answer[i].ToString()) ||
-                                            questionTile.IsQuestionTile() || 
+                                        // questionTile or reserved tile
+                                        if (questionTile.IsQuestionTile() ||
                                             questionTile.IsReserved())
+                                            possible = false;
+                                        // letter
+                                        else if (grid[letterY, letterX].GetText(out string text))
+                                        {
+                                            // letter matches
+                                            if (text == tuple.Answer[i].ToString())
+                                                matches++;
+                                            // letter doesn't match
+                                            else
                                                 possible = false;
-                                        else
-                                            matches++;
+                                        }
                                     }
                                     else
                                         possible = false;
@@ -184,15 +194,22 @@ namespace MiniKreuzwortraetsel
                     // Highlight candidates
                     for (int i = 0; i < candidates.Count; i++)
                     {
-                        Brush color;
-                        // Light green for few/no matches
-                        if (candidates[i].matches < maxMatches)
-                            color = Brushes.LightGreen;
-                        // Green for maximum matches
+                        Color minColor = Color.FromArgb(0x9be8a1);
+                        Color maxColor = Color.FromArgb(0x00ff14);
+                        float proportion = 0;
+                        if (maxMatches == 2)
+                        {
+                            if (candidates[i].matches == 2)
+                                Debug.WriteLine(candidates[i].matches);
+                        }
+                        if (maxMatches > 0)
+                            proportion = candidates[i].matches / maxMatches;
                         else
-                            color = Brushes.Green;
+                            proportion = 0;
+                        Color color = Color.FromArgb((int)(minColor.R + (maxColor.R - minColor.R) * proportion), (int)(minColor.G + (maxColor.G - minColor.G) * proportion), (int)(minColor.B + (maxColor.B - minColor.B) * proportion));
+                        SolidBrush brush = new SolidBrush(color);
 
-                        candidates[i].questionTile.SetBackgroundColor(color);
+                        candidates[i].questionTile.SetBackgroundColor(brush);
                         candidates[i].questionTile.HighlightDirections.Add(candidates[i].direction);
                     }
                     Tile.tupleToBeFilled = tuple;
@@ -233,40 +250,6 @@ namespace MiniKreuzwortraetsel
                 xCoords.Add(letterX);
                 yCoords.Add(letterY);
             }
-
-            gridPB.Refresh();
-        }
-        /// <summary>
-        /// ??? Increases Grid size in all directions by length
-        /// </summary>
-        private void IncreaseGridSize(int length)
-        {
-            // Create bigger Array
-            Tile[,] biggerArray = new Tile[grid.GetLength(0) + length * 2, grid.GetLength(1) + length * 2];
-            // Copy grid into bigger array at correct position
-            for (int y = 0; y < grid.GetLength(0); y++)
-            {
-                for (int x = 0; x < grid.GetLength(1); x++)
-                {
-                    biggerArray[y + length, x + length] = grid[y, x];
-                }
-            }
-
-            grid = biggerArray;
-        }
-        /// <summary>
-        /// ???
-        /// </summary>
-        private void RealignGrid()
-        {
-            gridOrigin.X = -xCoords.Min() * ts;
-            gridOrigin.Y = -yCoords.Min() * ts;
-            // Resize window
-            int minHeight = ts * 8 + 39;
-            Width = (xCoords.Max() + 1 - xCoords.Min()) * ts + 16 + UIPanel.Width;
-            Height = (yCoords.Max() + 1 - yCoords.Min()) * ts + 39;
-            if (Height < minHeight)
-                Height = minHeight;
 
             gridPB.Refresh();
         }
@@ -319,6 +302,9 @@ namespace MiniKreuzwortraetsel
 
             return input;
         }
+
+
+
         private void NewTupleBTN_Click(object sender, EventArgs e)
         {
             TextDialogForm textDialogForm = new TextDialogForm(2, "Eintrag in \"" + (string)tableMenu.SelectedItem + "\" hinzufügen", new string[] { "Frage eingeben: ", "Antwort eingeben: " }, "Eintrag hinzufügen", "");
@@ -345,9 +331,6 @@ namespace MiniKreuzwortraetsel
             MySqlQueries.DELETE((string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, tuplesListBox.SelectedItem.ToString().Split(new string[] { " <---> " }, StringSplitOptions.None));
             UpdateTuples(null, null);
         }
-        /// <summary>
-        /// Show user dialog and create new collection
-        /// </summary>
         private void NewCollectionBTN_Click(object sender, EventArgs e)
         {
             TextDialogForm textDialogForm = new TextDialogForm(1, "Neue Sammlung erstellen", new string[] { "Name der Sammlung:" }, "Erstellen", "");
@@ -395,6 +378,9 @@ namespace MiniKreuzwortraetsel
                 UpdateTableMenu();
             }
         }
+        /// <summary>
+        /// Prevents empty baseword
+        /// </summary>
         private void BaseWordTB_TextChanged(object sender, EventArgs e)
         {
             if ((sender as TextBox).Text == "")
@@ -439,7 +425,8 @@ namespace MiniKreuzwortraetsel
                 {
                     Tile tile = grid[y, x];
                     // Draw Background Color
-                    e.Graphics.FillRectangle(tile.GetBackgroundColor(), x * ts, y * ts, ts, ts);
+                    if (tile.)
+                        e.Graphics.FillPolygon(tile.GetBackgroundColor(), x * ts, y * ts, ts, ts);
                     // Draw Rectangle
                     if (tile.HasRectangle())
                         e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts - 1, ts - 1);
@@ -458,27 +445,59 @@ namespace MiniKreuzwortraetsel
                 e.Graphics.DrawString(arrow, Font, Brushes.Red, arrowPos);
             }
         }
+        /// <summary>
+        /// Calls FillAnswer if in bounds and hover active
+        /// </summary>
         private void GridPB_MouseClick(object sender, MouseEventArgs e)
         {
-            // TODO: out of range exception if clicking outside grid
-            Tile tile = grid[e.Y / ts, e.X / ts];
-            if (tile.IsHighlighted())
+            // Hover effect active?
+            if (Hover.GetHoveringTile(grid, out Tile tile, out Point direction))
             {
-                int direction = 0;
-                if (tile.HighlightDirections.Count > 1)
+                // Click in bounds of grid?
+                if (e.Y / ts <= grid.GetLength(0) && e.X / ts <= grid.GetLength(1))
                 {
-                    // relative to upper left corner of the tile
-                    Point mouse = new Point(e.X - ts * tile.GetPosition().X, e.Y - ts * tile.GetPosition().Y);
-                    if (mouse.X > mouse.Y)
-                        direction = 0;
-                    else
-                        direction = 1;
+                    FillAnswer(tile, direction, Tile.tupleToBeFilled);
+                    Hover.RemoveAllHighlights(grid);
+                    gridPB.Refresh();
                 }
-
-                FillAnswer(tile, tile.HighlightDirections[direction], Tile.tupleToBeFilled);
-                Hover.RemoveAllHighlights(grid);
-                gridPB.Refresh();
             }
+        }
+
+
+
+        /// <summary>
+        /// UNUSED Increases Grid size in all directions by length
+        /// </summary>
+        private void IncreaseGridSize(int length)
+        {
+            // Create bigger Array
+            Tile[,] biggerArray = new Tile[grid.GetLength(0) + length * 2, grid.GetLength(1) + length * 2];
+            // Copy grid into bigger array at correct position
+            for (int y = 0; y < grid.GetLength(0); y++)
+            {
+                for (int x = 0; x < grid.GetLength(1); x++)
+                {
+                    biggerArray[y + length, x + length] = grid[y, x];
+                }
+            }
+
+            grid = biggerArray;
+        }
+        /// <summary>
+        /// UNUSED
+        /// </summary>
+        private void RealignGrid()
+        {
+            gridOrigin.X = -xCoords.Min() * ts;
+            gridOrigin.Y = -yCoords.Min() * ts;
+            // Resize window
+            int minHeight = ts * 8 + 39;
+            Width = (xCoords.Max() + 1 - xCoords.Min()) * ts + 16 + UIPanel.Width;
+            Height = (yCoords.Max() + 1 - yCoords.Min()) * ts + 39;
+            if (Height < minHeight)
+                Height = minHeight;
+
+            gridPB.Refresh();
         }
     }
 }
