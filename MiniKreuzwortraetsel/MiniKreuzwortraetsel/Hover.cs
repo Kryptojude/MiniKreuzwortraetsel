@@ -13,8 +13,10 @@ namespace MiniKreuzwortraetsel
         static Point Position = new Point(-1, -1); // -1 means hover not active
         static int SubTile; // 0 means upper right subtile, 1 means lower left subtile
         static Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
-
-        public static bool GetHoveringTile(Tile[,] grid, out Tile tile, out Point direction)
+        /// <summary>
+        /// Returns Hover effect parameters: is it active?, what tile is it on?, what direction does it indicate?
+        /// </summary>
+        public static bool GetHoverInfo(Tile[,] grid, out Tile tile, out Point direction)
         {
             tile = new Tile(0 ,0);
             direction = new Point();
@@ -58,7 +60,10 @@ namespace MiniKreuzwortraetsel
             else
                 return false;
         }
-
+        /// <summary>
+        /// Checks if the state of the Hover effect has changed based on current mousePosition, 
+        /// if so, saves the new hover effect paramters in Hover class fields
+        /// </summary>
         public static bool HasHoverChanged(Point mousePosition, Tile[,] grid, int ts)
         {
             Point newPosition = new Point(Position.X, Position.Y);

@@ -44,7 +44,7 @@ namespace MiniKreuzwortraetsel
                 }
             }
             // Fill tableMenu with the tables in database
-            UpdateTableMenu();
+            //UpdateTableMenu();
         }
         public void UpdateTableMenu()
         {
@@ -403,11 +403,13 @@ namespace MiniKreuzwortraetsel
                 {
                     string tileText;
                     grid[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts].GetText(out tileText);
-                    int questionIndex = Convert.ToInt32(tileText[0].ToString()) - 1;
-                    string popupText = questions[questionIndex];
-                    popupLBL.Text = popupText;
-                    popupLBL.Location = new Point(e.X + ts/2, e.Y - ts/2);
-                    popupLBL.Visible = true;
+                    if (int.TryParse(tileText[0].ToString(), out int questionIndex))
+                    {
+                        string popupText = questions[questionIndex];
+                        popupLBL.Text = popupText;
+                        popupLBL.Location = new Point(e.X + ts/2, e.Y - ts/2);
+                        popupLBL.Visible = true;
+                    }
                 }
                 else
                     popupLBL.Visible = false;
@@ -425,8 +427,8 @@ namespace MiniKreuzwortraetsel
                 {
                     Tile tile = grid[y, x];
                     // Draw Background Color
-                    if (tile.)
-                        e.Graphics.FillPolygon(tile.GetBackgroundColor(), x * ts, y * ts, ts, ts);
+                    tile.GetBackgroundPolygon(ts, out Point[] polygon, out Brush color);
+                    e.Graphics.FillPolygon(color, polygon);
                     // Draw Rectangle
                     if (tile.HasRectangle())
                         e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts - 1, ts - 1);
@@ -451,7 +453,7 @@ namespace MiniKreuzwortraetsel
         private void GridPB_MouseClick(object sender, MouseEventArgs e)
         {
             // Hover effect active?
-            if (Hover.GetHoveringTile(grid, out Tile tile, out Point direction))
+            if (Hover.GetHoverInfo(grid, out Tile tile, out Point direction))
             {
                 // Click in bounds of grid?
                 if (e.Y / ts <= grid.GetLength(0) && e.X / ts <= grid.GetLength(1))

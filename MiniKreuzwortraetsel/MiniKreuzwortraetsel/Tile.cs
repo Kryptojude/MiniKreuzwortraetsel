@@ -39,17 +39,34 @@ namespace MiniKreuzwortraetsel
 
             return IsQuestionTile();
         }
-        public bool GetBackgroundPolygon(int ts, out Point[] polygon, out Brush color)
+        /// <summary>
+        /// TODO: Rectangle has uniform color, need to make it so that both subtiles can have different color
+        /// </summary>
+        public void GetBackgroundPolygon(int ts, out Point[] polygon, out Brush color)
         {
             color = BackgroundColor;
+            polygon = null;
 
             // Triangle
             if (HighlightDirections.Count == 1)
-                polygon = new Point[3] { new Point(), new Point(), new Point() };
+            {
+                // Vertical
+                if (HighlightDirections[0].X == 0)
+                    polygon = new Point[3] { new Point(Position.X, Position.Y), new Point(Position.X + 1, Position.Y + 1), new Point(Position.X, Position.Y + 1) };
+                // Horizontal
+                else if (HighlightDirections[0].X == 1)
+                    polygon = new Point[3] { new Point(Position.X, Position.Y), new Point(Position.X + 1, Position.Y), new Point(Position.X + 1, Position.Y + 1) };
+            }
             // Rectangle
             else
-                polygon = new Point[4] { new Point(Position.X, Position.Y), new Point(Position.X + ts, Position.Y), new Point(Position.X + ts, Position.Y + ts), new Point(Position.X, Position.Y + ts) };
+                polygon = new Point[4] { new Point(Position.X, Position.Y), new Point(Position.X + 1, Position.Y), new Point(Position.X + 1, Position.Y + 1), new Point(Position.X, Position.Y + 1) };
 
+            // Scale from grid space to world space
+            for (int i = 0; i < polygon.Length; i++)
+            {
+                polygon[i].X *= ts;
+                polygon[i].Y *= ts;
+            }
         }
         public void SetBackgroundColor(Brush color)
         {
@@ -65,7 +82,7 @@ namespace MiniKreuzwortraetsel
         public bool HasRectangle()
         {
             // Conditions: has background color or text
-            if (GetText(out _))
+            if (GetText(out _) || BackgroundColor != Brushes.White)
                 return true;
             else
                 return false;
