@@ -16,22 +16,19 @@ namespace MiniKreuzwortraetsel
     public partial class Form1 : Form
     {
         Tile[,] grid = new Tile[20,20];
-        Point gridOrigin = new Point();
         List<string> questions = new List<string>();
         Random random = new Random();
         int ts = 30;
-        // Used to determine empty space in grid
-        List<int> xCoords = new List<int>();
-        List<int> yCoords = new List<int>();
 
         // TODO: export to docx
         // TODO: thumbnail
 
-        // TODO: hover effect baseWord error
         // TODO: reserved tiles cant have question in it
         // TODO: Filling over reserved tiles
         // TODO: Wort ausgrauen, wenn wort nicht passen kann
         // TODO: Only Highlight subtile
+        // TODO: Rückgängig machen
+        // ??? Polygon Class???
         public Form1()
         {
             InitializeComponent();
@@ -208,9 +205,7 @@ namespace MiniKreuzwortraetsel
                             proportion = 0;
                         Color color = Color.FromArgb((int)(minColor.R + (maxColor.R - minColor.R) * proportion), (int)(minColor.G + (maxColor.G - minColor.G) * proportion), (int)(minColor.B + (maxColor.B - minColor.B) * proportion));
                         SolidBrush brush = new SolidBrush(color);
-
-                        candidates[i].questionTile.SetBackgroundColor(brush);
-                        candidates[i].questionTile.HighlightDirections.Add(candidates[i].direction);
+                        candidates[i].questionTile.HighlightDirectionsAndColors.Add((candidates[i].direction, brush));
                     }
                     Tile.tupleToBeFilled = tuple;
                     gridPB.Refresh();
@@ -234,9 +229,6 @@ namespace MiniKreuzwortraetsel
             Point tileAfterAnswerPos = new Point(questionTile.GetPosition().X + (direction.X * (tuple.Answer.Length + 1)), questionTile.GetPosition().Y + (direction.Y * (tuple.Answer.Length + 1)));
             if (tileAfterAnswerPos.Y < grid.GetLength(0) && tileAfterAnswerPos.X < grid.GetLength(1))
                 grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X].SetReserved(true);
-            // Save coordinates for easy grid shrinking later
-            xCoords.Add(questionTile.GetPosition().X);
-            yCoords.Add(questionTile.GetPosition().Y);
 
             int letterX = 0; // Absolute position of the current letter
             int letterY = 0;
@@ -246,9 +238,6 @@ namespace MiniKreuzwortraetsel
                 letterX = questionTile.GetPosition().X + (direction.X * (c + 1));
                 letterY = questionTile.GetPosition().Y + (direction.Y * (c + 1));
                 grid[letterY, letterX].SetText(tuple.Answer[c].ToString());
-                // Save the letter position for easy shrinking of the grid later
-                xCoords.Add(letterX);
-                yCoords.Add(letterY);
             }
 
             gridPB.Refresh();
@@ -265,7 +254,7 @@ namespace MiniKreuzwortraetsel
                     doc.MarginLeft = 0;
                     doc.MarginRight = 0;
 
-                    var table = doc.AddTable(grid.GetLength(0), grid.GetLength(1) + gridOrigin.X / ts);
+                    var table = doc.AddTable(grid.GetLength(0), grid.GetLength(1) / ts);
                     float[] floatArray = new float[table.ColumnCount];
                     for (int i = 0; i < table.ColumnCount; i++)
                     {
@@ -277,7 +266,7 @@ namespace MiniKreuzwortraetsel
                     {
                         for (int row = 0; row < table.RowCount; row++)
                         {
-                            grid[row - gridOrigin.Y / ts, col - gridOrigin.X / ts].GetText(out string gridString);
+                            grid[row, col].GetText(out string gridString);
                             table.Rows[row].Cells[col].Paragraphs[0].Append(gridString);
                         }
                     }
@@ -302,9 +291,6 @@ namespace MiniKreuzwortraetsel
 
             return input;
         }
-
-
-
         private void NewTupleBTN_Click(object sender, EventArgs e)
         {
             TextDialogForm textDialogForm = new TextDialogForm(2, "Eintrag in \"" + (string)tableMenu.SelectedItem + "\" hinzufügen", new string[] { "Frage eingeben: ", "Antwort eingeben: " }, "Eintrag hinzufügen", "");
@@ -394,15 +380,15 @@ namespace MiniKreuzwortraetsel
         private void GridPB_MouseMove(object sender, MouseEventArgs e)
         {
             // The tile the mouse is hovering over: 
-            int tileX = (e.X - gridOrigin.X) / ts;
-            int tileY = (e.Y - gridOrigin.Y) / ts;
+            int tileX = e.X / ts;
+            int tileY = e.Y / ts;
             // Out of bounds check
             if (tileX >= 0 && tileY >= 0 &&
                 tileX <= grid.GetUpperBound(1) && tileY <= grid.GetUpperBound(0) )
-                if (grid[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts].IsQuestionTile())
+                if (grid[e.Y / ts, e.X / ts].IsQuestionTile())
                 {
                     string tileText;
-                    grid[(e.Y - gridOrigin.Y) / ts, (e.X - gridOrigin.X) / ts].GetText(out tileText);
+                    grid[e.Y / ts, e.X / ts].GetText(out tileText);
                     if (int.TryParse(tileText[0].ToString(), out int questionIndex))
                     {
                         string popupText = questions[questionIndex];
@@ -420,15 +406,15 @@ namespace MiniKreuzwortraetsel
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.TranslateTransform(gridOrigin.X, gridOrigin.Y);
             for (int y = 0; y < grid.GetLength(0); y++)
             {
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
                     Tile tile = grid[y, x];
-                    // Draw Background Color
-                    tile.GetBackgroundPolygon(ts, out Point[] polygon, out Brush color);
-                    e.Graphics.FillPolygon(color, polygon);
+                    // Draw Background Color / polygon(s)
+                    List<(Point[] Polygon, Brush Color)> polygonsAndColors = tile.GetBackgroundPolygon(ts);
+                    for (int i = 0; i < polygonsAndColors.Count; i++)
+                        e.Graphics.FillPolygon(polygonsAndColors[i].Color, polygonsAndColors[i].Polygon);
                     // Draw Rectangle
                     if (tile.HasRectangle())
                         e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts - 1, ts - 1);
@@ -463,43 +449,6 @@ namespace MiniKreuzwortraetsel
                     gridPB.Refresh();
                 }
             }
-        }
-
-
-
-        /// <summary>
-        /// UNUSED Increases Grid size in all directions by length
-        /// </summary>
-        private void IncreaseGridSize(int length)
-        {
-            // Create bigger Array
-            Tile[,] biggerArray = new Tile[grid.GetLength(0) + length * 2, grid.GetLength(1) + length * 2];
-            // Copy grid into bigger array at correct position
-            for (int y = 0; y < grid.GetLength(0); y++)
-            {
-                for (int x = 0; x < grid.GetLength(1); x++)
-                {
-                    biggerArray[y + length, x + length] = grid[y, x];
-                }
-            }
-
-            grid = biggerArray;
-        }
-        /// <summary>
-        /// UNUSED
-        /// </summary>
-        private void RealignGrid()
-        {
-            gridOrigin.X = -xCoords.Min() * ts;
-            gridOrigin.Y = -yCoords.Min() * ts;
-            // Resize window
-            int minHeight = ts * 8 + 39;
-            Width = (xCoords.Max() + 1 - xCoords.Min()) * ts + 16 + UIPanel.Width;
-            Height = (yCoords.Max() + 1 - yCoords.Min()) * ts + 39;
-            if (Height < minHeight)
-                Height = minHeight;
-
-            gridPB.Refresh();
         }
     }
 }

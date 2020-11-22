@@ -84,9 +84,9 @@ namespace MiniKreuzwortraetsel
                     // Check if that subTile corresponds to the possible directions
                     Point directionPoint = directions[newSubTile];
                     bool foundDirection = false;
-                    for (int i = 0; i < tile.HighlightDirections.Count; i++)
+                    for (int i = 0; i < tile.HighlightDirectionsAndColors.Count; i++)
                     {
-                        if (tile.HighlightDirections[i].X == directionPoint.X && tile.HighlightDirections[i].Y == directionPoint.Y)
+                        if (tile.HighlightDirectionsAndColors[i].Direction.X == directionPoint.X && tile.HighlightDirectionsAndColors[i].Direction.Y == directionPoint.Y)
                             foundDirection = true;
                     }
 
@@ -122,8 +122,7 @@ namespace MiniKreuzwortraetsel
             {
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    grid[y, x].SetBackgroundColor(Brushes.White);
-                    grid[y, x].HighlightDirections.Clear();
+                    grid[y, x].HighlightDirectionsAndColors.Clear();
                 }
             }
         }

@@ -13,10 +13,9 @@ namespace MiniKreuzwortraetsel
 
         Point Position;
         string Text = "";
-        Brush BackgroundColor = Brushes.White;
         Brush ForeGroundColor = Brushes.Blue;
         bool Reserved = false;
-        public List<Point> HighlightDirections = new List<Point>();
+        public List<(Point Direction, Brush Color)> HighlightDirectionsAndColors = new List<(Point, Brush)>();
 
         public Tile(int x, int y)
         {
@@ -42,39 +41,35 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// TODO: Rectangle has uniform color, need to make it so that both subtiles can have different color
         /// </summary>
-        public void GetBackgroundPolygon(int ts, out Point[] polygon, out Brush color)
+        public List<(Point[] Polygon, Brush Color)> GetBackgroundPolygon(int ts)
         {
-            color = BackgroundColor;
-            polygon = null;
-
-            // Triangle
-            if (HighlightDirections.Count == 1)
+            List<(Point[] Polygon, Brush Color)> polygonsAndColors = new List<(Point[] Polygon, Brush Color)>();
+            for (int i = 0; i < HighlightDirectionsAndColors.Count; i++)
             {
+                polygonsAndColors.Add((new Point[3] { new Point(Position.X, Position.Y), new Point(Position.X + 1, Position.Y + 1), new Point() }, HighlightDirectionsAndColors[i].Color));
                 // Vertical
-                if (HighlightDirections[0].X == 0)
-                    polygon = new Point[3] { new Point(Position.X, Position.Y), new Point(Position.X + 1, Position.Y + 1), new Point(Position.X, Position.Y + 1) };
+                if (HighlightDirectionsAndColors[i].Direction.X == 0)
+                    polygonsAndColors.Last().Polygon[2] = new Point(Position.X, Position.Y + 1);
                 // Horizontal
-                else if (HighlightDirections[0].X == 1)
-                    polygon = new Point[3] { new Point(Position.X, Position.Y), new Point(Position.X + 1, Position.Y), new Point(Position.X + 1, Position.Y + 1) };
+                else if (HighlightDirectionsAndColors[i].Direction.X == 1)
+                    polygonsAndColors.Last().Polygon[2] = new Point(Position.X + 1, Position.Y);
             }
-            // Rectangle
-            else
-                polygon = new Point[4] { new Point(Position.X, Position.Y), new Point(Position.X + 1, Position.Y), new Point(Position.X + 1, Position.Y + 1), new Point(Position.X, Position.Y + 1) };
 
             // Scale from grid space to world space
-            for (int i = 0; i < polygon.Length; i++)
+            for (int polygon = 0; polygon < polygonsAndColors.Count; polygon++)
             {
-                polygon[i].X *= ts;
-                polygon[i].Y *= ts;
+                for (int point = 0; point < polygonsAndColors[polygon].Polygon.Length; point++)
+                {
+                    polygonsAndColors[polygon].Polygon[point].X *= ts;
+                    polygonsAndColors[polygon].Polygon[point].Y *= ts;
+                }
             }
-        }
-        public void SetBackgroundColor(Brush color)
-        {
-            BackgroundColor = color;
+
+            return polygonsAndColors;
         }
         public bool IsHighlighted()
         {
-            if (BackgroundColor != Brushes.White)
+            if (HighlightDirectionsAndColors.Count > 0)
                 return true;
             else
                 return false;
@@ -82,7 +77,7 @@ namespace MiniKreuzwortraetsel
         public bool HasRectangle()
         {
             // Conditions: has background color or text
-            if (GetText(out _) || BackgroundColor != Brushes.White)
+            if (GetText(out _) || HighlightDirectionsAndColors.Count > 0)
                 return true;
             else
                 return false;
