@@ -188,9 +188,9 @@
             this.exportBTN.Name = "exportBTN";
             this.exportBTN.Size = new System.Drawing.Size(135, 54);
             this.exportBTN.TabIndex = 4;
-            this.exportBTN.Text = "Als .docx exportieren";
+            this.exportBTN.Text = "Kreuzworträtsel exportieren";
             this.exportBTN.UseVisualStyleBackColor = true;
-            this.exportBTN.Click += new System.EventHandler(this.ExportToDocx);
+            this.exportBTN.Click += new System.EventHandler(this.ExportToHTML);
             // 
             // popupLBL
             // 

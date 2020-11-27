@@ -39,7 +39,7 @@ namespace MiniKreuzwortraetsel
             return IsQuestionTile();
         }
         /// <summary>
-        /// TODO: Rectangle has uniform color, need to make it so that both subtiles can have different color
+        /// Shit code
         /// </summary>
         public List<(Point[] Polygon, Brush Color)> GetBackgroundPolygon(int ts)
         {

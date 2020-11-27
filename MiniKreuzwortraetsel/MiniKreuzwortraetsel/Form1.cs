@@ -25,10 +25,10 @@ namespace MiniKreuzwortraetsel
 
         // TODO: reserved tiles cant have question in it
         // TODO: Filling over reserved tiles
-        // TODO: Wort ausgrauen, wenn wort nicht passen kann
-        // TODO: Only Highlight subtile
-        // TODO: Rückgängig machen
-        // ??? Polygon Class???
+        // TODO: Show word dimensions when hovering over highlight
+
+        // MAYBE: Wort ausgrauen, wenn wort nicht passen kann
+        // MAYBE: Rückgängig machen
         public Form1()
         {
             InitializeComponent();
@@ -194,11 +194,6 @@ namespace MiniKreuzwortraetsel
                         Color minColor = Color.FromArgb(0x9be8a1);
                         Color maxColor = Color.FromArgb(0x00ff14);
                         float proportion = 0;
-                        if (maxMatches == 2)
-                        {
-                            if (candidates[i].matches == 2)
-                                Debug.WriteLine(candidates[i].matches);
-                        }
                         if (maxMatches > 0)
                             proportion = candidates[i].matches / maxMatches;
                         else
@@ -241,6 +236,51 @@ namespace MiniKreuzwortraetsel
             }
 
             gridPB.Refresh();
+        }
+        private void ExportToHTML(object sender, EventArgs e)
+        {
+            // TODO: file path/name dialog
+            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                string html = "<!DOCTYPE HTML>" +
+                              "<html>" +
+                              "    <head>" +
+                              "        <style>" +
+                              "            td { " +
+                              "                border: 2px solid black" +
+                              "            }" +
+                              "            input { " +
+                              "                width: 20px" +
+                              "            }" +
+                              "        </style>" +
+                              "        <title></title>" +
+                              "    </head>" +
+                              "    <body>" +
+                              "        <table>";
+
+                for (int y = 0; y < grid.GetLength(0); y++)
+                {
+                    html += "<tr>";
+
+                    for (int x = 0; x < grid.GetLength(1); x++)
+                    {
+                        // TODO: also check if its a base word or not
+                        if (grid[y, x].GetText(out string text))
+                            html += "<td><input type='text'></input></td>";
+                    }
+
+                    html += "</tr>";
+                }
+
+                html += "       </table>" +
+                        "   </body>" +
+                        "</html>";
+
+                StreamWriter writer = new StreamWriter(dialog.SelectedPath + @"\rätsel.html");
+                writer.Write(html);
+                writer.Close();
+            }
         }
         private void ExportToDocx(object sender, EventArgs e)
         {
