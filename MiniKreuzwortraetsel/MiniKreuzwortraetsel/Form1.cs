@@ -40,6 +40,14 @@ namespace MiniKreuzwortraetsel
                     grid[y, x] = new Tile(x, y);
                 }
             }
+
+            Timer timer = new Timer { Enabled = true, Interval = 1000 };
+            timer.Tick += Timed;
+        }
+        public void Timed(object sender, EventArgs e)
+        {
+            Timer timer = sender as Timer;
+            timer.Stop();
             // Fill tableMenu with the tables in database
             if (MySqlQueries.TestConnection())
                 UpdateTableMenu();
@@ -54,6 +62,7 @@ namespace MiniKreuzwortraetsel
                     form.ShowDialog();
                     Tile.tupleToBeFilled = (form.userInputs[0], form.userInputs[1]);
                     PutAnswerIntoCrossword(null, null);
+                    Refresh();
                 }
             }
         }
