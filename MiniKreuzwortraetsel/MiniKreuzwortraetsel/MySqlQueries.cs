@@ -10,6 +10,19 @@ namespace MiniKreuzwortraetsel
     class MySqlQueries
     {
         static MySqlConnection conn = new MySqlConnection("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
+        public static bool TestConnection()
+        {
+            try
+            {
+                conn.Open();
+                conn.Close();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         public static List<string> SHOW_TABLES()
         {
             conn.Open();

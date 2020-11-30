@@ -126,6 +126,12 @@
     </Compile>
     <Compile Include="Hover.cs" />
     <Compile Include="MySqlQueries.cs" />
+    <Compile Include="NoMySQLForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NoMySQLForm.Designer.cs">
+      <DependentUpon>NoMySQLForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="TextDialogForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -137,6 +143,9 @@
     <Compile Include="Tile.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NoMySQLForm.resx">
+      <DependentUpon>NoMySQLForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TextDialogForm.resx">
       <DependentUpon>TextDialogForm.cs</DependentUpon>

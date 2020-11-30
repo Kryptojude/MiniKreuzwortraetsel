@@ -41,7 +41,21 @@ namespace MiniKreuzwortraetsel
                 }
             }
             // Fill tableMenu with the tables in database
-            //UpdateTableMenu();
+            if (MySqlQueries.TestConnection())
+                UpdateTableMenu();
+            else
+            {
+                // Gray out all buttons that need mySQL connection
+                newCollectionBTN.Enabled = false;
+                Show();
+                while (true)
+                {
+                    TextDialogForm form = new TextDialogForm(2, "Frage und Antwort eingeben", new string[2] { "Frage: ", "Antwort:" }, "Einfügen", "Verbindung zur Datenbank konnte nicht aufgebaut werden");
+                    form.ShowDialog();
+                    Tile.tupleToBeFilled = (form.userInputs[0], form.userInputs[1]);
+                    PutAnswerIntoCrossword(null, null);
+                }
+            }
         }
         public void UpdateTableMenu()
         {
@@ -233,6 +247,9 @@ namespace MiniKreuzwortraetsel
                 letterX = questionTile.GetPosition().X + (direction.X * (c + 1));
                 letterY = questionTile.GetPosition().Y + (direction.Y * (c + 1));
                 grid[letterY, letterX].SetText(tuple.Answer[c].ToString());
+                // Mark tile as baseWordTile, if question is empty (only the case if a baseWord is being filled)
+                if (tuple.Question == "")
+                    grid[letterY, letterX].IsBaseWordTile = true;
             }
 
             gridPB.Refresh();
@@ -243,42 +260,54 @@ namespace MiniKreuzwortraetsel
             FolderBrowserDialog dialog = new FolderBrowserDialog();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                string html = "<!DOCTYPE HTML>" +
-                              "<html>" +
-                              "    <head>" +
-                              "        <style>" +
-                              "            td { " +
-                              "                border: 2px solid black" +
-                              "            }" +
-                              "            input { " +
-                              "                width: 20px" +
-                              "            }" +
-                              "        </style>" +
-                              "        <title></title>" +
-                              "    </head>" +
-                              "    <body>" +
-                              "        <table>";
-
+                string html = "";
                 for (int y = 0; y < grid.GetLength(0); y++)
                 {
                     html += "<tr>";
 
                     for (int x = 0; x < grid.GetLength(1); x++)
                     {
-                        // TODO: also check if its a base word or not
-                        if (grid[y, x].GetText(out string text))
-                            html += "<td><input type='text'></input></td>";
+                        Tile tile = grid[y, x];
+                        // has content
+                        if (tile.GetText(out string text))
+                        { 
+                            // question tile
+                            if (tile.IsQuestionTile())
+                                html += "<td style='border: 2px solid black; color: red'>" + text + "</td>";
+                            // baseWord tile
+                            else if (tile.IsBaseWordTile)
+                                html += "<td style='border: 2px solid black'>" + text + "</td>";
+                            // question letter -> dont show letter / show text field
+                            else
+                                html += "<td style='border: 2px solid black'><input type='text'></input></td>";
+
+                        }
+                        // empty
+                        else
+                            html += "<td style='border: 2px solid white'></td>";
                     }
 
-                    html += "</tr>";
+                    html += "</tr><p>";
                 }
 
-                html += "       </table>" +
-                        "   </body>" +
-                        "</html>";
+                // Legende
+                for (int i = 0; i < questions.Count; i++)
+                {
+                    html += i + ". " + questions[i] + "<br/>";
+                }
+                html += "</p>";
 
+                // Read start file
+                StreamReader reader = new StreamReader("htmlStart.html");
+                string htmlStart = reader.ReadToEnd();
+                reader.Close();
+                // Read end file
+                reader = new StreamReader("htmlEnd.html");
+                string htmlEnd = reader.ReadToEnd();
+                reader.Close();
+                // Write everything
                 StreamWriter writer = new StreamWriter(dialog.SelectedPath + @"\rätsel.html");
-                writer.Write(html);
+                writer.Write(htmlStart + html + htmlEnd);
                 writer.Close();
             }
         }

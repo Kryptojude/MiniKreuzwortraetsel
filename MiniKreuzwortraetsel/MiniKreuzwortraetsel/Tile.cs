@@ -15,6 +15,7 @@ namespace MiniKreuzwortraetsel
         string Text = "";
         Brush ForeGroundColor = Brushes.Blue;
         bool Reserved = false;
+        public bool IsBaseWordTile = false;
         public List<(Point Direction, Brush Color)> HighlightDirectionsAndColors = new List<(Point, Brush)>();
 
         public Tile(int x, int y)
