@@ -1,4 +1,6 @@
-﻿namespace MiniKreuzwortraetsel
+﻿using System;
+
+namespace MiniKreuzwortraetsel
 {
     partial class Form1
     {
@@ -41,9 +43,16 @@
             this.label2 = new System.Windows.Forms.Label();
             this.tableMenu = new System.Windows.Forms.ComboBox();
             this.exportBTN = new System.Windows.Forms.Button();
+            this.NoDBPanel = new System.Windows.Forms.Panel();
+            this.NoDBInsertTupleBTN = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.NoDBAnswerTB = new System.Windows.Forms.TextBox();
+            this.NoDBQuestionTB = new System.Windows.Forms.TextBox();
             this.popupLBL = new System.Windows.Forms.Label();
             this.gridPB = new System.Windows.Forms.PictureBox();
             this.UIPanel.SuspendLayout();
+            this.NoDBPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridPB)).BeginInit();
             this.SuspendLayout();
             // 
@@ -131,7 +140,7 @@
             this.insertTupleBTN.TabIndex = 5;
             this.insertTupleBTN.Text = "Auswahl einfügen";
             this.insertTupleBTN.UseVisualStyleBackColor = true;
-            this.insertTupleBTN.Click += new System.EventHandler(this.PutAnswerIntoCrossword);
+            this.insertTupleBTN.Click += new System.EventHandler(this.InsertTupleBTN_Click);
             // 
             // newCollectionBTN
             // 
@@ -151,7 +160,7 @@
             this.baseWordBTN.TabIndex = 8;
             this.baseWordBTN.Text = "Einfügen";
             this.baseWordBTN.UseVisualStyleBackColor = true;
-            this.baseWordBTN.Click += new System.EventHandler(this.PutAnswerIntoCrossword);
+            this.baseWordBTN.Click += new System.EventHandler(this.BaseWordBTN_Click);
             // 
             // tuplesListBox
             // 
@@ -161,7 +170,7 @@
             this.tuplesListBox.Name = "tuplesListBox";
             this.tuplesListBox.Size = new System.Drawing.Size(418, 289);
             this.tuplesListBox.TabIndex = 7;
-            this.tuplesListBox.DoubleClick += new System.EventHandler(this.PutAnswerIntoCrossword);
+            this.tuplesListBox.DoubleClick += new System.EventHandler(this.TuplesListBox_DoubleClick);
             // 
             // label2
             // 
@@ -192,10 +201,66 @@
             this.exportBTN.UseVisualStyleBackColor = true;
             this.exportBTN.Click += new System.EventHandler(this.ExportToHTML);
             // 
+            // NoDBPanel
+            // 
+            this.NoDBPanel.Controls.Add(this.NoDBInsertTupleBTN);
+            this.NoDBPanel.Controls.Add(this.label4);
+            this.NoDBPanel.Controls.Add(this.label3);
+            this.NoDBPanel.Controls.Add(this.NoDBAnswerTB);
+            this.NoDBPanel.Controls.Add(this.NoDBQuestionTB);
+            this.NoDBPanel.Location = new System.Drawing.Point(761, 0);
+            this.NoDBPanel.Name = "NoDBPanel";
+            this.NoDBPanel.Size = new System.Drawing.Size(437, 656);
+            this.NoDBPanel.TabIndex = 6;
+            this.NoDBPanel.Visible = false;
+            // 
+            // NoDBInsertTupleBTN
+            // 
+            this.NoDBInsertTupleBTN.Location = new System.Drawing.Point(26, 151);
+            this.NoDBInsertTupleBTN.Name = "NoDBInsertTupleBTN";
+            this.NoDBInsertTupleBTN.Size = new System.Drawing.Size(81, 28);
+            this.NoDBInsertTupleBTN.TabIndex = 4;
+            this.NoDBInsertTupleBTN.Text = "Einfügen";
+            this.NoDBInsertTupleBTN.UseVisualStyleBackColor = true;
+            this.NoDBInsertTupleBTN.Click += new System.EventHandler(this.NoDBInsertTupleBTN_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(26, 82);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(135, 19);
+            this.label4.TabIndex = 3;
+            this.label4.Text = "Antwort eingeben: ";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(26, 23);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(121, 19);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Frage eingeben: ";
+            // 
+            // NoDBAnswerTB
+            // 
+            this.NoDBAnswerTB.Location = new System.Drawing.Point(27, 107);
+            this.NoDBAnswerTB.Name = "NoDBAnswerTB";
+            this.NoDBAnswerTB.Size = new System.Drawing.Size(248, 26);
+            this.NoDBAnswerTB.TabIndex = 1;
+            // 
+            // NoDBQuestionTB
+            // 
+            this.NoDBQuestionTB.Location = new System.Drawing.Point(26, 49);
+            this.NoDBQuestionTB.Name = "NoDBQuestionTB";
+            this.NoDBQuestionTB.Size = new System.Drawing.Size(249, 26);
+            this.NoDBQuestionTB.TabIndex = 0;
+            // 
             // popupLBL
             // 
             this.popupLBL.AutoSize = true;
-            this.popupLBL.Location = new System.Drawing.Point(504, 373);
+            this.popupLBL.BackColor = System.Drawing.SystemColors.Control;
+            this.popupLBL.Location = new System.Drawing.Point(0, 0);
             this.popupLBL.Name = "popupLBL";
             this.popupLBL.Size = new System.Drawing.Size(0, 19);
             this.popupLBL.TabIndex = 4;
@@ -203,7 +268,7 @@
             // 
             // gridPB
             // 
-            this.gridPB.Location = new System.Drawing.Point(0, 0);
+            this.gridPB.Location = new System.Drawing.Point(0, -2);
             this.gridPB.Name = "gridPB";
             this.gridPB.Size = new System.Drawing.Size(755, 658);
             this.gridPB.TabIndex = 5;
@@ -217,8 +282,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 658);
-            this.Controls.Add(this.gridPB);
+            this.Controls.Add(this.NoDBPanel);
             this.Controls.Add(this.popupLBL);
+            this.Controls.Add(this.gridPB);
             this.Controls.Add(this.UIPanel);
             this.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4);
@@ -226,6 +292,8 @@
             this.Text = "KreuzworträtselMacher";
             this.UIPanel.ResumeLayout(false);
             this.UIPanel.PerformLayout();
+            this.NoDBPanel.ResumeLayout(false);
+            this.NoDBPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridPB)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -248,6 +316,12 @@
         private System.Windows.Forms.Button deleteCollectionBTN;
         private System.Windows.Forms.Button deleteTupleBTN;
         private System.Windows.Forms.PictureBox gridPB;
+        private System.Windows.Forms.Panel NoDBPanel;
+        private System.Windows.Forms.Button NoDBInsertTupleBTN;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox NoDBAnswerTB;
+        private System.Windows.Forms.TextBox NoDBQuestionTB;
     }
 }
 

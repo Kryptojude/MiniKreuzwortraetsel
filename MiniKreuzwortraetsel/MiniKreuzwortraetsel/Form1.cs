@@ -20,7 +20,6 @@ namespace MiniKreuzwortraetsel
         Random random = new Random();
         int ts = 30;
 
-        // TODO: export to docx
         // TODO: thumbnail
 
         // TODO: reserved tiles cant have question in it
@@ -41,31 +40,18 @@ namespace MiniKreuzwortraetsel
                 }
             }
 
-            Timer timer = new Timer { Enabled = true, Interval = 1000 };
-            timer.Tick += Timed;
-        }
-        public void Timed(object sender, EventArgs e)
-        {
-            Timer timer = sender as Timer;
-            timer.Stop();
             // Fill tableMenu with the tables in database
             if (MySqlQueries.TestConnection())
                 UpdateTableMenu();
             else
             {
                 // Gray out all buttons that need mySQL connection
-                newCollectionBTN.Enabled = false;
-                Show();
-                while (true)
-                {
-                    TextDialogForm form = new TextDialogForm(2, "Frage und Antwort eingeben", new string[2] { "Frage: ", "Antwort:" }, "Einfügen", "Verbindung zur Datenbank konnte nicht aufgebaut werden");
-                    form.ShowDialog();
-                    Tile.tupleToBeFilled = (form.userInputs[0], form.userInputs[1]);
-                    PutAnswerIntoCrossword(null, null);
-                    Refresh();
-                }
+                MessageBox.Show("Datenbankverbindung konnte nicht aufgebaut werden");
+                UIPanel.Visible = false;
+                NoDBPanel.Visible = true;
             }
         }
+
         public void UpdateTableMenu()
         {
             tableMenu.Items.Clear();
@@ -112,23 +98,8 @@ namespace MiniKreuzwortraetsel
                 insertTupleBTN.Enabled = false;
             }
         }
-        private void PutAnswerIntoCrossword(object sender, EventArgs e)
+        private void PutAnswerIntoCrossword((string Question, string Answer) tuple)
         {
-            // Clean up?
-            // Handle different senders/sources (listBox, insertTupleBTN or baseWordBTN)
-            (string Question, string Answer) tuple = ("","");
-            if (sender is Button && (sender as Button).Name == "baseWordBTN")
-                    tuple = ("", baseWordTB.Text.ToUpper());
-            else if ((sender is ListBox || (sender is Button && (sender as Button).Name == "insertTupleBTN")) && tuplesListBox.SelectedItem != null)
-            {
-                if (tuplesListBox.SelectedItem != null)
-                {
-                    string selectedItem = tuplesListBox.SelectedItem?.ToString();
-                    string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
-                    tuple = (array[0], array[1].ToUpper());
-                }
-            }
-
             if (tuple.Answer != "")
             {
                 // Find all possible ways the answer can be placed
@@ -320,43 +291,6 @@ namespace MiniKreuzwortraetsel
                 writer.Close();
             }
         }
-        private void ExportToDocx(object sender, EventArgs e)
-        {
-            if (grid != null)
-            {
-                string fileName = "output.docx";
-                using (var doc = DocX.Create(fileName))
-                {
-                    doc.MarginBottom = 0;
-                    doc.MarginTop = 0;
-                    doc.MarginLeft = 0;
-                    doc.MarginRight = 0;
-
-                    var table = doc.AddTable(grid.GetLength(0), grid.GetLength(1) / ts);
-                    float[] floatArray = new float[table.ColumnCount];
-                    for (int i = 0; i < table.ColumnCount; i++)
-                    {
-                        floatArray[i] = 15f;
-                    }
-                    table.SetWidths(floatArray);
-                    //table.AutoFit = Xceed.Document.NET.AutoFit.Fixed;
-                    for (int col = 0; col < table.ColumnCount; col++)
-                    {
-                        for (int row = 0; row < table.RowCount; row++)
-                        {
-                            grid[row, col].GetText(out string gridString);
-                            table.Rows[row].Cells[col].Paragraphs[0].Append(gridString);
-                        }
-                    }
-
-                    doc.InsertTable(table);
-
-                    doc.Save();
-                    Process.Start("WINWORD.EXE", fileName);
-                }
-            }
-            //else errorMessageLBL.Text = "Zuerst Kreuzworträtsel machen";
-        }
         private string ReplaceUmlaute(string input)
         {
             input = input.Replace("ß", "ss");
@@ -369,6 +303,7 @@ namespace MiniKreuzwortraetsel
 
             return input;
         }
+        // Methods for changing collections
         private void NewTupleBTN_Click(object sender, EventArgs e)
         {
             TextDialogForm textDialogForm = new TextDialogForm(2, "Eintrag in \"" + (string)tableMenu.SelectedItem + "\" hinzufügen", new string[] { "Frage eingeben: ", "Antwort eingeben: " }, "Eintrag hinzufügen", "");
@@ -467,9 +402,9 @@ namespace MiniKreuzwortraetsel
                 {
                     string tileText;
                     grid[e.Y / ts, e.X / ts].GetText(out tileText);
-                    if (int.TryParse(tileText[0].ToString(), out int questionIndex))
+                    if (int.TryParse(tileText[0].ToString(), out int questionNumber))
                     {
-                        string popupText = questions[questionIndex];
+                        string popupText = questions[questionNumber - 1];
                         popupLBL.Text = popupText;
                         popupLBL.Location = new Point(e.X + ts/2, e.Y - ts/2);
                         popupLBL.Visible = true;
@@ -528,5 +463,79 @@ namespace MiniKreuzwortraetsel
                 }
             }
         }
+        // Methods that call PutAnswerIntoCrossWord(tuple);
+        private void TuplesListBox_DoubleClick(object sender, EventArgs e)
+        {
+            if (tuplesListBox.SelectedItem != null)
+            {
+                string selectedItem = tuplesListBox.SelectedItem.ToString();
+                string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
+                (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
+                PutAnswerIntoCrossword(tuple);
+            }
+        }
+        private void InsertTupleBTN_Click(object sender, EventArgs e)
+        {
+            if (tuplesListBox.SelectedItem != null)
+            {
+                string selectedItem = tuplesListBox.SelectedItem.ToString();
+                string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
+                (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
+                PutAnswerIntoCrossword(tuple);
+            }
+        }
+        private void BaseWordBTN_Click(object sender, EventArgs e)
+        {
+            (string Question, string Answer) tuple = ("", baseWordTB.Text.ToUpper());
+            PutAnswerIntoCrossword(tuple);
+        }
+        private void NoDBInsertTupleBTN_Click(object sender, EventArgs e)
+        {
+            (string Question, string Answer) tuple = (NoDBQuestionTB.Text, NoDBAnswerTB.Text);
+            PutAnswerIntoCrossword(tuple);
+        }
+
+
+        /// <summary>
+        /// Unused
+        /// </summary>
+        private void ExportToDocx(object sender, EventArgs e)
+        {
+            if (grid != null)
+            {
+                string fileName = "output.docx";
+                using (var doc = DocX.Create(fileName))
+                {
+                    doc.MarginBottom = 0;
+                    doc.MarginTop = 0;
+                    doc.MarginLeft = 0;
+                    doc.MarginRight = 0;
+
+                    var table = doc.AddTable(grid.GetLength(0), grid.GetLength(1) / ts);
+                    float[] floatArray = new float[table.ColumnCount];
+                    for (int i = 0; i < table.ColumnCount; i++)
+                    {
+                        floatArray[i] = 15f;
+                    }
+                    table.SetWidths(floatArray);
+                    //table.AutoFit = Xceed.Document.NET.AutoFit.Fixed;
+                    for (int col = 0; col < table.ColumnCount; col++)
+                    {
+                        for (int row = 0; row < table.RowCount; row++)
+                        {
+                            grid[row, col].GetText(out string gridString);
+                            table.Rows[row].Cells[col].Paragraphs[0].Append(gridString);
+                        }
+                    }
+
+                    doc.InsertTable(table);
+
+                    doc.Save();
+                    Process.Start("WINWORD.EXE", fileName);
+                }
+            }
+            //else errorMessageLBL.Text = "Zuerst Kreuzworträtsel machen";
+        }
+
     }
 }
