@@ -51,6 +51,8 @@ namespace MiniKreuzwortraetsel
             this.NoDBQuestionTB = new System.Windows.Forms.TextBox();
             this.popupLBL = new System.Windows.Forms.Label();
             this.gridPB = new System.Windows.Forms.PictureBox();
+            this.NoDBErrorLBL = new System.Windows.Forms.Label();
+            this.NoDBExportBTN = new System.Windows.Forms.Button();
             this.UIPanel.SuspendLayout();
             this.NoDBPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridPB)).BeginInit();
@@ -203,12 +205,14 @@ namespace MiniKreuzwortraetsel
             // 
             // NoDBPanel
             // 
+            this.NoDBPanel.Controls.Add(this.NoDBExportBTN);
+            this.NoDBPanel.Controls.Add(this.NoDBErrorLBL);
             this.NoDBPanel.Controls.Add(this.NoDBInsertTupleBTN);
             this.NoDBPanel.Controls.Add(this.label4);
             this.NoDBPanel.Controls.Add(this.label3);
             this.NoDBPanel.Controls.Add(this.NoDBAnswerTB);
             this.NoDBPanel.Controls.Add(this.NoDBQuestionTB);
-            this.NoDBPanel.Location = new System.Drawing.Point(761, 0);
+            this.NoDBPanel.Location = new System.Drawing.Point(291, 0);
             this.NoDBPanel.Name = "NoDBPanel";
             this.NoDBPanel.Size = new System.Drawing.Size(437, 656);
             this.NoDBPanel.TabIndex = 6;
@@ -216,7 +220,7 @@ namespace MiniKreuzwortraetsel
             // 
             // NoDBInsertTupleBTN
             // 
-            this.NoDBInsertTupleBTN.Location = new System.Drawing.Point(26, 151);
+            this.NoDBInsertTupleBTN.Location = new System.Drawing.Point(20, 198);
             this.NoDBInsertTupleBTN.Name = "NoDBInsertTupleBTN";
             this.NoDBInsertTupleBTN.Size = new System.Drawing.Size(81, 28);
             this.NoDBInsertTupleBTN.TabIndex = 4;
@@ -227,7 +231,7 @@ namespace MiniKreuzwortraetsel
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(26, 82);
+            this.label4.Location = new System.Drawing.Point(20, 129);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(135, 19);
             this.label4.TabIndex = 3;
@@ -236,7 +240,7 @@ namespace MiniKreuzwortraetsel
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(26, 23);
+            this.label3.Location = new System.Drawing.Point(20, 70);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(121, 19);
             this.label3.TabIndex = 2;
@@ -244,14 +248,14 @@ namespace MiniKreuzwortraetsel
             // 
             // NoDBAnswerTB
             // 
-            this.NoDBAnswerTB.Location = new System.Drawing.Point(27, 107);
+            this.NoDBAnswerTB.Location = new System.Drawing.Point(21, 154);
             this.NoDBAnswerTB.Name = "NoDBAnswerTB";
             this.NoDBAnswerTB.Size = new System.Drawing.Size(248, 26);
             this.NoDBAnswerTB.TabIndex = 1;
             // 
             // NoDBQuestionTB
             // 
-            this.NoDBQuestionTB.Location = new System.Drawing.Point(26, 49);
+            this.NoDBQuestionTB.Location = new System.Drawing.Point(20, 96);
             this.NoDBQuestionTB.Name = "NoDBQuestionTB";
             this.NoDBQuestionTB.Size = new System.Drawing.Size(249, 26);
             this.NoDBQuestionTB.TabIndex = 0;
@@ -276,6 +280,27 @@ namespace MiniKreuzwortraetsel
             this.gridPB.Paint += new System.Windows.Forms.PaintEventHandler(this.GridPB_Paint);
             this.gridPB.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GridPB_MouseClick);
             this.gridPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GridPB_MouseMove);
+            // 
+            // NoDBErrorLBL
+            // 
+            this.NoDBErrorLBL.AutoSize = true;
+            this.NoDBErrorLBL.ForeColor = System.Drawing.Color.Red;
+            this.NoDBErrorLBL.Location = new System.Drawing.Point(20, 19);
+            this.NoDBErrorLBL.Name = "NoDBErrorLBL";
+            this.NoDBErrorLBL.Size = new System.Drawing.Size(399, 38);
+            this.NoDBErrorLBL.TabIndex = 5;
+            this.NoDBErrorLBL.Text = "Verbindung zur Datenbank konnte nicht aufgebaut werden.\r\nReduzierte Benutzeroberf" +
+    "läche: ";
+            // 
+            // NoDBExportBTN
+            // 
+            this.NoDBExportBTN.Location = new System.Drawing.Point(20, 250);
+            this.NoDBExportBTN.Name = "NoDBExportBTN";
+            this.NoDBExportBTN.Size = new System.Drawing.Size(135, 54);
+            this.NoDBExportBTN.TabIndex = 11;
+            this.NoDBExportBTN.Text = "Kreuzworträtsel exportieren";
+            this.NoDBExportBTN.UseVisualStyleBackColor = true;
+            this.NoDBExportBTN.Click += new System.EventHandler(this.ExportToHTML);
             // 
             // Form1
             // 
@@ -322,6 +347,8 @@ namespace MiniKreuzwortraetsel
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox NoDBAnswerTB;
         private System.Windows.Forms.TextBox NoDBQuestionTB;
+        private System.Windows.Forms.Label NoDBErrorLBL;
+        private System.Windows.Forms.Button NoDBExportBTN;
     }
 }
 

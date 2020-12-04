@@ -22,10 +22,13 @@ namespace MiniKreuzwortraetsel
 
         // TODO: thumbnail
 
+        // TODO: SaveFileDialog implementation
+        // TODO: different shades of highlight dont work properly
         // TODO: reserved tiles cant have question in it
         // TODO: Filling over reserved tiles
         // TODO: Show word dimensions when hovering over highlight
 
+        // MAYBE: Solution word
         // MAYBE: Wort ausgrauen, wenn wort nicht passen kann
         // MAYBE: Rückgängig machen
         public Form1()
@@ -45,10 +48,10 @@ namespace MiniKreuzwortraetsel
                 UpdateTableMenu();
             else
             {
-                // Gray out all buttons that need mySQL connection
-                MessageBox.Show("Datenbankverbindung konnte nicht aufgebaut werden");
+                // Replace normal interface with non-DB interface
                 UIPanel.Visible = false;
                 NoDBPanel.Visible = true;
+                NoDBPanel.Location = UIPanel.Location;
             }
         }
 
@@ -192,6 +195,7 @@ namespace MiniKreuzwortraetsel
                             proportion = candidates[i].matches / maxMatches;
                         else
                             proportion = 0;
+                        // Candidates tuple is buggy, sometimes says matches is 0, when it's not
                         Color color = Color.FromArgb((int)(minColor.R + (maxColor.R - minColor.R) * proportion), (int)(minColor.G + (maxColor.G - minColor.G) * proportion), (int)(minColor.B + (maxColor.B - minColor.B) * proportion));
                         SolidBrush brush = new SolidBrush(color);
                         candidates[i].questionTile.HighlightDirectionsAndColors.Add((candidates[i].direction, brush));
@@ -236,11 +240,22 @@ namespace MiniKreuzwortraetsel
         }
         private void ExportToHTML(object sender, EventArgs e)
         {
-            // TODO: file path/name dialog
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "HTML-Datei|.html";
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                string html = "";
+                // Read start html
+                StreamReader reader = new StreamReader("htmlStart.html");
+                string html = reader.ReadToEnd();
+                reader.Close();
+
+                // Generate dynamic part of html
+                html += "<title>" + dialog.FileName + "</title>" + 
+                        "</head>" +
+                        "<body>" +
+                        "<h1>" + dialog.FileName + "</h1>" +
+                        "<table>";
+
                 for (int y = 0; y < grid.GetLength(0); y++)
                 {
                     html += "<tr>";
@@ -267,28 +282,30 @@ namespace MiniKreuzwortraetsel
                             html += "<td style='border: 2px solid white'></td>";
                     }
 
-                    html += "</tr><p>";
+                    html += "</tr>";
                 }
 
+                html += "</table><p>";
                 // Legende
                 for (int i = 0; i < questions.Count; i++)
                 {
-                    html += i + ". " + questions[i] + "<br/>";
+                    html += i + 1 + ". " + questions[i] + "<br/>";
                 }
                 html += "</p>";
 
-                // Read start file
-                StreamReader reader = new StreamReader("htmlStart.html");
-                string htmlStart = reader.ReadToEnd();
-                reader.Close();
-                // Read end file
+                // Read end html
                 reader = new StreamReader("htmlEnd.html");
-                string htmlEnd = reader.ReadToEnd();
+                html += reader.ReadToEnd();
                 reader.Close();
-                // Write everything
-                StreamWriter writer = new StreamWriter(dialog.SelectedPath + @"\rätsel.html");
-                writer.Write(htmlStart + html + htmlEnd);
-                writer.Close();
+
+                // Export HTML file
+                Stream stream;
+                if ((stream = dialog.OpenFile()) != null)
+                {
+                    byte[] bytes = Encoding.Unicode.GetBytes(html);
+                    stream.Write(bytes, 0, bytes.Length);
+                    stream.Close();
+                }
             }
         }
         private string ReplaceUmlaute(string input)
@@ -491,7 +508,7 @@ namespace MiniKreuzwortraetsel
         }
         private void NoDBInsertTupleBTN_Click(object sender, EventArgs e)
         {
-            (string Question, string Answer) tuple = (NoDBQuestionTB.Text, NoDBAnswerTB.Text);
+            (string Question, string Answer) tuple = (ReplaceUmlaute(NoDBQuestionTB.Text).ToUpper(), ReplaceUmlaute(NoDBAnswerTB.Text).ToUpper());
             PutAnswerIntoCrossword(tuple);
         }
 
