@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 
+
 namespace MiniKreuzwortraetsel
 {
     class Tile
@@ -17,11 +18,28 @@ namespace MiniKreuzwortraetsel
         bool Reserved = false;
         public bool IsBaseWordTile = false;
         public List<(Point Direction, Brush Color)> HighlightDirectionsAndColors = new List<(Point, Brush)>();
+        /// <summary>
+        /// -1 = no hover effect
+        /// 0 = hover on horizontal subtile
+        /// 1 = hover on vertical subtile
+        /// </summary>
+        int hoverSubtile = -1;
+        /// <summary>
+        /// Contains the grid coordinates for the two subtiles
+        /// </summary>
+        Point[][] HoverTriangles;
+        static Tile currentHoveringTile;
 
         public Tile(int x, int y)
         {
             Position = new Point(x, y);
+            // Generate grid coordinates for the two subtiles
+            HoverTriangles = new Point[2][] { new Point[3] { new Point(x, y), new Point(x + 1, y),     new Point(x + 1, y + 1) },
+                                              new Point[3] { new Point(x, y), new Point(x + 1, y + 1), new Point(x, y + 1) } };
         }
+
+        //MakeHoverTriangles()
+
         public bool IsQuestionTile()
         {
             if (Text.Contains("►") || Text.Contains("▼"))
@@ -39,11 +57,9 @@ namespace MiniKreuzwortraetsel
 
             return IsQuestionTile();
         }
-        /// <summary>
-        /// Shit code
-        /// </summary>
-        public List<(Point[] Polygon, Brush Color)> GetBackgroundPolygon(int ts)
+        public List<(Point[] Polygon, Brush Color)> GetVisuals(int ts, out string arrow)
         {
+            arrow = "";
             List<(Point[] Polygon, Brush Color)> polygonsAndColors = new List<(Point[] Polygon, Brush Color)>();
             for (int i = 0; i < HighlightDirectionsAndColors.Count; i++)
             {
@@ -54,6 +70,14 @@ namespace MiniKreuzwortraetsel
                 // Horizontal
                 else if (HighlightDirectionsAndColors[i].Direction.X == 1)
                     polygonsAndColors.Last().Polygon[2] = new Point(Position.X + 1, Position.Y);
+            }
+
+            // Check for Hover effect
+            if (hoverSubtile != -1)
+            {
+                // Hover effect is active on this tile
+                polygonsAndColors.Add(((Point[])HoverTriangles[hoverSubtile].Clone(), Brushes.Blue));
+                arrow = (hoverSubtile == 0) ? "►" : "▼";
             }
 
             // Scale from grid space to world space
@@ -68,12 +92,53 @@ namespace MiniKreuzwortraetsel
 
             return polygonsAndColors;
         }
+        /// <summary>
+        /// Checks if subtile should activate hover effect and does so if necessary
+        /// </summary>
+        public void ActivateHover(int mouseX, int mouseY, int ts)
+        {
+            // Remove old hover effect
+            if (currentHoveringTile != null)
+                currentHoveringTile.hoverSubtile = -1;
+
+            // Determine the subtile the mouse is over
+            int subtile = 0;
+            if (mouseX - Position.X * ts < mouseY - Position.Y * ts)
+                subtile = 1;
+
+            // Check if that subtile is highlighted
+            bool subtileIsHighlighted = false;
+            foreach (var item in HighlightDirectionsAndColors)
+            {
+                if (item.Direction.X == 1 && subtile == 0)
+                    subtileIsHighlighted = true;
+                else if (item.Direction.X == 0 && subtile == 1)
+                    subtileIsHighlighted = true;
+            }
+
+            if (subtileIsHighlighted)
+            {
+                //Activate Hover for this subtile
+                hoverSubtile = subtile;
+                currentHoveringTile = this;
+            }
+        }
         public bool IsHighlighted()
         {
             if (HighlightDirectionsAndColors.Count > 0)
                 return true;
             else
                 return false;
+        }
+        public static void RemoveAllHighlights(Tile[,] grid)
+        {
+            for (int y = 0; y < grid.GetLength(0); y++)
+            {
+                for (int x = 0; x < grid.GetLength(1); x++)
+                {
+                    grid[y, x].HighlightDirectionsAndColors.Clear();
+                }
+            }
         }
         public bool HasRectangle()
         {

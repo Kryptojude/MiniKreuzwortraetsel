@@ -410,15 +410,17 @@ namespace MiniKreuzwortraetsel
         private void GridPB_MouseMove(object sender, MouseEventArgs e)
         {
             // The tile the mouse is hovering over: 
+            Tile tile;
             int tileX = e.X / ts;
             int tileY = e.Y / ts;
             // Out of bounds check
             if (tileX >= 0 && tileY >= 0 &&
                 tileX <= grid.GetUpperBound(1) && tileY <= grid.GetUpperBound(0) )
-                if (grid[e.Y / ts, e.X / ts].IsQuestionTile())
+            {
+                tile = grid[tileY, tileX];
+                if (tile.IsQuestionTile())
                 {
-                    string tileText;
-                    grid[e.Y / ts, e.X / ts].GetText(out tileText);
+                    tile.GetText(out string tileText);
                     if (int.TryParse(tileText[0].ToString(), out int questionNumber))
                     {
                         string popupText = questions[questionNumber - 1];
@@ -430,9 +432,11 @@ namespace MiniKreuzwortraetsel
                 else
                     popupLBL.Visible = false;
 
-            // Call Refresh() bc of hover change?
-            if (Hover.HasHoverChanged(new Point(e.X, e.Y), grid, ts))
-                gridPB.Refresh();
+                // Activate hover effect?
+                tile.ActivateHover(e.X, e.Y, ts);
+
+                Refresh();
+            }
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
@@ -442,9 +446,12 @@ namespace MiniKreuzwortraetsel
                 {
                     Tile tile = grid[y, x];
                     // Draw Background Color / polygon(s)
-                    List<(Point[] Polygon, Brush Color)> polygonsAndColors = tile.GetBackgroundPolygon(ts);
+                    List<(Point[] Polygon, Brush Color)> polygonsAndColors = tile.GetVisuals(ts, out string arrow);
                     for (int i = 0; i < polygonsAndColors.Count; i++)
                         e.Graphics.FillPolygon(polygonsAndColors[i].Color, polygonsAndColors[i].Polygon);
+                    // Draw Hover Arrow
+                    if (arrow != "")
+                        e.Graphics.DrawString(arrow)
                     // Draw Rectangle
                     if (tile.HasRectangle())
                         e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts - 1, ts - 1);
@@ -456,12 +463,8 @@ namespace MiniKreuzwortraetsel
                     }
                 }
             }
-            // Draw Hover Effect
-            if (Hover.GetHoverTriangle(out Point[] triangle, out string arrow, out Point arrowPos, ts))
-            {
-                e.Graphics.FillPolygon(Brushes.Blue, triangle);
-                e.Graphics.DrawString(arrow, Font, Brushes.Red, arrowPos);
-            }
+
+            // Arrow missing
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and hover active
@@ -475,7 +478,7 @@ namespace MiniKreuzwortraetsel
                 if (e.Y / ts <= grid.GetLength(0) && e.X / ts <= grid.GetLength(1))
                 {
                     FillAnswer(tile, direction, Tile.tupleToBeFilled);
-                    Hover.RemoveAllHighlights(grid);
+                    Tile.RemoveAllHighlights(grid);
                     gridPB.Refresh();
                 }
             }

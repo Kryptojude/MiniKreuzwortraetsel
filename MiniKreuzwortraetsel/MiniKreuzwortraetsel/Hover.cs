@@ -116,15 +116,5 @@ namespace MiniKreuzwortraetsel
                 return false;
         }
 
-        public static void RemoveAllHighlights(Tile[,] grid)
-        {
-            for (int y = 0; y < grid.GetLength(0); y++)
-            {
-                for (int x = 0; x < grid.GetLength(1); x++)
-                {
-                    grid[y, x].HighlightDirectionsAndColors.Clear();
-                }
-            }
-        }
     }
 }
