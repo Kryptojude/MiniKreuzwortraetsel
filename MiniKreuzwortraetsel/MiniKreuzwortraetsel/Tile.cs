@@ -23,12 +23,12 @@ namespace MiniKreuzwortraetsel
         /// 0 = hover on horizontal subtile
         /// 1 = hover on vertical subtile
         /// </summary>
-        int hoverSubtile = -1;
+        public int hoverSubtile = -1;
         /// <summary>
         /// Contains the grid coordinates for the two subtiles
         /// </summary>
         Point[][] HoverTriangles;
-        static Tile currentHoveringTile;
+        public static Tile currentHoveringTile;
 
         public Tile(int x, int y)
         {
@@ -57,9 +57,10 @@ namespace MiniKreuzwortraetsel
 
             return IsQuestionTile();
         }
-        public List<(Point[] Polygon, Brush Color)> GetVisuals(int ts, out string arrow)
+        public List<(Point[] Polygon, Brush Color)> GetVisuals(int ts, out string arrow, out Point arrowPos)
         {
             arrow = "";
+            arrowPos = new Point();
             List<(Point[] Polygon, Brush Color)> polygonsAndColors = new List<(Point[] Polygon, Brush Color)>();
             for (int i = 0; i < HighlightDirectionsAndColors.Count; i++)
             {
@@ -77,7 +78,16 @@ namespace MiniKreuzwortraetsel
             {
                 // Hover effect is active on this tile
                 polygonsAndColors.Add(((Point[])HoverTriangles[hoverSubtile].Clone(), Brushes.Blue));
-                arrow = (hoverSubtile == 0) ? "►" : "▼";
+                if (hoverSubtile == 0)
+                {
+                    arrow = "►";
+                    arrowPos = new Point((Position.X * ts) + ts / 3, Position.Y * ts);
+                }
+                else
+                {
+                    arrow = "▼";
+                    arrowPos = new Point(Position.X * ts - 3, Position.Y * ts + 2 * (ts / 5));
+                }
             }
 
             // Scale from grid space to world space
@@ -99,7 +109,10 @@ namespace MiniKreuzwortraetsel
         {
             // Remove old hover effect
             if (currentHoveringTile != null)
+            {
                 currentHoveringTile.hoverSubtile = -1;
+                currentHoveringTile = null;
+            }
 
             // Determine the subtile the mouse is over
             int subtile = 0;

@@ -19,6 +19,7 @@ namespace MiniKreuzwortraetsel
         List<string> questions = new List<string>();
         Random random = new Random();
         int ts = 30;
+        static Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
 
         // TODO: thumbnail
 
@@ -253,7 +254,7 @@ namespace MiniKreuzwortraetsel
                 html += "<title>" + dialog.FileName + "</title>" + 
                         "</head>" +
                         "<body>" +
-                        "<h1>" + dialog.FileName + "</h1>" +
+                        "<h1>" + Path.GetFileNameWithoutExtension(dialog.FileName) + "</h1>" +
                         "<table>";
 
                 for (int y = 0; y < grid.GetLength(0); y++)
@@ -305,6 +306,7 @@ namespace MiniKreuzwortraetsel
                     byte[] bytes = Encoding.Unicode.GetBytes(html);
                     stream.Write(bytes, 0, bytes.Length);
                     stream.Close();
+                    Process.Start(dialog.FileName);
                 }
             }
         }
@@ -446,12 +448,12 @@ namespace MiniKreuzwortraetsel
                 {
                     Tile tile = grid[y, x];
                     // Draw Background Color / polygon(s)
-                    List<(Point[] Polygon, Brush Color)> polygonsAndColors = tile.GetVisuals(ts, out string arrow);
+                    List<(Point[] Polygon, Brush Color)> polygonsAndColors = tile.GetVisuals(ts, out string arrow, out Point arrowPos);
                     for (int i = 0; i < polygonsAndColors.Count; i++)
                         e.Graphics.FillPolygon(polygonsAndColors[i].Color, polygonsAndColors[i].Polygon);
                     // Draw Hover Arrow
                     if (arrow != "")
-                        e.Graphics.DrawString(arrow)
+                        e.Graphics.DrawString(arrow, Font, Brushes.Red, arrowPos);
                     // Draw Rectangle
                     if (tile.HasRectangle())
                         e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts - 1, ts - 1);
@@ -471,16 +473,13 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         private void GridPB_MouseClick(object sender, MouseEventArgs e)
         {
-            // Hover effect active?
-            if (Hover.GetHoverInfo(grid, out Tile tile, out Point direction))
+            Tile tile = Tile.currentHoveringTile;
+            if (tile != null)
             {
-                // Click in bounds of grid?
-                if (e.Y / ts <= grid.GetLength(0) && e.X / ts <= grid.GetLength(1))
-                {
-                    FillAnswer(tile, direction, Tile.tupleToBeFilled);
-                    Tile.RemoveAllHighlights(grid);
-                    gridPB.Refresh();
-                }
+                FillAnswer(tile, directions[tile.hoverSubtile], Tile.tupleToBeFilled);
+                Tile.RemoveAllHighlights(grid);
+                gridPB.Refresh();
+
             }
         }
         // Methods that call PutAnswerIntoCrossWord(tuple);
