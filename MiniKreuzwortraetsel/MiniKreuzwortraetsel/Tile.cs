@@ -17,7 +17,7 @@ namespace MiniKreuzwortraetsel
         Brush ForeGroundColor = Brushes.Blue;
         bool Reserved = false;
         public bool IsBaseWordTile = false;
-        public List<(Point Direction, Brush Color)> HighlightDirectionsAndColors = new List<(Point, Brush)>();
+        public Brush[] SubtileHighlightColors = new Brush[2];
         /// <summary>
         /// -1 = no hover effect
         /// 0 = hover on horizontal subtile
@@ -25,17 +25,18 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         public int hoverSubtile = -1;
         /// <summary>
-        /// Contains the grid coordinates for the two subtiles
+        /// Contains the world coordinates for the two subtiles
         /// </summary>
         Point[][] HoverTriangles;
+        string[] arrows = new string[2] { };
         public static Tile currentHoveringTile;
 
-        public Tile(int x, int y)
+        public Tile(int x, int y, int ts)
         {
             Position = new Point(x, y);
-            // Generate grid coordinates for the two subtiles
-            HoverTriangles = new Point[2][] { new Point[3] { new Point(x, y), new Point(x + 1, y),     new Point(x + 1, y + 1) },
-                                              new Point[3] { new Point(x, y), new Point(x + 1, y + 1), new Point(x, y + 1) } };
+            // Generate world coordinates for the two subtiles
+            HoverTriangles = new Point[2][] { new Point[3] { new Point(x * ts, y * ts), new Point((x + 1) * ts, y * ts),     new Point((x + 1) * ts, (y + 1) * ts) },
+                                              new Point[3] { new Point(x * ts, y * ts), new Point((x + 1) * ts, (y + 1) * ts), new Point(x * ts, (y + 1) * ts) } };
         }
 
         //MakeHoverTriangles()
@@ -56,6 +57,23 @@ namespace MiniKreuzwortraetsel
                 direction = new Point(0, 1);
 
             return IsQuestionTile();
+        }
+        public Image GetGraphics(int ts)
+        {
+            Image canvas = new Bitmap(ts, ts);
+            Graphics graphics = Graphics.FromImage(canvas);
+
+            // subtile 0
+            if (hoverSubtile == 0)
+            {
+                graphics.FillPolygon(SubtileHighlightColors[hoverSubtile], HoverTriangles[hoverSubtile]);
+                graphics.DrawString(SubtileHighlightColors[hoverSubtile], HoverTriangles[hoverSubtile]);
+            }
+            else
+
+                // subtile 1
+
+                return canvas;
         }
         public List<(Point[] Polygon, Brush Color)> GetVisuals(int ts, out string arrow, out Point arrowPos)
         {

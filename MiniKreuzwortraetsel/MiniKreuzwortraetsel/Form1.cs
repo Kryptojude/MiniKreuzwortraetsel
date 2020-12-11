@@ -40,7 +40,7 @@ namespace MiniKreuzwortraetsel
             {
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    grid[y, x] = new Tile(x, y);
+                    grid[y, x] = new Tile(x, y, ts);
                 }
             }
 
