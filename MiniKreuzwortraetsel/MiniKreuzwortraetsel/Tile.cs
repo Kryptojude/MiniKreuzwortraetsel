@@ -14,7 +14,7 @@ namespace MiniKreuzwortraetsel
 
         Point Position;
         string Text = "";
-        Brush ForeGroundColor = Brushes.Blue;
+        Brush ForegroundColor = Brushes.Blue;
         bool Reserved = false;
         public bool IsBaseWordTile = false;
         public Brush[] SubtileHighlightColors = new Brush[2];
@@ -27,16 +27,18 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Contains the world coordinates for the two subtiles
         /// </summary>
-        Point[][] HoverTriangles;
-        string[] arrows = new string[2] { };
+        Point[][] subtileTriangles;
+        string[] hoverArrows = new string[2] { "►", "▼" };
+        Point[] arrowPositions;
         public static Tile currentHoveringTile;
 
         public Tile(int x, int y, int ts)
         {
             Position = new Point(x, y);
             // Generate world coordinates for the two subtiles
-            HoverTriangles = new Point[2][] { new Point[3] { new Point(x * ts, y * ts), new Point((x + 1) * ts, y * ts),     new Point((x + 1) * ts, (y + 1) * ts) },
+            subtileTriangles = new Point[2][] { new Point[3] { new Point(x * ts, y * ts), new Point((x + 1) * ts, y * ts),     new Point((x + 1) * ts, (y + 1) * ts) },
                                               new Point[3] { new Point(x * ts, y * ts), new Point((x + 1) * ts, (y + 1) * ts), new Point(x * ts, (y + 1) * ts) } };
+            arrowPositions = new Point[] { new Point((x * ts) + ts / 3, y * ts), new Point(x * ts - 3, x * ts + 2 * (ts / 5)) };
         }
 
         //MakeHoverTriangles()
@@ -58,67 +60,34 @@ namespace MiniKreuzwortraetsel
 
             return IsQuestionTile();
         }
-        public Image GetGraphics(int ts)
+        public Image GetGraphics(int ts, Font font)
         {
             Image canvas = new Bitmap(ts, ts);
             Graphics graphics = Graphics.FromImage(canvas);
 
-            // subtile 0
-            if (hoverSubtile == 0)
+            // Draw highlights
+            for (int i = 0; i < SubtileHighlightColors.Length; i++)
             {
-                graphics.FillPolygon(SubtileHighlightColors[hoverSubtile], HoverTriangles[hoverSubtile]);
-                graphics.DrawString(SubtileHighlightColors[hoverSubtile], HoverTriangles[hoverSubtile]);
-            }
-            else
-
-                // subtile 1
-
-                return canvas;
-        }
-        public List<(Point[] Polygon, Brush Color)> GetVisuals(int ts, out string arrow, out Point arrowPos)
-        {
-            arrow = "";
-            arrowPos = new Point();
-            List<(Point[] Polygon, Brush Color)> polygonsAndColors = new List<(Point[] Polygon, Brush Color)>();
-            for (int i = 0; i < HighlightDirectionsAndColors.Count; i++)
-            {
-                polygonsAndColors.Add((new Point[3] { new Point(Position.X, Position.Y), new Point(Position.X + 1, Position.Y + 1), new Point() }, HighlightDirectionsAndColors[i].Color));
-                // Vertical
-                if (HighlightDirectionsAndColors[i].Direction.X == 0)
-                    polygonsAndColors.Last().Polygon[2] = new Point(Position.X, Position.Y + 1);
-                // Horizontal
-                else if (HighlightDirectionsAndColors[i].Direction.X == 1)
-                    polygonsAndColors.Last().Polygon[2] = new Point(Position.X + 1, Position.Y);
+                if (SubtileHighlightColors[i] != null)
+                    graphics.FillPolygon(SubtileHighlightColors[i], subtileTriangles[i]);
             }
 
-            // Check for Hover effect
+            // Draw hover effect
             if (hoverSubtile != -1)
             {
-                // Hover effect is active on this tile
-                polygonsAndColors.Add(((Point[])HoverTriangles[hoverSubtile].Clone(), Brushes.Blue));
-                if (hoverSubtile == 0)
-                {
-                    arrow = "►";
-                    arrowPos = new Point((Position.X * ts) + ts / 3, Position.Y * ts);
-                }
-                else
-                {
-                    arrow = "▼";
-                    arrowPos = new Point(Position.X * ts - 3, Position.Y * ts + 2 * (ts / 5));
-                }
+                graphics.FillPolygon(Brushes.Blue, subtileTriangles[hoverSubtile]);
+                graphics.DrawString(hoverArrows[hoverSubtile], font, Brushes.Red, arrowPositions[hoverSubtile]);
             }
 
-            // Scale from grid space to world space
-            for (int polygon = 0; polygon < polygonsAndColors.Count; polygon++)
-            {
-                for (int point = 0; point < polygonsAndColors[polygon].Polygon.Length; point++)
-                {
-                    polygonsAndColors[polygon].Polygon[point].X *= ts;
-                    polygonsAndColors[polygon].Polygon[point].Y *= ts;
-                }
-            }
+            // Draw text
+            Size textSize = System.Windows.Forms.TextRenderer.MeasureText(Text, font);
+            graphics.DrawString(Text, font, ForegroundColor, Position.X * ts + ts / 2 - textSize.Width / 2, Position.Y * ts + ts / 2 - textSize.Height / 2);
 
-            return polygonsAndColors;
+            // Draw Rectangle
+            if (HasRectangle())
+                graphics.DrawRectangle(Pens.Black, Position.X * ts, Position.Y * ts, ts - 1, ts - 1);
+
+            return canvas;
         }
         /// <summary>
         /// Checks if subtile should activate hover effect and does so if necessary
@@ -156,7 +125,13 @@ namespace MiniKreuzwortraetsel
         }
         public bool IsHighlighted()
         {
-            if (HighlightDirectionsAndColors.Count > 0)
+            bool highlighted = false;
+            foreach (Brush brush in SubtileHighlightColors)
+            {
+                if (brush != null)
+                    highlighted = true;
+            }
+            if (highlighted)
                 return true;
             else
                 return false;
@@ -167,14 +142,20 @@ namespace MiniKreuzwortraetsel
             {
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    grid[y, x].HighlightDirectionsAndColors.Clear();
+                    grid[y, x].SubtileHighlightColors = new Brush[2];
                 }
             }
         }
         public bool HasRectangle()
         {
+            bool highlighted = false;
+            foreach (Brush brush in SubtileHighlightColors)
+            {
+                if (brush != null)
+                    highlighted = true;
+            }
             // Conditions: has background color or text
-            if (GetText(out _) || HighlightDirectionsAndColors.Count > 0)
+            if (GetText(out _) || highlighted)
                 return true;
             else
                 return false;
@@ -197,7 +178,7 @@ namespace MiniKreuzwortraetsel
         }
         public Brush GetForegroundColor()
         {
-            return ForeGroundColor;
+            return ForegroundColor;
         }
         public bool IsReserved()
         {

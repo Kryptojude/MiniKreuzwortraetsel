@@ -447,22 +447,7 @@ namespace MiniKreuzwortraetsel
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
                     Tile tile = grid[y, x];
-                    // Draw Background Color / polygon(s)
-                    List<(Point[] Polygon, Brush Color)> polygonsAndColors = tile.GetVisuals(ts, out string arrow, out Point arrowPos);
-                    for (int i = 0; i < polygonsAndColors.Count; i++)
-                        e.Graphics.FillPolygon(polygonsAndColors[i].Color, polygonsAndColors[i].Polygon);
-                    // Draw Hover Arrow
-                    if (arrow != "")
-                        e.Graphics.DrawString(arrow, Font, Brushes.Red, arrowPos);
-                    // Draw Rectangle
-                    if (tile.HasRectangle())
-                        e.Graphics.DrawRectangle(Pens.Black, x * ts, y * ts, ts - 1, ts - 1);
-                    // Draw Text
-                    if (tile.GetText(out string text))
-                    {
-                        Size textSize = TextRenderer.MeasureText(text, Font);
-                        e.Graphics.DrawString(text, Font, tile.GetForegroundColor(), x * ts + ts / 2 - textSize.Width / 2, y * ts + ts / 2 - textSize.Height / 2);
-                    }
+                    e.Graphics.DrawImage(tile.GetGraphics(ts, Font), x, y)
                 }
             }
 
