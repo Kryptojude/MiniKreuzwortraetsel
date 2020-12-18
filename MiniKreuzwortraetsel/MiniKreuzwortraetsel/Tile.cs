@@ -11,6 +11,7 @@ namespace MiniKreuzwortraetsel
     class Tile
     {
         public static (string Question, string Answer) tupleToBeFilled;
+        public static Tile currentHoveringTile;
 
         Point Position;
         string Text = "";
@@ -30,18 +31,16 @@ namespace MiniKreuzwortraetsel
         Point[][] subtileTriangles;
         string[] hoverArrows = new string[2] { "►", "▼" };
         Point[] arrowPositions;
-        public static Tile currentHoveringTile;
 
         public Tile(int x, int y, int ts)
         {
             Position = new Point(x, y);
-            // Generate world coordinates for the two subtiles
-            subtileTriangles = new Point[2][] { new Point[3] { new Point(x * ts, y * ts), new Point((x + 1) * ts, y * ts),     new Point((x + 1) * ts, (y + 1) * ts) },
-                                              new Point[3] { new Point(x * ts, y * ts), new Point((x + 1) * ts, (y + 1) * ts), new Point(x * ts, (y + 1) * ts) } };
-            arrowPositions = new Point[] { new Point((x * ts) + ts / 3, y * ts), new Point(x * ts - 3, x * ts + 2 * (ts / 5)) };
-        }
+            // Generate tile-space coordinates for the two subtiles and the arrowPositions
+            subtileTriangles = new Point[2][] { new Point[3] { new Point(0, 0), new Point(ts, 0),  new Point(ts, ts) },
+                                                new Point[3] { new Point(0, 0), new Point(ts, ts), new Point(0, ts) } };
 
-        //MakeHoverTriangles()
+            arrowPositions = new Point[] { new Point(ts / 3, 0), new Point(-3, 2 * (ts / 5)) };
+        }
 
         public bool IsQuestionTile()
         {
@@ -60,6 +59,9 @@ namespace MiniKreuzwortraetsel
 
             return IsQuestionTile();
         }
+        /// <summary>
+        /// Draws all the visuals of this tile on an image and returns that image
+        /// </summary>
         public Image GetGraphics(int ts, Font font)
         {
             Image canvas = new Bitmap(ts, ts);
@@ -81,11 +83,12 @@ namespace MiniKreuzwortraetsel
 
             // Draw text
             Size textSize = System.Windows.Forms.TextRenderer.MeasureText(Text, font);
-            graphics.DrawString(Text, font, ForegroundColor, Position.X * ts + ts / 2 - textSize.Width / 2, Position.Y * ts + ts / 2 - textSize.Height / 2);
+            graphics.DrawString(Text, font, ForegroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
 
             // Draw Rectangle
-            if (HasRectangle())
-                graphics.DrawRectangle(Pens.Black, Position.X * ts, Position.Y * ts, ts - 1, ts - 1);
+            // Conditions: has background color or text
+            if (GetText(out _) || IsHighlighted())
+                graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
 
             return canvas;
         }
@@ -101,25 +104,16 @@ namespace MiniKreuzwortraetsel
                 currentHoveringTile = null;
             }
 
-            // Determine the subtile the mouse is over
-            int subtile = 0;
+            // Determine the subtile the mouse is hovering over
+            int mouseSubtile = 0;
             if (mouseX - Position.X * ts < mouseY - Position.Y * ts)
-                subtile = 1;
+                mouseSubtile = 1;
 
-            // Check if that subtile is highlighted
-            bool subtileIsHighlighted = false;
-            foreach (var item in HighlightDirectionsAndColors)
-            {
-                if (item.Direction.X == 1 && subtile == 0)
-                    subtileIsHighlighted = true;
-                else if (item.Direction.X == 0 && subtile == 1)
-                    subtileIsHighlighted = true;
-            }
-
-            if (subtileIsHighlighted)
+            // Is that subtile highlighted?
+            if (SubtileHighlightColors[mouseSubtile] != null)
             {
                 //Activate Hover for this subtile
-                hoverSubtile = subtile;
+                hoverSubtile = mouseSubtile;
                 currentHoveringTile = this;
             }
         }
@@ -145,20 +139,6 @@ namespace MiniKreuzwortraetsel
                     grid[y, x].SubtileHighlightColors = new Brush[2];
                 }
             }
-        }
-        public bool HasRectangle()
-        {
-            bool highlighted = false;
-            foreach (Brush brush in SubtileHighlightColors)
-            {
-                if (brush != null)
-                    highlighted = true;
-            }
-            // Conditions: has background color or text
-            if (GetText(out _) || highlighted)
-                return true;
-            else
-                return false;
         }
         public bool GetText(out string text)
         {

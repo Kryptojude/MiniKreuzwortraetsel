@@ -21,9 +21,9 @@ namespace MiniKreuzwortraetsel
         int ts = 30;
         static Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
 
+        // TODO: memory leak
         // TODO: thumbnail
 
-        // TODO: SaveFileDialog implementation
         // TODO: different shades of highlight dont work properly
         // TODO: reserved tiles cant have question in it
         // TODO: Filling over reserved tiles
@@ -102,17 +102,22 @@ namespace MiniKreuzwortraetsel
                 insertTupleBTN.Enabled = false;
             }
         }
-        private void PutAnswerIntoCrossword((string Question, string Answer) tuple)
+        /// <summary>
+        /// 1. Checks where the question word can be placed in the grid, 
+        /// 2. ranks the "candidates" by how many intersections with existing words there are, 
+        /// 3. highlights the candidate subtiles with green background color
+        /// </summary>
+        private void HighlightCandidateSubtiles((string Question, string Answer) tuple)
         {
             if (tuple.Answer != "")
             {
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed
-                List<(Tile questionTile, Tile tileAfterAnswer, Point direction, int matches)> candidates = new List<(Tile, Tile, Point, int)>();
+                List<(Tile questionTile, Tile tileAfterAnswer, int direction, int matches)> candidates = new List<(Tile, Tile, int, int)>();
                 int maxMatches = 0;
-                Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
-                foreach (Point direction in directions)
+                for (int direction = 0; direction < 2; direction++)
                 {
+                    Point directionPoint = directions[direction];
                     for (int y = 0; y < grid.GetLength(0); y++)
                     {
                         for (int x = 0; x < grid.GetLength(1); x++)
@@ -124,7 +129,7 @@ namespace MiniKreuzwortraetsel
                                 fits = false;
                             // Free space after answer?
                             Tile tileAfterAnswer = null;
-                            Point tileAfterAnswerPoint = new Point(x + (direction.X * (tuple.Answer.Length + 1)), y + (direction.Y * (tuple.Answer.Length + 1)));
+                            Point tileAfterAnswerPoint = new Point(x + (directionPoint.X * (tuple.Answer.Length + 1)), y + (directionPoint.Y * (tuple.Answer.Length + 1)));
                             if (tileAfterAnswerPoint.Y < grid.GetLength(0) && tileAfterAnswerPoint.X < grid.GetLength(1))
                             {
                                 tileAfterAnswer = grid[tileAfterAnswerPoint.Y, tileAfterAnswerPoint.X];
@@ -138,8 +143,8 @@ namespace MiniKreuzwortraetsel
                                 bool possible = true;
                                 for (int i = 0; i < tuple.Answer.Length && possible == true; i++)
                                 {
-                                    int letterX = questionTile.GetPosition().X + direction.X + i * direction.X;
-                                    int letterY = questionTile.GetPosition().Y + direction.Y + i * direction.Y;
+                                    int letterX = questionTile.GetPosition().X + directionPoint.X + i * directionPoint.X;
+                                    int letterY = questionTile.GetPosition().Y + directionPoint.Y + i * directionPoint.Y;
                                     // In bounds check
                                     if (letterX >= 0 && letterX <= grid.GetUpperBound(1) && letterY >= 0 && letterY <= grid.GetUpperBound(0))
                                     {
@@ -187,29 +192,30 @@ namespace MiniKreuzwortraetsel
                 else if (candidates.Count > 1)
                 {
                     // Highlight candidates
+                    Color minColor = Color.FromArgb(0x9be8a1);
+                    Color maxColor = Color.FromArgb(0x00ff14);
                     for (int i = 0; i < candidates.Count; i++)
                     {
-                        Color minColor = Color.FromArgb(0x9be8a1);
-                        Color maxColor = Color.FromArgb(0x00ff14);
                         float proportion = 0;
                         if (maxMatches > 0)
                             proportion = candidates[i].matches / maxMatches;
                         else
                             proportion = 0;
-                        // Candidates tuple is buggy, sometimes says matches is 0, when it's not
+                        // BUG: Candidates tuple is buggy, sometimes says matches is 0, when it's not
                         Color color = Color.FromArgb((int)(minColor.R + (maxColor.R - minColor.R) * proportion), (int)(minColor.G + (maxColor.G - minColor.G) * proportion), (int)(minColor.B + (maxColor.B - minColor.B) * proportion));
                         SolidBrush brush = new SolidBrush(color);
-                        candidates[i].questionTile.HighlightDirectionsAndColors.Add((candidates[i].direction, brush));
+                        candidates[i].questionTile.SubtileHighlightColors[candidates[i].direction] = brush;
                     }
                     Tile.tupleToBeFilled = tuple;
                     gridPB.Refresh();
                 }
             }
         }
-        private void FillAnswer(Tile questionTile, Point direction, (string Question, string Answer) tuple)
+        private void FillAnswer(Tile questionTile, int direction, (string Question, string Answer) tuple)
         {
+            Point directionPoint = directions[direction];
             // Fill the question indicator into the tile
-            string arrow = (direction.X == 1) ? "►" : "▼";
+            string arrow = (directionPoint.X == 1) ? "►" : "▼";
             string questionTileText = "";
             if (tuple.Question == "")
                 questionTileText = arrow;
@@ -220,7 +226,7 @@ namespace MiniKreuzwortraetsel
             }
             questionTile.SetText(questionTileText);
             // Reserve tile after answer
-            Point tileAfterAnswerPos = new Point(questionTile.GetPosition().X + (direction.X * (tuple.Answer.Length + 1)), questionTile.GetPosition().Y + (direction.Y * (tuple.Answer.Length + 1)));
+            Point tileAfterAnswerPos = new Point(questionTile.GetPosition().X + (directionPoint.X * (tuple.Answer.Length + 1)), questionTile.GetPosition().Y + (directionPoint.Y * (tuple.Answer.Length + 1)));
             if (tileAfterAnswerPos.Y < grid.GetLength(0) && tileAfterAnswerPos.X < grid.GetLength(1))
                 grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X].SetReserved(true);
 
@@ -229,8 +235,8 @@ namespace MiniKreuzwortraetsel
             // Fill the answer into the grid letter by letter
             for (int c = 0; c < tuple.Answer.Length; c++)
             {
-                letterX = questionTile.GetPosition().X + (direction.X * (c + 1));
-                letterY = questionTile.GetPosition().Y + (direction.Y * (c + 1));
+                letterX = questionTile.GetPosition().X + (directionPoint.X * (c + 1));
+                letterY = questionTile.GetPosition().Y + (directionPoint.Y * (c + 1));
                 grid[letterY, letterX].SetText(tuple.Answer[c].ToString());
                 // Mark tile as baseWordTile, if question is empty (only the case if a baseWord is being filled)
                 if (tuple.Question == "")
@@ -434,7 +440,6 @@ namespace MiniKreuzwortraetsel
                 else
                     popupLBL.Visible = false;
 
-                // Activate hover effect?
                 tile.ActivateHover(e.X, e.Y, ts);
 
                 Refresh();
@@ -447,21 +452,20 @@ namespace MiniKreuzwortraetsel
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
                     Tile tile = grid[y, x];
-                    e.Graphics.DrawImage(tile.GetGraphics(ts, Font), x, y)
+                    Image tileGraphics = tile.GetGraphics(ts, Font);
+                    e.Graphics.DrawImage(tileGraphics, x * ts, y * ts);
                 }
             }
-
-            // Arrow missing
         }
         /// <summary>
-        /// Calls FillAnswer if in bounds and hover active
+        /// Calls FillAnswer if in bounds and on hover tile
         /// </summary>
         private void GridPB_MouseClick(object sender, MouseEventArgs e)
         {
             Tile tile = Tile.currentHoveringTile;
             if (tile != null)
             {
-                FillAnswer(tile, directions[tile.hoverSubtile], Tile.tupleToBeFilled);
+                FillAnswer(tile, tile.hoverSubtile, Tile.tupleToBeFilled);
                 Tile.RemoveAllHighlights(grid);
                 gridPB.Refresh();
 
@@ -475,7 +479,7 @@ namespace MiniKreuzwortraetsel
                 string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
                 (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
-                PutAnswerIntoCrossword(tuple);
+                HighlightCandidateSubtiles(tuple);
             }
         }
         private void InsertTupleBTN_Click(object sender, EventArgs e)
@@ -485,18 +489,18 @@ namespace MiniKreuzwortraetsel
                 string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
                 (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
-                PutAnswerIntoCrossword(tuple);
+                HighlightCandidateSubtiles(tuple);
             }
         }
         private void BaseWordBTN_Click(object sender, EventArgs e)
         {
             (string Question, string Answer) tuple = ("", baseWordTB.Text.ToUpper());
-            PutAnswerIntoCrossword(tuple);
+            HighlightCandidateSubtiles(tuple);
         }
         private void NoDBInsertTupleBTN_Click(object sender, EventArgs e)
         {
             (string Question, string Answer) tuple = (ReplaceUmlaute(NoDBQuestionTB.Text).ToUpper(), ReplaceUmlaute(NoDBAnswerTB.Text).ToUpper());
-            PutAnswerIntoCrossword(tuple);
+            HighlightCandidateSubtiles(tuple);
         }
 
 
