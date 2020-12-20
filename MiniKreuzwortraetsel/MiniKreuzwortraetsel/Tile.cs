@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Windows.Forms;
 
 
 namespace MiniKreuzwortraetsel
@@ -12,11 +13,7 @@ namespace MiniKreuzwortraetsel
     {
         public static (string Question, string Answer) tupleToBeFilled;
         public static Tile currentHoveringTile;
-        /// <summary>
-        /// If this list has children, then only they will be repainted in the Form1.Paint method, 
-        /// this saves RAM and CPU, needs no additional Garbage Collection
-        /// </summary>
-        public static List<Tile> ExclusiveRedraw = new List<Tile>();
+        public enum DrawMode { Nothing, Everything };
 
         Point Position;
         string Text = "";
@@ -36,6 +33,7 @@ namespace MiniKreuzwortraetsel
         Point[][] subtileTriangles;
         string[] hoverArrows = new string[2] { "►", "▼" };
         Point[] arrowPositions;
+        public bool Draw = true;
 
         public Tile(int x, int y, int ts)
         {
@@ -104,7 +102,7 @@ namespace MiniKreuzwortraetsel
         /// Checks if subtile should activate hover effect and does so if necessary, 
         /// also returns whether hover effect has changed, and saves the affected tiles in Tile.ExclusiveRedraw
         /// </summary>
-        public void ActivateHover(int mouseX, int mouseY, int ts, out bool hasHoverChanged)
+        public void ActivateHover(int mouseX, int mouseY, int ts, Tile[,] grid, PictureBox gridPB, out bool hasHoverChanged)
         {
             // Get old state of hover effect
             Tile oldTile = currentHoveringTile;
@@ -146,23 +144,40 @@ namespace MiniKreuzwortraetsel
             if (hoverStateNew != hoverStateOld)
             {
                 hasHoverChanged = true;
-                // Tell paint method to only redraw the two affected tiles,
-                // (one lost hover effect, one gained hover effect)
-                if (oldTile != newTile)
+                // Turn off all unnecessary drawing on the next Refresh()
+                SetDrawModeForAllTiles(grid, DrawMode.Nothing);
+                // Turn on drawing only for the tiles that had a visual change
+                if (oldTile != null)
                 {
-                    if (oldTile != null)
-                        ExclusiveRedraw.Add(oldTile);
-                    if (newTile != null)
-                        ExclusiveRedraw.Add(newTile);
+                    oldTile.Draw = true;
+                    // Since other tiles won't be drawn, they would appear white,
+                    // so only show change for the two tiles with the Draw flag set to true
+                    gridPB.Invalidate(new Rectangle(oldTile.Position.X * ts, oldTile.Position.Y * ts, ts, ts));
                 }
-                // If both tiles are the same, then only the hoverSubtile within the same tile was changed, 
-                // so only redraw that one tile, instead of drawing the same one twice
-                else
-                    if (oldTile != null)
-                    ExclusiveRedraw.Add(oldTile);
+                if (newTile != null)
+                {
+                    newTile.Draw = true;
+                    gridPB.Invalidate(new Rectangle(newTile.Position.X * ts, newTile.Position.Y * ts, ts, ts));
+                }
+
             }
             else
                 hasHoverChanged = false;
+        }
+        /// <summary>
+        /// Turns on/off drawing for all tiles
+        /// </summary>
+        /// <param name="grid"></param>
+        /// <param name="draw"></param>
+        public static void SetDrawModeForAllTiles(Tile [,] grid, DrawMode drawMode)
+        {
+            for (int y = 0; y < grid.GetLength(0); y++)
+            {
+                for (int x = 0; x < grid.GetLength(1); x++)
+                {
+                    grid[y, x].Draw = Convert.ToBoolean((int)drawMode);
+                }
+            }
         }
         public bool IsHighlighted()
         {

@@ -21,7 +21,7 @@ namespace MiniKreuzwortraetsel
         int ts = 30;
         static Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
 
-        // TODO: memory leak
+        // TODO: PopUpLBL not as control
         // TODO: thumbnail
 
         // TODO: different shades of highlight dont work properly
@@ -207,6 +207,7 @@ namespace MiniKreuzwortraetsel
                         candidates[i].questionTile.SubtileHighlightColors[candidates[i].direction] = brush;
                     }
                     Tile.tupleToBeFilled = tuple;
+                    Tile.SetDrawModeForAllTiles(grid, Tile.DrawMode.Everything);
                     gridPB.Refresh();
                 }
             }
@@ -244,6 +245,7 @@ namespace MiniKreuzwortraetsel
                     grid[letterY, letterX].IsBaseWordTile = true;
             }
 
+            Tile.SetDrawModeForAllTiles(grid, Tile.DrawMode.Everything);
             gridPB.Refresh();
         }
         private void ExportToHTML(object sender, EventArgs e)
@@ -438,51 +440,34 @@ namespace MiniKreuzwortraetsel
                         popupLBL.Visible = true;
                     }
                 }
-                else
+                else if (popupLBL.Visible)
+                {
                     popupLBL.Visible = false;
+                    Tile.SetDrawModeForAllTiles(grid, Tile.DrawMode.Everything);
+                    gridPB.Refresh();
+                }
 
-                tile.ActivateHover(e.X, e.Y, ts, out bool hasHoverChanged);
+                tile.ActivateHover(e.X, e.Y, ts, grid, gridPB, out bool hasHoverChanged);
 
                 if (hasHoverChanged)
-                {
-                    // Refresh() would erase all tiles that aren't supposed to be redrawn, 
-                    // so use invalidate/update with the one/two redraw tiles
-                    foreach  (Tile redrawTile in Tile.ExclusiveRedraw)
-                        gridPB.Invalidate(new Rectangle(redrawTile.GetPosition().X * ts, redrawTile.GetPosition().Y * ts, ts, ts));
                     gridPB.Update();
-                }
             }
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
-            // Re-Draw all tiles
-            if (Tile.ExclusiveRedraw.Count == 0)
+            for (int y = 0; y < grid.GetLength(0); y++)
             {
-                for (int y = 0; y < grid.GetLength(0); y++)
+                for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    for (int x = 0; x < grid.GetLength(1); x++)
+                    Tile tile = grid[y, x];
+                    if (tile.Draw)
                     {
-                        Tile tile = grid[y, x];
                         Image canvas = tile.GetGraphics(ts, Font);
                         e.Graphics.DrawImage(canvas, x * ts, y * ts);
                         canvas.Dispose();
                     }
                 }
-                
             }
-            // Re-Draw only tile(s) in Tile.ExclusiveRedraw
-            else
-            {
-                foreach (Tile tile in Tile.ExclusiveRedraw)
-                {
-                    Image canvas = tile.GetGraphics(ts, Font);
-                    e.Graphics.DrawImage(canvas, tile.GetPosition().X * ts, tile.GetPosition().Y * ts);
-                    canvas.Dispose();
-                }
-                // Deactivate ExclusiveRedraw
-                Tile.ExclusiveRedraw.Clear();
-            }
-
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and on hover tile
