@@ -45,9 +45,9 @@ namespace MiniKreuzwortraetsel
             }
 
             // Fill tableMenu with the tables in database
-            if (MySqlQueries.TestConnection())
-                UpdateTableMenu();
-            else
+            //if (MySqlQueries.TestConnection())
+            //    UpdateTableMenu();
+            //else
             {
                 // Replace normal interface with non-DB interface
                 UIPanel.Visible = false;
@@ -467,7 +467,7 @@ namespace MiniKreuzwortraetsel
                         e.Graphics.DrawImage(tileGraphics, x * ts, y * ts);
                     }
                 }
-                GC.Collect();
+                //GC.Collect();
             }
             // Re-Draw only tile(s) in Tile.ExclusiveRedraw
             else
