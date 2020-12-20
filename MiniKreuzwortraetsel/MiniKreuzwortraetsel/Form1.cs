@@ -463,19 +463,21 @@ namespace MiniKreuzwortraetsel
                     for (int x = 0; x < grid.GetLength(1); x++)
                     {
                         Tile tile = grid[y, x];
-                        Image tileGraphics = tile.GetGraphics(ts, Font);
-                        e.Graphics.DrawImage(tileGraphics, x * ts, y * ts);
+                        Image canvas = tile.GetGraphics(ts, Font);
+                        e.Graphics.DrawImage(canvas, x * ts, y * ts);
+                        canvas.Dispose();
                     }
                 }
-                //GC.Collect();
+                
             }
             // Re-Draw only tile(s) in Tile.ExclusiveRedraw
             else
             {
                 foreach (Tile tile in Tile.ExclusiveRedraw)
                 {
-                    Image tileGraphics = tile.GetGraphics(ts, Font);
-                    e.Graphics.DrawImage(tileGraphics, tile.GetPosition().X * ts, tile.GetPosition().Y * ts);
+                    Image canvas = tile.GetGraphics(ts, Font);
+                    e.Graphics.DrawImage(canvas, tile.GetPosition().X * ts, tile.GetPosition().Y * ts);
+                    canvas.Dispose();
                 }
                 // Deactivate ExclusiveRedraw
                 Tile.ExclusiveRedraw.Clear();

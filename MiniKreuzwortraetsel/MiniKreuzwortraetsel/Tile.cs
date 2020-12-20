@@ -69,33 +69,36 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         public Image GetGraphics(int ts, Font font)
         {
+            // Dispose Image and Graphics to prevent memory leak
             Image canvas = new Bitmap(ts, ts);
-            Graphics graphics = Graphics.FromImage(canvas);
-
-            // Draw highlights
-            for (int i = 0; i < SubtileHighlightColors.Length; i++)
+            using (Graphics graphics = Graphics.FromImage(canvas))
             {
-                if (SubtileHighlightColors[i] != null)
-                    graphics.FillPolygon(SubtileHighlightColors[i], subtileTriangles[i]);
+                // Draw highlights
+                for (int i = 0; i < SubtileHighlightColors.Length; i++)
+                {
+                    if (SubtileHighlightColors[i] != null)
+                        graphics.FillPolygon(SubtileHighlightColors[i], subtileTriangles[i]);
+                }
+
+                // Draw hover effect
+                if (hoverSubtile != -1)
+                {
+                    graphics.FillPolygon(Brushes.Blue, subtileTriangles[hoverSubtile]);
+                    graphics.DrawString(hoverArrows[hoverSubtile], font, Brushes.Red, arrowPositions[hoverSubtile]);
+                }
+
+                // Draw text
+                Size textSize = System.Windows.Forms.TextRenderer.MeasureText(Text, font);
+                graphics.DrawString(Text, font, ForegroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
+
+                // Draw Rectangle
+                // Conditions: has background color or text
+                if (GetText(out _) || IsHighlighted())
+                    graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
+
+                return canvas;
             }
 
-            // Draw hover effect
-            if (hoverSubtile != -1)
-            {
-                graphics.FillPolygon(Brushes.Blue, subtileTriangles[hoverSubtile]);
-                graphics.DrawString(hoverArrows[hoverSubtile], font, Brushes.Red, arrowPositions[hoverSubtile]);
-            }
-
-            // Draw text
-            Size textSize = System.Windows.Forms.TextRenderer.MeasureText(Text, font);
-            graphics.DrawString(Text, font, ForegroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
-
-            // Draw Rectangle
-            // Conditions: has background color or text
-            if (GetText(out _) || IsHighlighted())
-                graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
-
-            return canvas;
         }
         /// <summary>
         /// Checks if subtile should activate hover effect and does so if necessary, 
