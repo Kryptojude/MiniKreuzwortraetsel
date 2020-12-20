@@ -225,6 +225,7 @@ namespace MiniKreuzwortraetsel
                 questionTileText = questions.Count + arrow;
             }
             questionTile.SetText(questionTileText);
+            questionTile.SetForegroundColor(Brushes.Red);
             // Reserve tile after answer
             Point tileAfterAnswerPos = new Point(questionTile.GetPosition().X + (directionPoint.X * (tuple.Answer.Length + 1)), questionTile.GetPosition().Y + (directionPoint.Y * (tuple.Answer.Length + 1)));
             if (tileAfterAnswerPos.Y < grid.GetLength(0) && tileAfterAnswerPos.X < grid.GetLength(1))
@@ -440,22 +441,46 @@ namespace MiniKreuzwortraetsel
                 else
                     popupLBL.Visible = false;
 
-                tile.ActivateHover(e.X, e.Y, ts);
+                tile.ActivateHover(e.X, e.Y, ts, out bool hasHoverChanged);
 
-                Refresh();
+                if (hasHoverChanged)
+                {
+                    // Refresh() would erase all tiles that aren't supposed to be redrawn, 
+                    // so use invalidate/update with the one/two redraw tiles
+                    foreach  (Tile redrawTile in Tile.ExclusiveRedraw)
+                        gridPB.Invalidate(new Rectangle(redrawTile.GetPosition().X * ts, redrawTile.GetPosition().Y * ts, ts, ts));
+                    gridPB.Update();
+                }
             }
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
-            for (int y = 0; y < grid.GetLength(0); y++)
+            // Re-Draw all tiles
+            if (Tile.ExclusiveRedraw.Count == 0)
             {
-                for (int x = 0; x < grid.GetLength(1); x++)
+                for (int y = 0; y < grid.GetLength(0); y++)
                 {
-                    Tile tile = grid[y, x];
-                    Image tileGraphics = tile.GetGraphics(ts, Font);
-                    e.Graphics.DrawImage(tileGraphics, x * ts, y * ts);
+                    for (int x = 0; x < grid.GetLength(1); x++)
+                    {
+                        Tile tile = grid[y, x];
+                        Image tileGraphics = tile.GetGraphics(ts, Font);
+                        e.Graphics.DrawImage(tileGraphics, x * ts, y * ts);
+                    }
                 }
+                GC.Collect();
             }
+            // Re-Draw only tile(s) in Tile.ExclusiveRedraw
+            else
+            {
+                foreach (Tile tile in Tile.ExclusiveRedraw)
+                {
+                    Image tileGraphics = tile.GetGraphics(ts, Font);
+                    e.Graphics.DrawImage(tileGraphics, tile.GetPosition().X * ts, tile.GetPosition().Y * ts);
+                }
+                // Deactivate ExclusiveRedraw
+                Tile.ExclusiveRedraw.Clear();
+            }
+
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and on hover tile
@@ -465,10 +490,8 @@ namespace MiniKreuzwortraetsel
             Tile tile = Tile.currentHoveringTile;
             if (tile != null)
             {
-                FillAnswer(tile, tile.hoverSubtile, Tile.tupleToBeFilled);
                 Tile.RemoveAllHighlights(grid);
-                gridPB.Refresh();
-
+                FillAnswer(tile, tile.hoverSubtile, Tile.tupleToBeFilled);
             }
         }
         // Methods that call PutAnswerIntoCrossWord(tuple);
@@ -544,6 +567,5 @@ namespace MiniKreuzwortraetsel
             }
             //else errorMessageLBL.Text = "Zuerst Kreuzworträtsel machen";
         }
-
     }
 }

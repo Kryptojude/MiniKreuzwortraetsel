@@ -12,6 +12,11 @@ namespace MiniKreuzwortraetsel
     {
         public static (string Question, string Answer) tupleToBeFilled;
         public static Tile currentHoveringTile;
+        /// <summary>
+        /// If this list has children, then only they will be repainted in the Form1.Paint method, 
+        /// this saves RAM and CPU, needs no additional Garbage Collection
+        /// </summary>
+        public static List<Tile> ExclusiveRedraw = new List<Tile>();
 
         Point Position;
         string Text = "";
@@ -93,10 +98,19 @@ namespace MiniKreuzwortraetsel
             return canvas;
         }
         /// <summary>
-        /// Checks if subtile should activate hover effect and does so if necessary
+        /// Checks if subtile should activate hover effect and does so if necessary, 
+        /// also returns whether hover effect has changed, and saves the affected tiles in Tile.ExclusiveRedraw
         /// </summary>
-        public void ActivateHover(int mouseX, int mouseY, int ts)
+        public void ActivateHover(int mouseX, int mouseY, int ts, out bool hasHoverChanged)
         {
+            // Get old state of hover effect
+            Tile oldTile = currentHoveringTile;
+            string hoverStateOld = "";
+            if (currentHoveringTile != null)
+                hoverStateOld += "active-" + currentHoveringTile.Position.X + "-" + currentHoveringTile.Position.Y + "-" + currentHoveringTile.hoverSubtile + "-";
+            else
+                hoverStateOld += "inactive-";
+
             // Remove old hover effect
             if (currentHoveringTile != null)
             {
@@ -116,6 +130,36 @@ namespace MiniKreuzwortraetsel
                 hoverSubtile = mouseSubtile;
                 currentHoveringTile = this;
             }
+
+            // Get new state of hover effect
+            Tile newTile = currentHoveringTile;
+            string hoverStateNew = "";
+            if (currentHoveringTile != null)
+                hoverStateNew += "active-" + currentHoveringTile.Position.X + "-" + currentHoveringTile.Position.Y + "-" + currentHoveringTile.hoverSubtile + "-";
+            else
+                hoverStateNew += "inactive-";
+
+            // Did hover effect change?
+            if (hoverStateNew != hoverStateOld)
+            {
+                hasHoverChanged = true;
+                // Tell paint method to only redraw the two affected tiles,
+                // (one lost hover effect, one gained hover effect)
+                if (oldTile != newTile)
+                {
+                    if (oldTile != null)
+                        ExclusiveRedraw.Add(oldTile);
+                    if (newTile != null)
+                        ExclusiveRedraw.Add(newTile);
+                }
+                // If both tiles are the same, then only the hoverSubtile within the same tile was changed, 
+                // so only redraw that one tile, instead of drawing the same one twice
+                else
+                    if (oldTile != null)
+                    ExclusiveRedraw.Add(oldTile);
+            }
+            else
+                hasHoverChanged = false;
         }
         public bool IsHighlighted()
         {
@@ -159,6 +203,10 @@ namespace MiniKreuzwortraetsel
         public Brush GetForegroundColor()
         {
             return ForegroundColor;
+        }
+        public void SetForegroundColor(Brush color)
+        {
+            ForegroundColor = color;
         }
         public bool IsReserved()
         {
