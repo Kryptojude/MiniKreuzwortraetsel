@@ -15,20 +15,17 @@ namespace MiniKreuzwortraetsel
 {
     public partial class Form1 : Form
     {
-        Tile[,] grid = new Tile[20,20];
+        readonly Tile[,] grid = new Tile[20,20];
         List<string> questions = new List<string>();
         readonly int ts = 30;
         readonly Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
         (Point Location, string Text, bool Visible) Popup = (new Point(), "", false);
 
-        // TODO: PopUpLBL not as control
         // TODO: thumbnail
 
-        // TODO: different shades of highlight dont work properly
-        // TODO: reserved tiles cant have question in it
-        // TODO: Filling over reserved tiles
-        // TODO: Show word dimensions when hovering over highlight
-
+        // MAYBE: Let user decide dimensions of crossword canvas
+        // MAYBE: clear crossword button
+        // MAYBE: Show word dimensions when hovering over highlight
         // MAYBE: Solution word
         // MAYBE: Wort ausgrauen, wenn wort nicht passen kann
         // MAYBE: Rückgängig machen
@@ -113,7 +110,7 @@ namespace MiniKreuzwortraetsel
             {
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed
-                List<(Tile questionTile, Tile tileAfterAnswer, int direction, int matches)> candidates = new List<(Tile, Tile, int, int)>();
+                List<(Tile potentialQuestionTile, Tile tileAfterAnswer, int direction, int matches)> candidates = new List<(Tile, Tile, int, int)>();
                 int maxMatches = 0;
                 for (int direction = 0; direction < 2; direction++)
                 {
@@ -122,10 +119,10 @@ namespace MiniKreuzwortraetsel
                     {
                         for (int x = 0; x < grid.GetLength(1); x++)
                         {
-                            Tile questionTile = grid[y, x];
+                            Tile potentialQuestionTile = grid[y, x];
                             bool fits = true;
                             // Does question tile fit?
-                            if (questionTile.GetText(out _))
+                            if (potentialQuestionTile.GetText(out _))
                                 fits = false;
                             // Free space after answer?
                             Tile tileAfterAnswer = null;
@@ -143,17 +140,18 @@ namespace MiniKreuzwortraetsel
                                 bool possible = true;
                                 for (int i = 0; i < tuple.Answer.Length && possible == true; i++)
                                 {
-                                    int letterX = questionTile.GetPosition().X + directionPoint.X + i * directionPoint.X;
-                                    int letterY = questionTile.GetPosition().Y + directionPoint.Y + i * directionPoint.Y;
+                                    int letterX = potentialQuestionTile.GetPosition().X + directionPoint.X + i * directionPoint.X;
+                                    int letterY = potentialQuestionTile.GetPosition().Y + directionPoint.Y + i * directionPoint.Y;
                                     // In bounds check
                                     if (letterX >= 0 && letterX <= grid.GetUpperBound(1) && letterY >= 0 && letterY <= grid.GetUpperBound(0))
                                     {
+                                        Tile letterTile = grid[letterY, letterX];
                                         // questionTile or reserved tile
-                                        if (questionTile.IsQuestionTile() ||
-                                            questionTile.IsReserved())
+                                        if (letterTile.IsQuestionTile() ||
+                                            letterTile.IsReserved())
                                             possible = false;
                                         // letter
-                                        else if (grid[letterY, letterX].GetText(out string text))
+                                        else if (letterTile.GetText(out string text))
                                         {
                                             // letter matches
                                             if (text == tuple.Answer[i].ToString())
@@ -171,7 +169,7 @@ namespace MiniKreuzwortraetsel
                                 if (possible)
                                 {
                                     // Then save the properties for later
-                                    candidates.Add((questionTile, tileAfterAnswer, direction, matches));
+                                    candidates.Add((potentialQuestionTile, tileAfterAnswer, direction, matches));
                                     // Save maxMatches number for later
                                     if (matches >= maxMatches)
                                         maxMatches = matches;
@@ -186,7 +184,7 @@ namespace MiniKreuzwortraetsel
                     MessageBox.Show("Keine passende Stelle gefunden");
                 else if (candidates.Count == 1)
                     // Fill answer into that position
-                    FillAnswer(candidates[0].questionTile,
+                    FillAnswer(candidates[0].potentialQuestionTile,
                                     candidates[0].direction,
                                     tuple);
                 else if (candidates.Count > 1)
@@ -198,13 +196,12 @@ namespace MiniKreuzwortraetsel
                     {
                         float proportion = 0;
                         if (maxMatches > 0)
-                            proportion = candidates[i].matches / maxMatches;
+                            proportion = (float)candidates[i].matches / maxMatches;
                         else
                             proportion = 0;
-                        // BUG: Candidates tuple is buggy, sometimes says matches is 0, when it's not
                         Color color = Color.FromArgb((int)(minColor.R + (maxColor.R - minColor.R) * proportion), (int)(minColor.G + (maxColor.G - minColor.G) * proportion), (int)(minColor.B + (maxColor.B - minColor.B) * proportion));
                         SolidBrush brush = new SolidBrush(color);
-                        candidates[i].questionTile.SubtileHighlightColors[candidates[i].direction] = brush;
+                        candidates[i].potentialQuestionTile.SubtileHighlightColors[candidates[i].direction] = brush;
                     }
                     Tile.tupleToBeFilled = tuple;
                     gridPB.Refresh();
