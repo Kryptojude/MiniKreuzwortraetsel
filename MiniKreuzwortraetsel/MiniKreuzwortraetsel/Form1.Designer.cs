@@ -44,15 +44,14 @@ namespace MiniKreuzwortraetsel
             this.tableMenu = new System.Windows.Forms.ComboBox();
             this.exportBTN = new System.Windows.Forms.Button();
             this.NoDBPanel = new System.Windows.Forms.Panel();
+            this.NoDBExportBTN = new System.Windows.Forms.Button();
+            this.NoDBErrorLBL = new System.Windows.Forms.Label();
             this.NoDBInsertTupleBTN = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.NoDBAnswerTB = new System.Windows.Forms.TextBox();
             this.NoDBQuestionTB = new System.Windows.Forms.TextBox();
-            this.popupLBL = new System.Windows.Forms.Label();
             this.gridPB = new System.Windows.Forms.PictureBox();
-            this.NoDBErrorLBL = new System.Windows.Forms.Label();
-            this.NoDBExportBTN = new System.Windows.Forms.Button();
             this.UIPanel.SuspendLayout();
             this.NoDBPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridPB)).BeginInit();
@@ -218,6 +217,27 @@ namespace MiniKreuzwortraetsel
             this.NoDBPanel.TabIndex = 6;
             this.NoDBPanel.Visible = false;
             // 
+            // NoDBExportBTN
+            // 
+            this.NoDBExportBTN.Location = new System.Drawing.Point(20, 250);
+            this.NoDBExportBTN.Name = "NoDBExportBTN";
+            this.NoDBExportBTN.Size = new System.Drawing.Size(135, 54);
+            this.NoDBExportBTN.TabIndex = 11;
+            this.NoDBExportBTN.Text = "Kreuzworträtsel exportieren";
+            this.NoDBExportBTN.UseVisualStyleBackColor = true;
+            this.NoDBExportBTN.Click += new System.EventHandler(this.ExportToHTML);
+            // 
+            // NoDBErrorLBL
+            // 
+            this.NoDBErrorLBL.AutoSize = true;
+            this.NoDBErrorLBL.ForeColor = System.Drawing.Color.Red;
+            this.NoDBErrorLBL.Location = new System.Drawing.Point(20, 19);
+            this.NoDBErrorLBL.Name = "NoDBErrorLBL";
+            this.NoDBErrorLBL.Size = new System.Drawing.Size(399, 38);
+            this.NoDBErrorLBL.TabIndex = 5;
+            this.NoDBErrorLBL.Text = "Verbindung zur Datenbank konnte nicht aufgebaut werden.\r\nReduzierte Benutzeroberf" +
+    "läche: ";
+            // 
             // NoDBInsertTupleBTN
             // 
             this.NoDBInsertTupleBTN.Location = new System.Drawing.Point(20, 198);
@@ -260,16 +280,6 @@ namespace MiniKreuzwortraetsel
             this.NoDBQuestionTB.Size = new System.Drawing.Size(249, 26);
             this.NoDBQuestionTB.TabIndex = 0;
             // 
-            // popupLBL
-            // 
-            this.popupLBL.AutoSize = true;
-            this.popupLBL.BackColor = System.Drawing.SystemColors.Control;
-            this.popupLBL.Location = new System.Drawing.Point(0, 0);
-            this.popupLBL.Name = "popupLBL";
-            this.popupLBL.Size = new System.Drawing.Size(0, 19);
-            this.popupLBL.TabIndex = 4;
-            this.popupLBL.Visible = false;
-            // 
             // gridPB
             // 
             this.gridPB.Location = new System.Drawing.Point(0, -2);
@@ -281,34 +291,12 @@ namespace MiniKreuzwortraetsel
             this.gridPB.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GridPB_MouseClick);
             this.gridPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GridPB_MouseMove);
             // 
-            // NoDBErrorLBL
-            // 
-            this.NoDBErrorLBL.AutoSize = true;
-            this.NoDBErrorLBL.ForeColor = System.Drawing.Color.Red;
-            this.NoDBErrorLBL.Location = new System.Drawing.Point(20, 19);
-            this.NoDBErrorLBL.Name = "NoDBErrorLBL";
-            this.NoDBErrorLBL.Size = new System.Drawing.Size(399, 38);
-            this.NoDBErrorLBL.TabIndex = 5;
-            this.NoDBErrorLBL.Text = "Verbindung zur Datenbank konnte nicht aufgebaut werden.\r\nReduzierte Benutzeroberf" +
-    "läche: ";
-            // 
-            // NoDBExportBTN
-            // 
-            this.NoDBExportBTN.Location = new System.Drawing.Point(20, 250);
-            this.NoDBExportBTN.Name = "NoDBExportBTN";
-            this.NoDBExportBTN.Size = new System.Drawing.Size(135, 54);
-            this.NoDBExportBTN.TabIndex = 11;
-            this.NoDBExportBTN.Text = "Kreuzworträtsel exportieren";
-            this.NoDBExportBTN.UseVisualStyleBackColor = true;
-            this.NoDBExportBTN.Click += new System.EventHandler(this.ExportToHTML);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 658);
             this.Controls.Add(this.NoDBPanel);
-            this.Controls.Add(this.popupLBL);
             this.Controls.Add(this.gridPB);
             this.Controls.Add(this.UIPanel);
             this.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -329,7 +317,6 @@ namespace MiniKreuzwortraetsel
         private System.Windows.Forms.TextBox baseWordTB;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel UIPanel;
-        private System.Windows.Forms.Label popupLBL;
         private System.Windows.Forms.Button exportBTN;
         private System.Windows.Forms.ComboBox tableMenu;
         private System.Windows.Forms.Label label2;

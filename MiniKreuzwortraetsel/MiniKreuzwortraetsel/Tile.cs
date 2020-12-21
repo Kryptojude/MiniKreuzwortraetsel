@@ -103,7 +103,7 @@ namespace MiniKreuzwortraetsel
         /// Checks if subtile should activate hover effect and does so if necessary, 
         /// also returns whether hover effect has changed and sets a draw flag exclusively for the affected tiles
         /// </summary>
-        public void ActivateHover(int mouseX, int mouseY, int ts, Tile[,] grid, PictureBox gridPB, out bool hasHoverChanged)
+        public void ActivateHover(int mouseX, int mouseY, int ts, Tile[,] grid, PictureBox gridPB)
         {
             // Get old state of hover effect
             Tile oldTile = currentHoveringTile;
@@ -144,7 +144,6 @@ namespace MiniKreuzwortraetsel
             // Did hover effect change?
             if (hoverStateNew != hoverStateOld)
             {
-                hasHoverChanged = true;
                 // Turn off all unnecessary drawing on the next Refresh()
                 SetDrawModeForAllTiles(grid, DrawMode.Nothing);
                 // Turn on drawing only for the tiles that had a visual change
@@ -160,9 +159,10 @@ namespace MiniKreuzwortraetsel
                     newTile.Draw = true;
                     gridPB.Invalidate(new Rectangle(newTile.Position.X * ts, newTile.Position.Y * ts, ts, ts));
                 }
+
+                // Update invalidated areas only
+                gridPB.Update();
             }
-            else
-                hasHoverChanged = false;
         }
         /// <summary>
         /// Turns on/off drawing for all tiles

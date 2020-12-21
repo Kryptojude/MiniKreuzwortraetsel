@@ -17,9 +17,9 @@ namespace MiniKreuzwortraetsel
     {
         Tile[,] grid = new Tile[20,20];
         List<string> questions = new List<string>();
-        Random random = new Random();
-        int ts = 30;
-        static Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
+        readonly int ts = 30;
+        readonly Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
+        (Point Location, string Text, bool Visible) Popup = (new Point(), "", false);
 
         // TODO: PopUpLBL not as control
         // TODO: thumbnail
@@ -207,7 +207,6 @@ namespace MiniKreuzwortraetsel
                         candidates[i].questionTile.SubtileHighlightColors[candidates[i].direction] = brush;
                     }
                     Tile.tupleToBeFilled = tuple;
-                    Tile.SetDrawModeForAllTiles(grid, Tile.DrawMode.Everything);
                     gridPB.Refresh();
                 }
             }
@@ -245,7 +244,6 @@ namespace MiniKreuzwortraetsel
                     grid[letterY, letterX].IsBaseWordTile = true;
             }
 
-            Tile.SetDrawModeForAllTiles(grid, Tile.DrawMode.Everything);
             gridPB.Refresh();
         }
         private void ExportToHTML(object sender, EventArgs e)
@@ -434,26 +432,19 @@ namespace MiniKreuzwortraetsel
                     tile.GetText(out string tileText);
                     if (int.TryParse(tileText[0].ToString(), out int questionNumber))
                     {
-                        string popupText = questions[questionNumber - 1];
-                        popupLBL.Text = popupText;
-                        popupLBL.Location = new Point(e.X + ts/2, e.Y - ts/2);
-                        popupLBL.Visible = true;
+                        Popup.Text = questions[questionNumber - 1];
+                        Popup.Location = new Point(e.X + ts/2, e.Y - ts/2);
+                        Popup.Visible = true;
+                        gridPB.Refresh();
                     }
                 }
-                else if (popupLBL.Visible)
+                else if (Popup.Visible)
                 {
-                    popupLBL.Visible = false;
-                    Tile.SetDrawModeForAllTiles(grid, Tile.DrawMode.Everything);
+                    Popup.Visible = false;
                     gridPB.Refresh();
                 }
 
-                tile.ActivateHover(e.X, e.Y, ts, grid, gridPB, out bool hasHoverChanged);
-
-                if (hasHoverChanged)
-                    // Update only draws invalidated areas, 
-                    // ActivateHover() invalidated the two tiles that had 
-                    // a visual change based on the hover effect change
-                    gridPB.Update();
+                tile.ActivateHover(e.X, e.Y, ts, grid, gridPB);
             }
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
@@ -471,6 +462,13 @@ namespace MiniKreuzwortraetsel
                     }
                 }
             }
+
+            // Draw Popup
+            if (Popup.Visible)
+                e.Graphics.DrawString(Popup.Text, Font, Brushes.Black, Popup.Location);
+
+            // Set all tiles to be drawn next refresh()
+            Tile.SetDrawModeForAllTiles(grid, Tile.DrawMode.Everything);
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and on hover tile
