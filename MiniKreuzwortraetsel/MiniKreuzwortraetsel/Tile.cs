@@ -71,6 +71,7 @@ namespace MiniKreuzwortraetsel
             Image canvas = new Bitmap(ts, ts);
             using (Graphics graphics = Graphics.FromImage(canvas))
             {
+                graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
                 // Draw highlights
                 for (int i = 0; i < SubtileHighlightColors.Length; i++)
                 {
@@ -86,7 +87,7 @@ namespace MiniKreuzwortraetsel
                 }
 
                 // Draw text
-                Size textSize = System.Windows.Forms.TextRenderer.MeasureText(Text, font);
+                Size textSize = TextRenderer.MeasureText(Text, font);
                 graphics.DrawString(Text, font, ForegroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
 
                 // Draw Rectangle
@@ -100,7 +101,7 @@ namespace MiniKreuzwortraetsel
         }
         /// <summary>
         /// Checks if subtile should activate hover effect and does so if necessary, 
-        /// also returns whether hover effect has changed, and saves the affected tiles in Tile.ExclusiveRedraw
+        /// also returns whether hover effect has changed and sets a draw flag exclusively for the affected tiles
         /// </summary>
         public void ActivateHover(int mouseX, int mouseY, int ts, Tile[,] grid, PictureBox gridPB, out bool hasHoverChanged)
         {
@@ -159,7 +160,6 @@ namespace MiniKreuzwortraetsel
                     newTile.Draw = true;
                     gridPB.Invalidate(new Rectangle(newTile.Position.X * ts, newTile.Position.Y * ts, ts, ts));
                 }
-
             }
             else
                 hasHoverChanged = false;

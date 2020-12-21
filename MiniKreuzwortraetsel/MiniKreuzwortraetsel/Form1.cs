@@ -450,6 +450,9 @@ namespace MiniKreuzwortraetsel
                 tile.ActivateHover(e.X, e.Y, ts, grid, gridPB, out bool hasHoverChanged);
 
                 if (hasHoverChanged)
+                    // Update only draws invalidated areas, 
+                    // ActivateHover() invalidated the two tiles that had 
+                    // a visual change based on the hover effect change
                     gridPB.Update();
             }
         }
