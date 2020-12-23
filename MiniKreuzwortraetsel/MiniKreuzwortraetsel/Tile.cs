@@ -32,7 +32,8 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Determines if this tile should have red outline based on question tile hover pointing to it
         /// </summary>
-        bool extendedHover = false;
+        int extendedHover = -1;
+        Pen extendedHoverPen = new Pen(Brushes.Red, 5);
         /// <summary>
         /// Contains the tile-space coordinates for the two subtiles
         /// </summary>
@@ -40,7 +41,6 @@ namespace MiniKreuzwortraetsel
         string[] hoverArrows = new string[2] { "►", "▼" };
         static Font arrowFont = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
         Point[] arrowPositions;
-        public bool Draw = true;
 
         public Tile(int x, int y, int ts, Font font)
         {
@@ -87,8 +87,18 @@ namespace MiniKreuzwortraetsel
                     graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
 
                 // Draw extendedHover
-                if (extendedHover)
-                    graphics.DrawRectangle(Pens.Red, 0, 0, ts - 1, ts - 1);
+                switch (extendedHover)
+                {
+                    case 0:  
+                        graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
+                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                        break;
+                    case 1:
+                        graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
+                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                        break;
+                }
 
                 return canvas;
             }
@@ -139,23 +149,10 @@ namespace MiniKreuzwortraetsel
             // Did hover effect change?
             if (hoverStateNew != hoverStateOld)
             {
-                // Turn off all unnecessary drawing on the next Refresh()
-                SetDrawModeForAllTiles(grid, DrawMode.Nothing);
-                // Turn on drawing only for the tiles that had a visual change
-                if (oldTile != null)
-                {
-                    oldTile.Draw = true;
-                    // Since other tiles won't be drawn, they would appear white,
-                    // so only show change for the two tiles with the Draw flag set to true
-                    gridPB.Invalidate(new Rectangle(oldTile.Position.X * ts, oldTile.Position.Y * ts, ts, ts));
-                }
+                RemoveAllExtendedHover(grid);
                 if (newTile != null)
                 {
-                    newTile.Draw = true;
-                    gridPB.Invalidate(new Rectangle(newTile.Position.X * ts, newTile.Position.Y * ts, ts, ts));
-
                     // Activate extendedHover for adjacent tiles
-                    RemoveAllExtendedHover(grid);
                     Point directionPoint = directions[hoverSubtile];
                     for (int i = 0; i < tupleToBeFilled.Answer.Length; i++)
                     {
@@ -164,30 +161,15 @@ namespace MiniKreuzwortraetsel
                         // out of bounds check
                         if (letterX <= grid.GetUpperBound(1) && letterY <= grid.GetUpperBound(0))
                         {
-                            grid[letterY, letterX].extendedHover = true;
-                            gridPB.Invalidate(new Rectangle(newTile.Position.X * ts, newTile.Position.Y * ts, ts, ts));
+                            if (i < tupleToBeFilled.Answer.Length - 1)
+                                grid[letterY, letterX].extendedHover = 0;
+                            else
+                                grid[letterY, letterX].extendedHover = 1;
                         }
                     }
-
                 }
 
-                // Update invalidated areas only
-                gridPB.Update();
-            }
-        }
-        /// <summary>
-        /// Turns on/off drawing for all tiles
-        /// </summary>
-        /// <param name="grid"></param>
-        /// <param name="draw"></param>
-        public static void SetDrawModeForAllTiles(Tile [,] grid, DrawMode drawMode)
-        {
-            for (int y = 0; y < grid.GetLength(0); y++)
-            {
-                for (int x = 0; x < grid.GetLength(1); x++)
-                {
-                    grid[y, x].Draw = Convert.ToBoolean((int)drawMode);
-                }
+                gridPB.Refresh();
             }
         }
         public bool IsQuestionTile()
@@ -229,7 +211,7 @@ namespace MiniKreuzwortraetsel
             {
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    grid[y, x].extendedHover = false;
+                    grid[y, x].extendedHover = -1;
                 }
             }
         }

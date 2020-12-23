@@ -451,21 +451,15 @@ namespace MiniKreuzwortraetsel
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
                     Tile tile = grid[y, x];
-                    if (tile.Draw)
-                    {
-                        Image canvas = tile.GetGraphics(ts);
-                        e.Graphics.DrawImage(canvas, x * ts, y * ts);
-                        canvas.Dispose();
-                    }
+                    Image canvas = tile.GetGraphics(ts);
+                    e.Graphics.DrawImage(canvas, x * ts, y * ts);
+                    canvas.Dispose();
                 }
             }
 
             // Draw Popup
             if (Popup.Visible)
                 e.Graphics.DrawString(Popup.Text, Font, Brushes.Black, Popup.Location);
-
-            // Set all tiles to be drawn next refresh()
-            Tile.SetDrawModeForAllTiles(grid, Tile.DrawMode.Everything);
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and on hover tile
@@ -476,6 +470,7 @@ namespace MiniKreuzwortraetsel
             if (tile != null)
             {
                 Tile.RemoveAllHighlights(grid);
+                Tile.RemoveAllExtendedHover(grid);
                 FillAnswer(tile, tile.hoverSubtile, Tile.tupleToBeFilled);
             }
         }
