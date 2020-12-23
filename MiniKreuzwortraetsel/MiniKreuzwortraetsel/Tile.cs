@@ -30,6 +30,10 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         public int hoverSubtile = -1;
         /// <summary>
+        /// Determines if this tile should have red outline based on question tile hover pointing to it
+        /// </summary>
+        bool extendedHover = false;
+        /// <summary>
         /// Contains the tile-space coordinates for the two subtiles
         /// </summary>
         Point[][] subtileTriangles;
@@ -82,6 +86,10 @@ namespace MiniKreuzwortraetsel
                 if (GetText(out _) || IsHighlighted())
                     graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
 
+                // Draw extendedHover
+                if (extendedHover)
+                    graphics.DrawRectangle(Pens.Red, 0, 0, ts - 1, ts - 1);
+
                 return canvas;
             }
 
@@ -90,7 +98,7 @@ namespace MiniKreuzwortraetsel
         /// Checks if subtile should activate hover effect and does so if necessary, 
         /// also returns whether hover effect has changed and sets a draw flag exclusively for the affected tiles
         /// </summary>
-        public void ActivateHover(int mouseX, int mouseY, int ts, Tile[,] grid, PictureBox gridPB)
+        public void ActivateHover(int mouseX, int mouseY, int ts, Tile[,] grid, PictureBox gridPB, Point[] directions)
         {
             // Get old state of hover effect
             Tile oldTile = currentHoveringTile;
@@ -145,6 +153,22 @@ namespace MiniKreuzwortraetsel
                 {
                     newTile.Draw = true;
                     gridPB.Invalidate(new Rectangle(newTile.Position.X * ts, newTile.Position.Y * ts, ts, ts));
+
+                    // Activate extendedHover for adjacent tiles
+                    RemoveAllExtendedHover(grid);
+                    Point directionPoint = directions[hoverSubtile];
+                    for (int i = 0; i < tupleToBeFilled.Answer.Length; i++)
+                    {
+                        int letterX = Position.X + directionPoint.X * (1 + i);
+                        int letterY = Position.Y + directionPoint.Y * (1 + i);
+                        // out of bounds check
+                        if (letterX <= grid.GetUpperBound(1) && letterY <= grid.GetUpperBound(0))
+                        {
+                            grid[letterY, letterX].extendedHover = true;
+                            gridPB.Invalidate(new Rectangle(newTile.Position.X * ts, newTile.Position.Y * ts, ts, ts));
+                        }
+                    }
+
                 }
 
                 // Update invalidated areas only
@@ -196,6 +220,16 @@ namespace MiniKreuzwortraetsel
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
                     grid[y, x].SubtileHighlightColors = new Brush[2];
+                }
+            }
+        }
+        public static void RemoveAllExtendedHover(Tile[,] grid)
+        {
+            for (int y = 0; y < grid.GetLength(0); y++)
+            {
+                for (int x = 0; x < grid.GetLength(1); x++)
+                {
+                    grid[y, x].extendedHover = false;
                 }
             }
         }

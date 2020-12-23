@@ -221,9 +221,8 @@ namespace MiniKreuzwortraetsel
                 questions.Add(tuple.Question);
                 questionTileText = questions.Count + arrow;
             }
+            questionTile.SetQuestionTile();
             questionTile.SetText(questionTileText);
-            questionTile.SetForegroundColor(Brushes.Red);
-            questionTile.SetArrowFont();
             // Reserve tile after answer
             Point tileAfterAnswerPos = new Point(questionTile.GetPosition().X + (directionPoint.X * (tuple.Answer.Length + 1)), questionTile.GetPosition().Y + (directionPoint.Y * (tuple.Answer.Length + 1)));
             if (tileAfterAnswerPos.Y < grid.GetLength(0) && tileAfterAnswerPos.X < grid.GetLength(1))
@@ -442,7 +441,7 @@ namespace MiniKreuzwortraetsel
                     gridPB.Refresh();
                 }
 
-                tile.ActivateHover(e.X, e.Y, ts, grid, gridPB);
+                tile.ActivateHover(e.X, e.Y, ts, grid, gridPB, directions);
             }
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
