@@ -37,7 +37,7 @@ namespace MiniKreuzwortraetsel
             {
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    grid[y, x] = new Tile(x, y, ts);
+                    grid[y, x] = new Tile(x, y, ts, Font);
                 }
             }
 
@@ -223,6 +223,7 @@ namespace MiniKreuzwortraetsel
             }
             questionTile.SetText(questionTileText);
             questionTile.SetForegroundColor(Brushes.Red);
+            questionTile.SetArrowFont();
             // Reserve tile after answer
             Point tileAfterAnswerPos = new Point(questionTile.GetPosition().X + (directionPoint.X * (tuple.Answer.Length + 1)), questionTile.GetPosition().Y + (directionPoint.Y * (tuple.Answer.Length + 1)));
             if (tileAfterAnswerPos.Y < grid.GetLength(0) && tileAfterAnswerPos.X < grid.GetLength(1))
@@ -453,7 +454,7 @@ namespace MiniKreuzwortraetsel
                     Tile tile = grid[y, x];
                     if (tile.Draw)
                     {
-                        Image canvas = tile.GetGraphics(ts, Font);
+                        Image canvas = tile.GetGraphics(ts);
                         e.Graphics.DrawImage(canvas, x * ts, y * ts);
                         canvas.Dispose();
                     }
@@ -507,7 +508,7 @@ namespace MiniKreuzwortraetsel
         }
         private void NoDBInsertTupleBTN_Click(object sender, EventArgs e)
         {
-            (string Question, string Answer) tuple = (ReplaceUmlaute(NoDBQuestionTB.Text).ToUpper(), ReplaceUmlaute(NoDBAnswerTB.Text).ToUpper());
+            (string Question, string Answer) tuple = (ReplaceUmlaute(NoDBQuestionTB.Text), ReplaceUmlaute(NoDBAnswerTB.Text).ToUpper());
             HighlightCandidateSubtiles(tuple);
         }
 

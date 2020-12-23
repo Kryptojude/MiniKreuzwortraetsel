@@ -30,6 +30,7 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.baseWordTB = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.UIPanel = new System.Windows.Forms.Panel();
@@ -60,7 +61,7 @@ namespace MiniKreuzwortraetsel
             // baseWordTB
             // 
             this.baseWordTB.Location = new System.Drawing.Point(9, 31);
-            this.baseWordTB.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.baseWordTB.Margin = new System.Windows.Forms.Padding(4);
             this.baseWordTB.Name = "baseWordTB";
             this.baseWordTB.Size = new System.Drawing.Size(148, 23);
             this.baseWordTB.TabIndex = 1;
@@ -92,10 +93,10 @@ namespace MiniKreuzwortraetsel
             this.UIPanel.Controls.Add(this.exportBTN);
             this.UIPanel.Controls.Add(this.label1);
             this.UIPanel.Controls.Add(this.baseWordTB);
-            this.UIPanel.Location = new System.Drawing.Point(607, 0);
-            this.UIPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.UIPanel.Location = new System.Drawing.Point(600, 0);
+            this.UIPanel.Margin = new System.Windows.Forms.Padding(4);
             this.UIPanel.Name = "UIPanel";
-            this.UIPanel.Size = new System.Drawing.Size(377, 598);
+            this.UIPanel.Size = new System.Drawing.Size(384, 600);
             this.UIPanel.TabIndex = 3;
             // 
             // deleteTupleBTN
@@ -223,7 +224,7 @@ namespace MiniKreuzwortraetsel
             this.NoDBPanel.Location = new System.Drawing.Point(134, 443);
             this.NoDBPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.NoDBPanel.Name = "NoDBPanel";
-            this.NoDBPanel.Size = new System.Drawing.Size(377, 598);
+            this.NoDBPanel.Size = new System.Drawing.Size(384, 600);
             this.NoDBPanel.TabIndex = 6;
             this.NoDBPanel.Visible = false;
             // 
@@ -296,7 +297,7 @@ namespace MiniKreuzwortraetsel
             // gridPB
             // 
             this.gridPB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.gridPB.Location = new System.Drawing.Point(0, -2);
+            this.gridPB.Location = new System.Drawing.Point(0, 0);
             this.gridPB.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gridPB.Name = "gridPB";
             this.gridPB.Size = new System.Drawing.Size(600, 600);
@@ -315,7 +316,8 @@ namespace MiniKreuzwortraetsel
             this.Controls.Add(this.gridPB);
             this.Controls.Add(this.UIPanel);
             this.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "KreuzworträtselMacher";
             this.UIPanel.ResumeLayout(false);

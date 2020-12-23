@@ -17,9 +17,11 @@ namespace MiniKreuzwortraetsel
 
         Point Position;
         string Text = "";
+        public Font font;
         Brush ForegroundColor = Brushes.Blue;
         bool Reserved = false;
         public bool IsBaseWordTile = false;
+        bool isQuestionTile = false;
         public Brush[] SubtileHighlightColors = new Brush[2];
         /// <summary>
         /// -1 = no hover effect
@@ -28,16 +30,18 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         public int hoverSubtile = -1;
         /// <summary>
-        /// Contains the world coordinates for the two subtiles
+        /// Contains the tile-space coordinates for the two subtiles
         /// </summary>
         Point[][] subtileTriangles;
         string[] hoverArrows = new string[2] { "►", "▼" };
+        static Font arrowFont = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
         Point[] arrowPositions;
         public bool Draw = true;
 
-        public Tile(int x, int y, int ts)
+        public Tile(int x, int y, int ts, Font font)
         {
             Position = new Point(x, y);
+            this.font = font;
             // Generate tile-space coordinates for the two subtiles and the arrowPositions
             subtileTriangles = new Point[2][] { new Point[3] { new Point(0, 0), new Point(ts, 0),  new Point(ts, ts) },
                                                 new Point[3] { new Point(0, 0), new Point(ts, ts), new Point(0, ts) } };
@@ -45,27 +49,10 @@ namespace MiniKreuzwortraetsel
             arrowPositions = new Point[] { new Point(ts / 3, 0), new Point(-3, 2 * (ts / 5)) };
         }
 
-        public bool IsQuestionTile()
-        {
-            if (Text.Contains("►") || Text.Contains("▼"))
-                return true;
-            else
-                return false;
-        }
-        public bool GetQuestionDirection(out Point direction)
-        {
-            direction = new Point();
-            if (Text.Contains("►"))
-                direction = new Point(1, 0);
-            else if (Text.Contains("▼"))
-                direction = new Point(0, 1);
-
-            return IsQuestionTile();
-        }
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public Image GetGraphics(int ts, Font font)
+        public Image GetGraphics(int ts)
         {
             // Dispose Image and Graphics to prevent memory leak
             Image canvas = new Bitmap(ts, ts);
@@ -83,7 +70,7 @@ namespace MiniKreuzwortraetsel
                 if (hoverSubtile != -1)
                 {
                     graphics.FillPolygon(Brushes.Blue, subtileTriangles[hoverSubtile]);
-                    graphics.DrawString(hoverArrows[hoverSubtile], font, Brushes.Red, arrowPositions[hoverSubtile]);
+                    graphics.DrawString(hoverArrows[hoverSubtile], arrowFont, Brushes.Red, arrowPositions[hoverSubtile]);
                 }
 
                 // Draw text
@@ -179,6 +166,16 @@ namespace MiniKreuzwortraetsel
                 }
             }
         }
+        public bool IsQuestionTile()
+        {
+            return isQuestionTile;
+        }
+        public void SetQuestionTile()
+        {
+            isQuestionTile = true;
+            ForegroundColor = Brushes.Red;
+            font = arrowFont;
+        }
         public bool IsHighlighted()
         {
             bool highlighted = false;
@@ -217,14 +214,6 @@ namespace MiniKreuzwortraetsel
         public Point GetPosition()
         {
             return Position;
-        }
-        public Brush GetForegroundColor()
-        {
-            return ForegroundColor;
-        }
-        public void SetForegroundColor(Brush color)
-        {
-            ForegroundColor = color;
         }
         public bool IsReserved()
         {
