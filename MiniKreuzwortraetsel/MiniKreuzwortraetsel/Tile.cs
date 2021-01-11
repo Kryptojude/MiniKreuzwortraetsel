@@ -176,7 +176,7 @@ namespace MiniKreuzwortraetsel
                                 grid[letterY, letterX].extendedHover = 1;
 
                             // Vertical mode
-                            if (directionPoint.Y == 1)
+                            if (directionPoint.Y == 1) 
                                 grid[letterY, letterX].extendedHover += 2;
                         }
                     }
