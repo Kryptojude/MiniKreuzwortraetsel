@@ -13,7 +13,6 @@ namespace MiniKreuzwortraetsel
     {
         public static (string Question, string Answer) tupleToBeFilled;
         public static Tile currentHoveringTile;
-        public enum DrawMode { Nothing, Everything };
 
         Point Position;
         string Text = "";
@@ -30,7 +29,8 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         public int hoverSubtile = -1;
         /// <summary>
-        /// Determines if this tile should have red outline based on question tile hover pointing to it
+        /// Determines if this tile should have red outline based on question tile hover pointing to it, 
+        /// -1 = off, 0 = 2 outlines horizontal, 1 = 3 outlines horizontal, 2 = 2 outlines vertical, 3 = 3 outlines vertical
         /// </summary>
         int extendedHover = -1;
         Pen extendedHoverPen = new Pen(Brushes.Red, 5);
@@ -89,12 +89,21 @@ namespace MiniKreuzwortraetsel
                 // Draw extendedHover
                 switch (extendedHover)
                 {
-                    case 0:  
+                    case 0:
                         graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
                         graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
                         break;
                     case 1:
                         graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
+                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                        break;
+                    case 2:
+                        graphics.DrawLine(extendedHoverPen, 0, 0, 0, ts);
+                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                        break;
+                    case 3:
+                        graphics.DrawLine(extendedHoverPen, 0, 0, 0, ts);
                         graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
                         graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
                         break;
@@ -111,7 +120,6 @@ namespace MiniKreuzwortraetsel
         public void ActivateHover(int mouseX, int mouseY, int ts, Tile[,] grid, PictureBox gridPB, Point[] directions)
         {
             // Get old state of hover effect
-            Tile oldTile = currentHoveringTile;
             string hoverStateOld = "";
             if (currentHoveringTile != null)
                 hoverStateOld += "active-" + currentHoveringTile.Position.X + "-" + currentHoveringTile.Position.Y + "-" + currentHoveringTile.hoverSubtile + "-";
@@ -161,10 +169,15 @@ namespace MiniKreuzwortraetsel
                         // out of bounds check
                         if (letterX <= grid.GetUpperBound(1) && letterY <= grid.GetUpperBound(0))
                         {
+                            // End or middle outline
                             if (i < tupleToBeFilled.Answer.Length - 1)
                                 grid[letterY, letterX].extendedHover = 0;
                             else
                                 grid[letterY, letterX].extendedHover = 1;
+
+                            // Vertical mode
+                            if (directionPoint.Y == 1)
+                                grid[letterY, letterX].extendedHover += 2;
                         }
                     }
                 }
