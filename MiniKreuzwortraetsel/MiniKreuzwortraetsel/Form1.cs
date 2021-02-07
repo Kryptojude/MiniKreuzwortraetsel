@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO;
 using Xceed.Words.NET;
 using System.Diagnostics;
+using MySqlQueriesNamespace;
 
 namespace MiniKreuzwortraetsel
 {
@@ -21,8 +22,6 @@ namespace MiniKreuzwortraetsel
         readonly Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
         (Point Location, string Text, bool Visible) Popup = (new Point(), "", false);
         MySqlQueries mySqlQueries;
-
-        // TODO: thumbnail
 
         // MAYBE: Let user decide dimensions of crossword canvas
         // MAYBE: clear crossword button
