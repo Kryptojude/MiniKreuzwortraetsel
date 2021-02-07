@@ -20,6 +20,7 @@ namespace MiniKreuzwortraetsel
         readonly int ts = 30;
         readonly Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
         (Point Location, string Text, bool Visible) Popup = (new Point(), "", false);
+        MySqlQueries mySqlQueries;
 
         // TODO: thumbnail
 
@@ -41,10 +42,14 @@ namespace MiniKreuzwortraetsel
                 }
             }
 
-            // Fill tableMenu with the tables in database
-            //if (MySqlQueries.TestConnection())
-            //    UpdateTableMenu();
-            //else
+            // Test database connection
+            mySqlQueries = new MySqlQueries("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
+            if (mySqlQueries.TestConnection())
+            {
+                // Fill tableMenu with the tables in database
+                UpdateTableMenu();
+            }
+            else
             {
                 // Replace normal interface with non-DB interface
                 UIPanel.Visible = false;
@@ -56,7 +61,7 @@ namespace MiniKreuzwortraetsel
         public void UpdateTableMenu()
         {
             tableMenu.Items.Clear();
-            foreach (var item in MySqlQueries.SHOW_TABLES())
+            foreach (var item in mySqlQueries.SHOW_TABLES())
             {
                 tableMenu.Items.Add(item);
             }
@@ -81,7 +86,7 @@ namespace MiniKreuzwortraetsel
         private void UpdateTuples(object sender, EventArgs e)
         {
             tuplesListBox.Items.Clear();
-            foreach (string[] row in MySqlQueries.SELECT((string)tableMenu.SelectedItem, "Question", true))
+            foreach (string[] row in mySqlQueries.SELECT((string)tableMenu.SelectedItem, "Question", true))
             {
                 tuplesListBox.Items.Add(row[1] + " <---> " + row[2]);
             }
@@ -336,7 +341,7 @@ namespace MiniKreuzwortraetsel
                 {
                     if (textDialogForm.userInputs[0] != "" && textDialogForm.userInputs[1] != "")
                     {
-                        MySqlQueries.INSERT( (string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, new string[] { textDialogForm.userInputs[0], ReplaceUmlaute(textDialogForm.userInputs[1]) } );
+                        mySqlQueries.INSERT( (string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, new string[] { textDialogForm.userInputs[0], ReplaceUmlaute(textDialogForm.userInputs[1]) } );
                         error = false;
                         UpdateTuples(null, null);
                     }
@@ -350,7 +355,7 @@ namespace MiniKreuzwortraetsel
         }
         private void DeleteTupleBTN_Click(object sender, EventArgs e)
         {
-            MySqlQueries.DELETE((string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, tuplesListBox.SelectedItem.ToString().Split(new string[] { " <---> " }, StringSplitOptions.None));
+            mySqlQueries.DELETE((string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, tuplesListBox.SelectedItem.ToString().Split(new string[] { " <---> " }, StringSplitOptions.None));
             UpdateTuples(null, null);
         }
         private void NewCollectionBTN_Click(object sender, EventArgs e)
@@ -365,7 +370,7 @@ namespace MiniKreuzwortraetsel
                     {
                         // Check if name is available
                         bool available = true;
-                        foreach (var item in MySqlQueries.SHOW_TABLES())
+                        foreach (var item in mySqlQueries.SHOW_TABLES())
                         {
                             if (item == userInput)
                                 available = false;
@@ -374,7 +379,7 @@ namespace MiniKreuzwortraetsel
                         if (available)
                         {
                             // success
-                            MySqlQueries.CREATE_TABLE(userInput);
+                            mySqlQueries.CREATE_TABLE(userInput);
                             UpdateTableMenu();
                             error = false;
                         }
@@ -396,7 +401,7 @@ namespace MiniKreuzwortraetsel
             DialogResult result = MessageBox.Show("Sammlung '" + selectedTable + "' unwiderruflich löschen?", "Sammlung löschen", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
             if (result == DialogResult.Yes)
             {
-                MySqlQueries.DROP_TABLE(selectedTable);
+                mySqlQueries.DROP_TABLE(selectedTable);
                 UpdateTableMenu();
             }
         }

@@ -9,8 +9,13 @@ namespace MiniKreuzwortraetsel
 {
     class MySqlQueries
     {
-        static MySqlConnection conn = new MySqlConnection("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
-        public static bool TestConnection()
+        MySqlConnection conn;
+        public MySqlQueries(string connectionString)
+        {
+            conn = new MySqlConnection(connectionString);
+        }
+
+        public bool TestConnection()
         {
             try
             {
@@ -23,7 +28,7 @@ namespace MiniKreuzwortraetsel
                 return false;
             }
         }
-        public static List<string> SHOW_TABLES()
+        public List<string> SHOW_TABLES()
         {
             conn.Open();
             MySqlCommand cmd = new MySqlCommand("SHOW TABLES", conn);
@@ -39,7 +44,7 @@ namespace MiniKreuzwortraetsel
             return tableNames;
         }
         // TODO: Generalize this method
-        public static void CREATE_TABLE(string newTableName)
+        public void CREATE_TABLE(string newTableName)
         {
             conn.Open();
             string query = " CREATE TABLE " + newTableName + "(" + "\n" +
@@ -51,7 +56,7 @@ namespace MiniKreuzwortraetsel
             cmd.ExecuteNonQuery();
             conn.Close();
         }
-        public static void DROP_TABLE(string table)
+        public void DROP_TABLE(string table)
         {
             conn.Open();
             string query = " DROP TABLE " + table;
@@ -63,7 +68,7 @@ namespace MiniKreuzwortraetsel
         /// Selects everything from table
         /// </summary>
         /// <param name="table">Which table to query</param>
-        public static List<string[]> SELECT(string table)
+        public List<string[]> SELECT(string table)
         {
             conn.Open();
             string query = " SELECT * FROM " + table;
@@ -87,7 +92,7 @@ namespace MiniKreuzwortraetsel
         /// <param name="table">Which table to query</param>
         /// <param name="orderByColumn">Which column to order by</param>
         /// <param name="ascending">true for asc, false for desc</param>
-        public static List<string[]> SELECT(string table, string orderByColumn, bool ascending)
+        public List<string[]> SELECT(string table, string orderByColumn, bool ascending)
         {
             conn.Open();
             string direction = ascending == true ? " ASC":" DESC";
@@ -107,7 +112,7 @@ namespace MiniKreuzwortraetsel
             conn.Close();
             return rows;
         }
-        public static void INSERT(string table, string[] columnNames, string[] values)
+        public void INSERT(string table, string[] columnNames, string[] values)
         {
             conn.Open();
             string query = "INSERT INTO " + table + "(";
@@ -135,7 +140,7 @@ namespace MiniKreuzwortraetsel
         /// <param name="table">Which table to query</param>
         /// <param name="column">Which column to look for value</param>
         /// <param name="value">Row with this value in column will be deleted</param>
-        public static void DELETE(string table, string column, int value)
+        public void DELETE(string table, string column, int value)
         {
             conn.Open();
             string query = "DELETE FROM " + table + "\n" +
@@ -151,7 +156,7 @@ namespace MiniKreuzwortraetsel
         /// <param name="table">Which table to query</param>
         /// <param name="column">Which column to look for value</param>
         /// <param name="value">Row with this value in column will be deleted</param>
-        public static void DELETE(string table, string column, string value)
+        public void DELETE(string table, string column, string value)
         {
             conn.Open();
             string query = "DELETE FROM " + table + "\n" +
@@ -167,7 +172,7 @@ namespace MiniKreuzwortraetsel
         /// <param name="table">Which table to query</param>
         /// <param name="column">Which column to look for value</param>
         /// <param name="value">Row with this value in column will be deleted</param>
-        public static void DELETE(string table, string[] columns, string[] values)
+        public void DELETE(string table, string[] columns, string[] values)
         {
             conn.Open();
             string query = "DELETE FROM " + table + "\n" +
