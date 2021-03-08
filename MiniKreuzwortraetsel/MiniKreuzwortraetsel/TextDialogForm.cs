@@ -75,5 +75,12 @@ namespace MiniKreuzwortraetsel
             if (e.KeyCode == Keys.Escape)
                 Close();
         }
+
+        private void TextDialogForm_Shown(object sender, EventArgs e)
+        {                
+            // Automatically focus first text box if any
+            if (textBoxes.Length > 0)
+                textBoxes[0].Focus();
+        }
     }
 }

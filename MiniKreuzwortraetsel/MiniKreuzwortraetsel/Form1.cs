@@ -75,27 +75,31 @@ namespace MiniKreuzwortraetsel
                 newTupleBTN.Enabled = false;
                 deleteTupleBTN.Enabled = false;
                 deleteCollectionBTN.Enabled = false;
+                UpdateTuples(null,  null);
             }
         }
         private void UpdateTuples(object sender, EventArgs e)
         {
             tuplesListBox.Items.Clear();
-            foreach (string[] row in mySqlQueries.SELECT((string)tableMenu.SelectedItem, "Question", true))
+            if (tableMenu.Items.Count > 0)
             {
-                tuplesListBox.Items.Add(row[1] + " <---> " + row[2]);
-            }
-            // At least 1 tuple in table
-            if (tuplesListBox.Items.Count > 0)
-            {
-                tuplesListBox.SelectedIndex = 0;
-                deleteTupleBTN.Enabled = true;
-                insertTupleBTN.Enabled = true;
-            }
-            // No tuples in table
-            else
-            {
-                deleteTupleBTN.Enabled = false;
-                insertTupleBTN.Enabled = false;
+                foreach (string[] row in mySqlQueries.SELECT((string)tableMenu.SelectedItem, "Question", true))
+                {
+                    tuplesListBox.Items.Add(row[1] + " <---> " + row[2]);
+                }
+                // At least 1 tuple in table
+                if (tuplesListBox.Items.Count > 0)
+                {
+                    tuplesListBox.SelectedIndex = 0;
+                    deleteTupleBTN.Enabled = true;
+                    insertTupleBTN.Enabled = true;
+                }
+                // No tuples in table
+                else
+                {
+                    deleteTupleBTN.Enabled = false;
+                    insertTupleBTN.Enabled = false;
+                }
             }
         }
         /// <summary>
@@ -377,6 +381,8 @@ namespace MiniKreuzwortraetsel
                             // success
                             mySqlQueries.CREATE_TABLE(userInput);
                             UpdateTableMenu();
+                            // Select the newly created table
+                            tableMenu.SelectedItem = userInput;
                             error = false;
                         }
                         // error

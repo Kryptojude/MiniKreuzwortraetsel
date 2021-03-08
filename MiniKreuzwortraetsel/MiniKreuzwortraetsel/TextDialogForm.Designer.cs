@@ -35,6 +35,7 @@
             // button1
             // 
             this.button1.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.button1.AutoSize = true;
             this.button1.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.button1.Location = new System.Drawing.Point(140, 39);
             this.button1.Name = "button1";
@@ -63,6 +64,7 @@
             this.KeyPreview = true;
             this.Name = "TextDialogForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Shown += new System.EventHandler(this.TextDialogForm_Shown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.RichTextDialog_KeyUp);
             this.ResumeLayout(false);
             this.PerformLayout();
