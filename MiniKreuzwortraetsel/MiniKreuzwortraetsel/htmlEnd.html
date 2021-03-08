@@ -1,0 +1,17 @@
+       </table>
+       <script>
+           // Clear all text fields
+           var inputs = document.getElementsByTagName("input");
+           for (var i = 0; i < inputs.length; i++) {
+               inputs[i].value = "";
+           }
+           document.onkeyup = function()
+           {
+               // Capitalize and trim all text fields
+               for (var i = 0; i < inputs.length; i++) {
+                   inputs[i].value = inputs[i].value.toUpperCase().substr(inputs[i].value.length - 1, 1);
+               }
+           }
+       </script>
+   </body>
+</html>

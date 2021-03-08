@@ -105,6 +105,8 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         private void HighlightCandidateSubtiles((string Question, string Answer) tuple)
         {
+            // Reset Highlights
+            Tile.RemoveAllHighlights(grid);
             if (tuple.Answer != "")
             {
                 // Find all possible ways the answer can be placed
