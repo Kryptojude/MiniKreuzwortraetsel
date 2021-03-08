@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
-using Xceed.Words.NET;
 using System.Diagnostics;
 using MySqlQueriesNamespace;
 
@@ -510,46 +505,5 @@ namespace MiniKreuzwortraetsel
             HighlightCandidateSubtiles(tuple);
         }
 
-
-        /// <summary>
-        /// Unused
-        /// </summary>
-        private void ExportToDocx(object sender, EventArgs e)
-        {
-            if (grid != null)
-            {
-                string fileName = "output.docx";
-                using (var doc = DocX.Create(fileName))
-                {
-                    doc.MarginBottom = 0;
-                    doc.MarginTop = 0;
-                    doc.MarginLeft = 0;
-                    doc.MarginRight = 0;
-
-                    var table = doc.AddTable(grid.GetLength(0), grid.GetLength(1) / ts);
-                    float[] floatArray = new float[table.ColumnCount];
-                    for (int i = 0; i < table.ColumnCount; i++)
-                    {
-                        floatArray[i] = 15f;
-                    }
-                    table.SetWidths(floatArray);
-                    //table.AutoFit = Xceed.Document.NET.AutoFit.Fixed;
-                    for (int col = 0; col < table.ColumnCount; col++)
-                    {
-                        for (int row = 0; row < table.RowCount; row++)
-                        {
-                            grid[row, col].GetText(out string gridString);
-                            table.Rows[row].Cells[col].Paragraphs[0].Append(gridString);
-                        }
-                    }
-
-                    doc.InsertTable(table);
-
-                    doc.Save();
-                    Process.Start("WINWORD.EXE", fileName);
-                }
-            }
-            //else errorMessageLBL.Text = "Zuerst Kreuzworträtsel machen";
-        }
     }
 }
