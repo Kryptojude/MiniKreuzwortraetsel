@@ -18,12 +18,13 @@ namespace MiniKreuzwortraetsel
         (Point Location, string Text, bool Visible) Popup = (new Point(), "", false);
         MySqlQueries mySqlQueries;
 
-        // MAYBE: Let user decide dimensions of crossword canvas
-        // MAYBE: clear crossword button
-        // MAYBE: Show word dimensions when hovering over highlight
-        // MAYBE: Solution word
-        // MAYBE: Wort ausgrauen, wenn wort nicht passen kann
-        // MAYBE: Rückgängig machen
+        // TODO: 
+        /*
+           wörter löschen können
+           hilfswort einfärben
+           automatisches einfügen
+           datenbankverbindungsfehler abfangen
+        */
         public Form1()
         {
             InitializeComponent();
