@@ -13,6 +13,7 @@ namespace MiniKreuzwortraetsel
     {
         public static (string Question, string Answer) tupleToBeFilled;
         public static Tile currentHoveringTile;
+        static List<Tile> questionTileList = new List<Tile>();
 
         Point Position;
         string Text = "";
@@ -21,6 +22,8 @@ namespace MiniKreuzwortraetsel
         bool Reserved = false;
         public bool IsBaseWordTile = false;
         bool isQuestionTile = false;
+        string question = "";
+        List<Tile> linkedLetterTiles = new List<Tile>();
         public Brush[] SubtileHighlightColors = new Brush[2];
         /// <summary>
         /// -1 = no hover effect
@@ -41,6 +44,10 @@ namespace MiniKreuzwortraetsel
         string[] hoverArrows = new string[2] { "►", "▼" };
         static Font arrowFont = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
         Point[] arrowPositions;
+        /// <summary>
+        /// Keeps track of how many question tiles point over this tile, important when deleting
+        /// </summary>
+        int setTextCounter = 0;
 
         public Tile(int x, int y, int ts, Font font)
         {
@@ -78,8 +85,11 @@ namespace MiniKreuzwortraetsel
                 }
 
                 // Draw text
-                Size textSize = TextRenderer.MeasureText(Text, font);
-                graphics.DrawString(Text, font, ForegroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
+                if (GetText(out _))
+                {
+                    Size textSize = TextRenderer.MeasureText(Text, font);
+                    graphics.DrawString(Text, font, ForegroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
+                }
 
                 // Draw Rectangle
                 // Conditions: has background color or text
@@ -111,11 +121,9 @@ namespace MiniKreuzwortraetsel
 
                 return canvas;
             }
-
         }
         /// <summary>
         /// Checks if subtile should activate hover effect and does so if necessary, 
-        /// also returns whether hover effect has changed and sets a draw flag exclusively for the affected tiles
         /// </summary>
         public void ActivateHover(int mouseX, int mouseY, int ts, Tile[,] grid, PictureBox gridPB, Point[] directions)
         {
@@ -194,6 +202,9 @@ namespace MiniKreuzwortraetsel
             isQuestionTile = true;
             ForegroundColor = Brushes.Red;
             font = arrowFont;
+            questionTileList.Add(this);
+            Reserved = false;
+            hoverSubtile = -1;
         }
         public bool IsHighlighted()
         {
@@ -239,10 +250,23 @@ namespace MiniKreuzwortraetsel
         public void SetText(string text)
         {
             Text = text;
+            setTextCounter++;
+        }
+        public int GetSetTextCounter()
+        {
+            return setTextCounter;
+        }
+        public void DecreaseSetTextCounter()
+        {
+            setTextCounter--;
         }
         public Point GetPosition()
         {
             return Position;
+        }
+        public Point GetWorldPosition(int ts)
+        {
+            return new Point(Position.X * ts, Position.Y * ts);
         }
         public bool IsReserved()
         {
@@ -251,6 +275,33 @@ namespace MiniKreuzwortraetsel
         public void SetReserved(bool reserved)
         {
             Reserved = reserved;
+        }
+        /// <summary>
+        /// Links a letter tile to this question Tile, important for deleting
+        /// </summary>
+        public void AddLinkedLetterTile(Tile letterTile)
+        {
+            linkedLetterTiles.Add(letterTile);
+        }
+        public List<Tile> GetLinkedLetterTiles()
+        {
+            return linkedLetterTiles;
+        }
+        public void SetQuestion(string question)
+        {
+            this.question = question;
+        }
+        public string GetQuestion()
+        {
+            return question;
+        }
+        static public List<Tile> GetQuestionTileList()
+        {
+            return questionTileList;
+        }
+        public void RemoveFromQuestionTileList()
+        {
+            questionTileList.Remove(this);
         }
     }
 }
