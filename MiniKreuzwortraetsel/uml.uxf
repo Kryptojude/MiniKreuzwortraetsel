@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>240</x>
+      <y>30</y>
+      <w>200</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>/Tile/
+-
+-position : Point
+-foreGroundColor : Brush
+-font : Font
+-text : string
+-
++GetPosition() : Point</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>40</x>
+      <y>270</y>
+      <w>190</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>QuestionTile
+-
+-question : string
+-letterTiles : List&lt;LetterTile&gt;
+-
++HasNumber() : bool
+
++ToEmptyTile(in grid : Tile[][]) : EmptyTile</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>250</x>
+      <y>270</y>
+      <w>210</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>LetterTile
+-
+-questionTile : QuestionTile
+-
+
++ToEmptyTile() : EmptyTile</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>480</x>
+      <y>270</y>
+      <w>220</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>EmptyTile
+-
+-reserved : bool
+-subTiles : SubTile[]
+-
+
++ToQuestionTile() : QuestionTile
++ToLetterTile() : LetterTile</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>330</x>
+      <y>170</y>
+      <w>30</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>130</x>
+      <y>220</y>
+      <w>30</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>130</x>
+      <y>210</y>
+      <w>460</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>440.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>560</x>
+      <y>220</y>
+      <w>30</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>480</x>
+      <y>510</y>
+      <w>220</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>SubTile
+-
+-color : Brush
+-
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
