@@ -16,7 +16,7 @@ namespace MiniKreuzwortraetsel
         static List<Tile> questionTileList = new List<Tile>();
 
         Point Position;
-        string Text = "";
+        string text = "";
         public Font font;
         Brush ForegroundColor = Brushes.Blue;
         bool Reserved = false;
@@ -87,8 +87,8 @@ namespace MiniKreuzwortraetsel
                 // Draw text
                 if (GetText(out _))
                 {
-                    Size textSize = TextRenderer.MeasureText(Text, font);
-                    graphics.DrawString(Text, font, ForegroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
+                    Size textSize = TextRenderer.MeasureText(text, font);
+                    graphics.DrawString(text, font, ForegroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
                 }
 
                 // Draw Rectangle
@@ -241,15 +241,15 @@ namespace MiniKreuzwortraetsel
         }
         public bool GetText(out string text)
         {
-            text = Text;
-            if (Text != "")
+            text = this.text;
+            if (this.text != "")
                 return true;
             else
                 return false;
         }
         public void SetText(string text)
         {
-            Text = text;
+            this.text = text;
             setTextCounter++;
         }
         public int GetSetTextCounter()
