@@ -9,21 +9,17 @@ using System.Windows.Forms;
 
 namespace MiniKreuzwortraetsel
 {
-    class Tile
+    abstract class Tile
     {
         public static (string Question, string Answer) tupleToBeFilled;
         public static Tile currentHoveringTile;
         static List<Tile> questionTileList = new List<Tile>();
 
-        Point Position;
+        Point position;
         string text = "";
         public Font font;
         Brush ForegroundColor = Brushes.Blue;
         bool Reserved = false;
-        public bool IsBaseWordTile = false;
-        bool isQuestionTile = false;
-        string question = "";
-        List<Tile> linkedLetterTiles = new List<Tile>();
         public Brush[] SubtileHighlightColors = new Brush[2];
         /// <summary>
         /// -1 = no hover effect
@@ -49,9 +45,19 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         int setTextCounter = 0;
 
+        public Tile(int x, int y)
+        {
+            position = new Point(x, y);
+        }
+
+        public void ToEmptyTile(Tile[,] grid)
+        {
+            grid[position.Y, position.X] = new EmptyTile();
+        }
+
         public Tile(int x, int y, int ts, Font font)
         {
-            Position = new Point(x, y);
+            position = new Point(x, y);
             this.font = font;
             // Generate tile-space coordinates for the two subtiles and the arrowPositions
             subtileTriangles = new Point[2][] { new Point[3] { new Point(0, 0), new Point(ts, 0),  new Point(ts, ts) },
@@ -130,7 +136,7 @@ namespace MiniKreuzwortraetsel
             // Get old state of hover effect
             string hoverStateOld = "";
             if (currentHoveringTile != null)
-                hoverStateOld += "active-" + currentHoveringTile.Position.X + "-" + currentHoveringTile.Position.Y + "-" + currentHoveringTile.hoverSubtile + "-";
+                hoverStateOld += "active-" + currentHoveringTile.position.X + "-" + currentHoveringTile.position.Y + "-" + currentHoveringTile.hoverSubtile + "-";
             else
                 hoverStateOld += "inactive-";
 
@@ -143,7 +149,7 @@ namespace MiniKreuzwortraetsel
 
             // Determine the subtile the mouse is hovering over
             int mouseSubtile = 0;
-            if (mouseX - Position.X * ts < mouseY - Position.Y * ts)
+            if (mouseX - position.X * ts < mouseY - position.Y * ts)
                 mouseSubtile = 1;
 
             // Is that subtile highlighted?
@@ -158,7 +164,7 @@ namespace MiniKreuzwortraetsel
             Tile newTile = currentHoveringTile;
             string hoverStateNew = "";
             if (currentHoveringTile != null)
-                hoverStateNew += "active-" + currentHoveringTile.Position.X + "-" + currentHoveringTile.Position.Y + "-" + currentHoveringTile.hoverSubtile + "-";
+                hoverStateNew += "active-" + currentHoveringTile.position.X + "-" + currentHoveringTile.position.Y + "-" + currentHoveringTile.hoverSubtile + "-";
             else
                 hoverStateNew += "inactive-";
 
@@ -172,8 +178,8 @@ namespace MiniKreuzwortraetsel
                     Point directionPoint = directions[hoverSubtile];
                     for (int i = 0; i < tupleToBeFilled.Answer.Length; i++)
                     {
-                        int letterX = Position.X + directionPoint.X * (1 + i);
-                        int letterY = Position.Y + directionPoint.Y * (1 + i);
+                        int letterX = position.X + directionPoint.X * (1 + i);
+                        int letterY = position.Y + directionPoint.Y * (1 + i);
                         // out of bounds check
                         if (letterX <= grid.GetUpperBound(1) && letterY <= grid.GetUpperBound(0))
                         {
@@ -262,11 +268,11 @@ namespace MiniKreuzwortraetsel
         }
         public Point GetPosition()
         {
-            return Position;
+            return position;
         }
         public Point GetWorldPosition(int ts)
         {
-            return new Point(Position.X * ts, Position.Y * ts);
+            return new Point(position.X * ts, position.Y * ts);
         }
         public bool IsReserved()
         {
