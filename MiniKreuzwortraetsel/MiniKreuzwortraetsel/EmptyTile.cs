@@ -41,15 +41,15 @@ namespace MiniKreuzwortraetsel
                 // Draw highlights
                 for (int i = 0; i < subTiles.Length; i++)
                 {
-                    graphics.FillPolygon(subTiles[i].GetColor(), subTiles[i].GetSubTileTriangle());
+                    graphics.FillPolygon(subTiles[i].GetColor(), subTiles[i].GetSubTilePolygon());
                 }
 
                 SubTile hoverSubTile = SubTile.GetHoverSubTile();
                 // Draw hover effect
                 if (SubTile.GetHoverSubTile().GetParentTile() == this)
                 {
-                    graphics.FillPolygon(SubTile.GetHoverBrush(), hoverSubTile.GetSubTileTriangle());
-                    graphics.DrawString(hoverArrows[hoverSubtile], , Brushes.Red, arrowPositions[hoverSubtile]);
+                    graphics.FillPolygon(SubTile.GetHoverBrush(), hoverSubTile.GetSubTilePolygon());
+                    graphics.DrawString(hoverSubTile.GetHoverArrow(), new Font(,), Brushes.Red, hoverSubTile.GetArrowPosition(),);
                 }
 
                 // Draw Rectangle
