@@ -22,9 +22,9 @@ namespace MiniKreuzwortraetsel
         }
 
         Point position;
-        string text = "";
-        Font font = new Font("Verdana", 9.75f, FontStyle.Bold);
-        Brush foregroundColor = Brushes.Blue;
+        protected string text = "";
+        protected Font font = new Font("Verdana", 9.75f, FontStyle.Bold);
+        protected Brush foregroundColor = Brushes.Blue;
         /// <summary>
         /// Determines if this tile should have red outline based on question tile hover pointing to it, 
         /// -1 = off, 0 = 2 outlines horizontal, 1 = 3 outlines horizontal, 2 = 2 outlines vertical, 3 = 3 outlines vertical

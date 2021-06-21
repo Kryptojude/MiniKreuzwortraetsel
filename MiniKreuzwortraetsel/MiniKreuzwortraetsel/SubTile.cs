@@ -10,7 +10,7 @@ namespace MiniKreuzwortraetsel
     class SubTile
     {
         static SubTile hoverSubTile;
-        static Brush hoverBrush = Brushes.Blue;
+        static Font arrowFont = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
         static Dictionary<string, Point[]> subTilePolygons = new Dictionary<string, Point[]>() {
                                                                 { "horizontal", new Point[3] { new Point(0, 0), new Point(Form1.ts, 0),  new Point(Form1.ts, Form1.ts) } },
                                                                 { "vertical",   new Point[3] { new Point(0, 0), new Point(Form1.ts, Form1.ts), new Point(0, Form1.ts) } },
@@ -74,9 +74,9 @@ namespace MiniKreuzwortraetsel
             return hoverSubTile;
         }
 
-        static public Brush GetHoverBrush()
+        static public Font GetArrowFont()
         {
-            return hoverBrush;
+            return arrowFont;
         }
           
     }

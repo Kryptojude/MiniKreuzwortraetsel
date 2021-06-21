@@ -48,8 +48,8 @@ namespace MiniKreuzwortraetsel
                 // Draw hover effect
                 if (SubTile.GetHoverSubTile().GetParentTile() == this)
                 {
-                    graphics.FillPolygon(SubTile.GetHoverBrush(), hoverSubTile.GetSubTilePolygon());
-                    graphics.DrawString(hoverSubTile.GetHoverArrow(), new Font(,), Brushes.Red, hoverSubTile.GetArrowPosition(),);
+                    graphics.FillPolygon(Brushes.Blue, hoverSubTile.GetSubTilePolygon());
+                    graphics.DrawString(hoverSubTile.GetHoverArrow(), SubTile.GetArrowFont(), Brushes.Red, hoverSubTile.GetArrowPosition());
                 }
 
                 // Draw Rectangle
