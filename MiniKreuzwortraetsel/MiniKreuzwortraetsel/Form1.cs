@@ -11,13 +11,13 @@ namespace MiniKreuzwortraetsel
 {
     public partial class Form1 : Form
     {
-        readonly Tile[,] grid = new Tile[20,20];
-        readonly int ts = 30;
-        readonly Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
+        Tile[,] grid = new Tile[20,20];
+        static public int ts = 30;
+        Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
         (Point Location, string Text, bool Visible) Popup = (new Point(), "", false);
         DeleteButton deleteButton = new DeleteButton();
         MySqlQueries mySqlQueries;
-        static Pen deleteButtonPen = new Pen(Brushes.Red, 1.7f);
+        Pen deleteButtonPen = new Pen(Brushes.Red, 1.7f);
 
         // TODO: 
         /*
@@ -34,7 +34,7 @@ namespace MiniKreuzwortraetsel
             {
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    grid[y, x] = new Tile(x, y, ts, Font);
+                    grid[y, x] = new EmptyTile(new Point(x, y));
                 }
             }
 

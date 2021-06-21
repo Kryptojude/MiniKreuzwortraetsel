@@ -12,64 +12,40 @@ namespace MiniKreuzwortraetsel
     abstract class Tile
     {
         public static (string Question, string Answer) tupleToBeFilled;
-        public static Tile currentHoveringTile;
-        static List<Tile> questionTileList = new List<Tile>();
+        protected enum ExtendedHover
+        {
+            Off = -1,
+            Two_Outlines_Horizontal = 0,
+            Three_Outlines_Horizontal = 1,
+            Two_Outlines_Vertical = 2,
+            Three_Outlines_Vertical = 3,
+        }
 
         Point position;
         string text = "";
-        public Font font;
-        Brush ForegroundColor = Brushes.Blue;
-        bool Reserved = false;
-        public Brush[] SubtileHighlightColors = new Brush[2];
-        /// <summary>
-        /// -1 = no hover effect
-        /// 0 = hover on horizontal subtile
-        /// 1 = hover on vertical subtile
-        /// </summary>
-        public int hoverSubtile = -1;
+        Font font = new Font("Verdana", 9.75f, FontStyle.Bold);
+        Brush foregroundColor = Brushes.Blue;
         /// <summary>
         /// Determines if this tile should have red outline based on question tile hover pointing to it, 
         /// -1 = off, 0 = 2 outlines horizontal, 1 = 3 outlines horizontal, 2 = 2 outlines vertical, 3 = 3 outlines vertical
         /// </summary>
-        int extendedHover = -1;
-        Pen extendedHoverPen = new Pen(Brushes.Red, 5);
-        /// <summary>
-        /// Contains the tile-space coordinates for the two subtiles
-        /// </summary>
-        Point[][] subtileTriangles;
-        string[] hoverArrows = new string[2] { "►", "▼" };
-        static Font arrowFont = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
-        Point[] arrowPositions;
-        /// <summary>
-        /// Keeps track of how many question tiles point over this tile, important when deleting
-        /// </summary>
-        int setTextCounter = 0;
+        protected ExtendedHover extendedHover = ExtendedHover.Off;
+        protected Pen extendedHoverPen = new Pen(Brushes.Red, 5);
 
-        public Tile(int x, int y)
+        public Tile(Point position)
         {
-            position = new Point(x, y);
+            this.position = position;
         }
 
         public void ToEmptyTile(Tile[,] grid)
         {
-            grid[position.Y, position.X] = new EmptyTile();
-        }
-
-        public Tile(int x, int y, int ts, Font font)
-        {
-            position = new Point(x, y);
-            this.font = font;
-            // Generate tile-space coordinates for the two subtiles and the arrowPositions
-            subtileTriangles = new Point[2][] { new Point[3] { new Point(0, 0), new Point(ts, 0),  new Point(ts, ts) },
-                                                new Point[3] { new Point(0, 0), new Point(ts, ts), new Point(0, ts) } };
-
-            arrowPositions = new Point[] { new Point(ts / 3, 0), new Point(-3, 2 * (ts / 5)) };
+            grid[position.Y, position.X] = new EmptyTile(position);
         }
 
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public Image GetGraphics(int ts)
+        public abstract Image GetGraphics(int ts)
         {
             // Dispose Image and Graphics to prevent memory leak
             Image canvas = new Bitmap(ts, ts);
@@ -77,7 +53,7 @@ namespace MiniKreuzwortraetsel
             {
                 graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
                 // Draw highlights
-                for (int i = 0; i < SubtileHighlightColors.Length; i++)
+                for (int i = 0; i < subTiles.Length; i++)
                 {
                     if (SubtileHighlightColors[i] != null)
                         graphics.FillPolygon(SubtileHighlightColors[i], subtileTriangles[i]);
@@ -94,7 +70,7 @@ namespace MiniKreuzwortraetsel
                 if (GetText(out _))
                 {
                     Size textSize = TextRenderer.MeasureText(text, font);
-                    graphics.DrawString(text, font, ForegroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
+                    graphics.DrawString(text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
                 }
 
                 // Draw Rectangle
@@ -105,20 +81,20 @@ namespace MiniKreuzwortraetsel
                 // Draw extendedHover
                 switch (extendedHover)
                 {
-                    case 0:
+                    case ExtendedHover.Two_Outlines_Horizontal:
                         graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
                         graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
                         break;
-                    case 1:
+                    case ExtendedHover.Three_Outlines_Horizontal:
                         graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
                         graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
                         graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
                         break;
-                    case 2:
+                    case ExtendedHover.Two_Outlines_Vertical:
                         graphics.DrawLine(extendedHoverPen, 0, 0, 0, ts);
                         graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
                         break;
-                    case 3:
+                    case ExtendedHover.Three_Outlines_Vertical:
                         graphics.DrawLine(extendedHoverPen, 0, 0, 0, ts);
                         graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
                         graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
@@ -206,7 +182,7 @@ namespace MiniKreuzwortraetsel
         public void SetQuestionTile()
         {
             isQuestionTile = true;
-            ForegroundColor = Brushes.Red;
+            foregroundColor = Brushes.Red;
             font = arrowFont;
             questionTileList.Add(this);
             Reserved = false;
