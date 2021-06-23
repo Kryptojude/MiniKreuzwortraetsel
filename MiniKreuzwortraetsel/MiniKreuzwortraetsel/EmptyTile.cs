@@ -9,7 +9,18 @@ namespace MiniKreuzwortraetsel
 {
     class EmptyTile : Tile
     {
-        bool reserved = false;
+        public static void RemoveAllHighlights(Tile[,] grid)
+        {
+            for (int y = 0; y < grid.GetLength(0); y++)
+            {
+                for (int x = 0; x < grid.GetLength(1); x++)
+                {
+                    grid[y, x].SubtileHighlightColors = new Brush[2];
+                }
+            }
+        }
+
+        public bool Reserved { get; set; } = false;
         SubTile[] subTiles = new SubTile[2];
 
         public EmptyTile(Point position) : base(position)
@@ -22,12 +33,10 @@ namespace MiniKreuzwortraetsel
         {
             grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition());
         }
-
         public void ToQuestionTile(Tile[,] grid)
         {
             grid[GetPosition().Y, GetPosition().X] = new QuestionTile(GetPosition());
         }
-
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>

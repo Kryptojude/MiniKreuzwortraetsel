@@ -11,15 +11,19 @@ namespace MiniKreuzwortraetsel
     class QuestionTile : Tile
     {
         static List<Tile> questionTileList = new List<Tile>();
+        static public List<Tile> GetQuestionTileList()
+        {
+            return questionTileList;
+        }
 
         string question;
-        List<LetterTile> letterTiles = new List<LetterTile>();
-        Font font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
-        Brush foregroundColor = Brushes.Red;
+        public string Text { get; set; } = "";
+        public List<LetterTile> linkedLetterTiles { get; } = new List<LetterTile>();
 
         public QuestionTile(Point position) : base(position)
         {
-
+            foregroundColor = Brushes.Red;
+            font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
         }
 
         public bool HasNumber()
@@ -27,6 +31,20 @@ namespace MiniKreuzwortraetsel
             return !string.IsNullOrEmpty(question);
         }
 
+        public void ToEmptyTile(Tile[,] grid)
+        {
+            grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
+            questionTileList.Remove(this);
+        }
+
+        public void SetQuestion(string question)
+        {
+            this.question = question;
+        }
+        public string GetQuestion()
+        {
+            return question;
+        }
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
@@ -39,40 +57,12 @@ namespace MiniKreuzwortraetsel
                 graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
                 // Draw text
-                if (GetText(out _))
-                {
-                    Size textSize = TextRenderer.MeasureText(text, font);
-                    graphics.DrawString(text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
-                }
+                Size textSize = TextRenderer.MeasureText(Text, font);
+                graphics.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
 
                 // Draw Rectangle
-                // Conditions: has background color or text
-                if (GetText(out _) || IsHighlighted())
-                    graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
-
-                // Draw extendedHover
-                switch (extendedHover)
-                {
-                    case ExtendedHover.Two_Outlines_Horizontal:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                        break;
-                    case ExtendedHover.Three_Outlines_Horizontal:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                        break;
-                    case ExtendedHover.Two_Outlines_Vertical:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                        break;
-                    case ExtendedHover.Three_Outlines_Vertical:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                        break;
-                }
-
+                graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
+                
                 return canvas;
             }
         }

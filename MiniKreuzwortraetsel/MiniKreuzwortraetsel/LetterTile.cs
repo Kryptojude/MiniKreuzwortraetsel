@@ -10,13 +10,21 @@ namespace MiniKreuzwortraetsel
 {
     class LetterTile : Tile
     {
+        /// <summary>
+        /// The question tile(s) that this letter belongs to
+        /// </summary>
         List<QuestionTile> questionTiles = new List<QuestionTile>();
+        public string Text { get; set; } = "";
 
         public LetterTile(Point position) : base(position)
         {
 
         }
 
+        public void ToEmptyTile(Tile[,] grid)
+        {
+            grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
+        }
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
@@ -29,11 +37,8 @@ namespace MiniKreuzwortraetsel
                 graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
                 // Draw text
-                if (GetText(out _))
-                {
-                    Size textSize = TextRenderer.MeasureText(text, font);
-                    graphics.DrawString(text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
-                }
+                Size textSize = TextRenderer.MeasureText(Text, font);
+                graphics.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
 
                 // Draw Rectangle
                 graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
