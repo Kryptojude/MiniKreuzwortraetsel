@@ -15,20 +15,25 @@ namespace MiniKreuzwortraetsel
             {
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    grid[y, x].SubtileHighlightColors = new Brush[2];
+                    if (grid[y, x] is EmptyTile)
+                        ((EmptyTile)grid[y, x]).MakeSubTiles();
                 }
             }
         }
 
-        public bool Reserved { get; set; } = false;
-        SubTile[] subTiles = new SubTile[2];
+        public bool Reserved = false;
+        public SubTile[] SubTiles { get; } = new SubTile[2];
 
         public EmptyTile(Point position) : base(position)
         {
-            subTiles[0] = new SubTile("horizontal", this);
-            subTiles[1] = new SubTile("vertical", this);
+            MakeSubTiles();
         }
 
+        void MakeSubTiles()
+        {
+            SubTiles[0] = new SubTile("horizontal", this);
+            SubTiles[1] = new SubTile("vertical", this);
+        }
         public void ToLetterTile(Tile[,] grid)
         {
             grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition());
@@ -48,22 +53,22 @@ namespace MiniKreuzwortraetsel
             {
                 graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
                 // Draw highlights
-                for (int i = 0; i < subTiles.Length; i++)
+                for (int i = 0; i < SubTiles.Length; i++)
                 {
-                    graphics.FillPolygon(subTiles[i].GetColor(), subTiles[i].GetSubTilePolygon());
+                    graphics.FillPolygon(SubTiles[i].GetColor(), SubTiles[i].GetSubTilePolygon());
                 }
 
-                SubTile hoverSubTile = SubTile.GetHoverSubTile();
+                SubTile hoverSubTile = SubTile.HoverSubTile;
                 // Draw hover effect
-                if (SubTile.GetHoverSubTile().GetParentTile() == this)
+                if (SubTile.HoverSubTile.ParentTile == this)
                 {
                     graphics.FillPolygon(Brushes.Blue, hoverSubTile.GetSubTilePolygon());
-                    graphics.DrawString(hoverSubTile.GetHoverArrow(), SubTile.GetArrowFont(), Brushes.Red, hoverSubTile.GetArrowPosition());
+                    graphics.DrawString(hoverSubTile.GetHoverArrow(), SubTile.ARROW_FONT, Brushes.Red, hoverSubTile.GetArrowPosition());
                 }
 
                 // Draw Rectangle
                 // Condition: At least one subtile is highlighted
-                if (subTiles[0].IsHighlighted() || subTiles[1].IsHighlighted())
+                if (SubTiles[0].IsHighlighted() || SubTiles[1].IsHighlighted())
                     graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
 
                 // Draw extendedHover

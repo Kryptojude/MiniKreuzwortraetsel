@@ -9,8 +9,9 @@ namespace MiniKreuzwortraetsel
 {
     class SubTile
     {
-        static SubTile hoverSubTile;
-        static Font arrowFont = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
+        static public SubTile HoverSubTile;
+
+        static public readonly Font ARROW_FONT = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
         static Dictionary<string, Point[]> subTilePolygons = new Dictionary<string, Point[]>() {
                                                                 { "horizontal", new Point[3] { new Point(0, 0), new Point(Form1.ts, 0),  new Point(Form1.ts, Form1.ts) } },
                                                                 { "vertical",   new Point[3] { new Point(0, 0), new Point(Form1.ts, Form1.ts), new Point(0, Form1.ts) } },
@@ -25,13 +26,13 @@ namespace MiniKreuzwortraetsel
                                                             };
 
         Brush color = Brushes.White;
-        string direction;
-        EmptyTile parentTile;
+        public string Direction { get; }
+        public EmptyTile ParentTile { get; }
 
         public SubTile(string direction, EmptyTile parentTile)
         {
-            this.direction = direction;
-            this.parentTile = parentTile;
+            Direction = direction;
+            ParentTile = parentTile;
         }
 
         public void SetHighlight(int level)
@@ -49,35 +50,19 @@ namespace MiniKreuzwortraetsel
             return color;
         }
 
-        public EmptyTile GetParentTile()
-        {
-            return parentTile;
-        }
-
         public Point[] GetSubTilePolygon()
         {
-            return subTilePolygons[direction];
+            return subTilePolygons[Direction];
         }
 
         public string GetHoverArrow()
         {
-            return hoverArrows[direction];
+            return hoverArrows[Direction];
         }
 
         public Point GetArrowPosition()
         {
-            return arrowPositions[direction];
-        }
-
-        static public SubTile GetHoverSubTile()
-        {
-            return hoverSubTile;
-        }
-
-        static public Font GetArrowFont()
-        {
-            return arrowFont;
-        }
-          
+            return arrowPositions[Direction];
+        }  
     }
 }

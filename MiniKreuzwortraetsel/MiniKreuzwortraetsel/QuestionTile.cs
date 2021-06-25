@@ -10,15 +10,11 @@ namespace MiniKreuzwortraetsel
 {
     class QuestionTile : Tile
     {
-        static List<Tile> questionTileList = new List<Tile>();
-        static public List<Tile> GetQuestionTileList()
-        {
-            return questionTileList;
-        }
+        static List<Tile> questionTileList { get; } = new List<Tile>();
 
-        string question;
-        public string Text { get; set; } = "";
-        public List<LetterTile> linkedLetterTiles { get; } = new List<LetterTile>();
+        public string Question;
+        public string Text = "";
+        public List<LetterTile> LinkedLetterTiles { get; } = new List<LetterTile>();
 
         public QuestionTile(Point position) : base(position)
         {
@@ -28,7 +24,7 @@ namespace MiniKreuzwortraetsel
 
         public bool HasNumber()
         {
-            return !string.IsNullOrEmpty(question);
+            return !string.IsNullOrEmpty(Question);
         }
 
         public void ToEmptyTile(Tile[,] grid)
@@ -37,14 +33,6 @@ namespace MiniKreuzwortraetsel
             questionTileList.Remove(this);
         }
 
-        public void SetQuestion(string question)
-        {
-            this.question = question;
-        }
-        public string GetQuestion()
-        {
-            return question;
-        }
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
