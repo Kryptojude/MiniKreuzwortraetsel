@@ -25,6 +25,7 @@ namespace MiniKreuzwortraetsel
            hilfswort einfärben
            automatisches einfügen
            datenbankverbindungsfehler abfangen
+           Baseword class?
         */
         public Form1()
         {
@@ -117,7 +118,7 @@ namespace MiniKreuzwortraetsel
             {
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed
-                List<(EmptyTile potentialQuestionTile, EmptyTile tileAfterAnswer, int direction, int matches)> candidates = new List<(Tile, Tile, int, int)>();
+                List<(EmptyTile potentialQuestionTile, EmptyTile tileAfterAnswer, int direction, int matches)> candidates = new List<(EmptyTile, EmptyTile, int, int)>();
                 int maxMatches = 0;
                 for (int direction = 0; direction < 2; direction++)
                 {
@@ -133,16 +134,19 @@ namespace MiniKreuzwortraetsel
                             else
                             {
                                 EmptyTile potentialQuestionTile = grid[y, x] as EmptyTile;
+
                                 // Free space after answer?
-                                Tile tileAfterAnswer = null;
+                                EmptyTile tileAfterAnswer = null;
                                 Point tileAfterAnswerPoint = new Point(x + (directionPoint.X * (tuple.Answer.Length + 1)), y + (directionPoint.Y * (tuple.Answer.Length + 1)));
                                 // Out of bounds check
                                 if (tileAfterAnswerPoint.Y < grid.GetLength(0) && tileAfterAnswerPoint.X < grid.GetLength(1))
                                 {
-                                    tileAfterAnswer = grid[tileAfterAnswerPoint.Y, tileAfterAnswerPoint.X];
-                                
-                                    if (!(tileAfterAnswer is EmptyTile))
+                                    // Is the tile after the answer empty?
+                                    if (!(grid[tileAfterAnswerPoint.Y, tileAfterAnswerPoint.X] is EmptyTile))
+                                    {
+                                        tileAfterAnswer = grid[tileAfterAnswerPoint.Y, tileAfterAnswerPoint.X] as EmptyTile;
                                         questionTileFits = false;
+                                    }
                                 }
 
                                 // Question tile fits into the spot, now find out if the answer fits
@@ -197,10 +201,7 @@ namespace MiniKreuzwortraetsel
                                             maxMatches = matchesForCurrentAnswer;
                                     }
                                 }
-
                             }
-
-
                         }
                     }
                 }
@@ -209,10 +210,12 @@ namespace MiniKreuzwortraetsel
                 if (candidates.Count == 0)
                     MessageBox.Show("Keine passende Stelle gefunden");
                 else if (candidates.Count == 1)
-                    // Fill answer into that position
-                    FillAnswer(candidates[0].potentialQuestionTile,
-                                    candidates[0].direction,
-                                    tuple);
+                {       
+                    // Fill answer into that position, convert the EmptyTile to QuestionTile
+                    FillAnswer(candidates[0].potentialQuestionTile.ToQuestionTile(grid, tuple.Question),
+                               candidates[0].direction,
+                               tuple);
+                }
                 else if (candidates.Count > 1)
                 {
                     // Highlight candidates
@@ -223,7 +226,7 @@ namespace MiniKreuzwortraetsel
                             colorLevel = (float)candidates[i].matches / maxMatches;
                         else
                             colorLevel = 0;
-                        (candidates[i].potentialQuestionTile as EmptyTile).SubTiles[candidates[i].direction].SetHighlight(colorLevel);
+                        candidates[i].potentialQuestionTile.SubTiles[candidates[i].direction].SetHighlight(colorLevel);
                     }
                     Tile.TupleToBeFilled = tuple;
                     gridPB.Refresh();
@@ -232,27 +235,22 @@ namespace MiniKreuzwortraetsel
         }
         private void FillAnswer(QuestionTile questionTile, int direction, (string Question, string Answer) tuple)
         {
-            // Mark the question tile as such
-            questionTile.SetQuestionTile();
-
             // Generate text for the question tile
             Point directionPoint = directions[direction];
             string arrow = (directionPoint.X == 1) ? "►" : "▼";
-            if (questionTile.IsBaseWordTile)
-                questionTile.SetText(arrow);
-            else
-                questionTile.SetText(Tile.GetQuestionTileList().Count + arrow);
+
 
             // Get the tile after the answer
             Point tileAfterAnswerPos = new Point(questionTile.GetPosition().X + (directionPoint.X * (tuple.Answer.Length + 1)), questionTile.GetPosition().Y + (directionPoint.Y * (tuple.Answer.Length + 1)));
             // Out of bounds check
             if (tileAfterAnswerPos.Y < grid.GetLength(0) && tileAfterAnswerPos.X < grid.GetLength(1))
             {
+                EmptyTile tileAfterAnswer = grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X] as EmptyTile;
                 // Reserve the tile
-                grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X].SetReserved(true);
+                tileAfterAnswer.Reserved = true;
 
                 // Link the reserved tile to the question tile that points to it
-                questionTile.AddLinkedLetterTile(grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X]);
+                questionTile.LinkedLetterTiles.Add(grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X]);
             }
 
             // Fill the answer into the grid letter by letter

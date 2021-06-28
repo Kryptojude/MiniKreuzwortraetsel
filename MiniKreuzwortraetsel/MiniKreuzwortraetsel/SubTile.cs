@@ -11,12 +11,12 @@ namespace MiniKreuzwortraetsel
     {
         static public SubTile HoverSubTile;
 
-        static public readonly Font ARROW_FONT = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
+        static public readonly Font HOVER_ARROW_FONT = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
         static readonly Dictionary<string, Point[]> subTilePolygons = new Dictionary<string, Point[]>() {
                                                                  { "horizontal", new Point[3] { new Point(0, 0), new Point(Form1.ts, 0),  new Point(Form1.ts, Form1.ts) } },
                                                                  { "vertical",   new Point[3] { new Point(0, 0), new Point(Form1.ts, Form1.ts), new Point(0, Form1.ts) } },
                                                               };
-        static readonly Dictionary<string, string> hoverArrows = new Dictionary<string, string>() {
+        static public readonly Dictionary<string, string> Arrows = new Dictionary<string, string>() {
                                                                     { "horizontal", "►" },
                                                                     { "vertical", "▼" }
                                                                  };
@@ -60,7 +60,7 @@ namespace MiniKreuzwortraetsel
 
         public string GetHoverArrow()
         {
-            return hoverArrows[Direction];
+            return Arrows[Direction];
         }
 
         public Point GetArrowPosition()

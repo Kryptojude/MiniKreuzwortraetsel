@@ -34,13 +34,15 @@ namespace MiniKreuzwortraetsel
             SubTiles[0] = new SubTile("horizontal", this);
             SubTiles[1] = new SubTile("vertical", this);
         }
-        public void ToLetterTile(Tile[,] grid)
+        public LetterTile ToLetterTile(Tile[,] grid)
         {
             grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition());
+            return grid[GetPosition().Y, GetPosition().X] as LetterTile;
         }
-        public void ToQuestionTile(Tile[,] grid)
+        public QuestionTile ToQuestionTile(Tile[,] grid, string question)
         {
-            grid[GetPosition().Y, GetPosition().X] = new QuestionTile(GetPosition());
+            grid[GetPosition().Y, GetPosition().X] = new QuestionTile(GetPosition(), question);
+            return grid[GetPosition().Y, GetPosition().X] as QuestionTile;
         }
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
@@ -63,7 +65,7 @@ namespace MiniKreuzwortraetsel
                 if (SubTile.HoverSubTile.ParentTile == this)
                 {
                     graphics.FillPolygon(Brushes.Blue, hoverSubTile.GetSubTilePolygon());
-                    graphics.DrawString(hoverSubTile.GetHoverArrow(), SubTile.ARROW_FONT, Brushes.Red, hoverSubTile.GetArrowPosition());
+                    graphics.DrawString(hoverSubTile.GetHoverArrow(), SubTile.HOVER_ARROW_FONT, Brushes.Red, hoverSubTile.GetArrowPosition());
                 }
 
                 // Draw Rectangle
