@@ -50,20 +50,6 @@ namespace MiniKreuzwortraetsel
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
         public abstract Image GetGraphics(int ts);
-        public bool IsHighlighted()
-        {
-            bool highlighted = false;
-            foreach (Brush brush in SubtileHighlightColors)
-            {
-                if (brush != null)
-                    highlighted = true;
-            }
-            if (highlighted)
-                return true;
-            else
-                return false;
-        }
-
 
         public Point GetPosition()
         {

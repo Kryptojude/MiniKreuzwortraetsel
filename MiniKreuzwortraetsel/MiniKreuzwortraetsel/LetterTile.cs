@@ -13,7 +13,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// The question tile(s) that this letter belongs to
         /// </summary>
-        List<QuestionTile> questionTiles = new List<QuestionTile>();
+        readonly List<QuestionTile> questionTiles = new List<QuestionTile>();
         public string Text = "";
 
         public LetterTile(Point position) : base(position)
