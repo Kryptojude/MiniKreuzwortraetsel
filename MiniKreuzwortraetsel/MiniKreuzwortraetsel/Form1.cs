@@ -212,8 +212,7 @@ namespace MiniKreuzwortraetsel
                 else if (candidates.Count == 1)
                 {       
                     // Fill answer into that position, convert the EmptyTile to QuestionTile
-                    FillAnswer(candidates[0].potentialQuestionTile.ToQuestionTile(grid, tuple.Question),
-                               candidates[0].direction,
+                    FillAnswer(candidates[0].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[0].direction),
                                tuple);
                 }
                 else if (candidates.Count > 1)
@@ -233,24 +232,22 @@ namespace MiniKreuzwortraetsel
                 }
             }
         }
-        private void FillAnswer(QuestionTile questionTile, int direction, (string Question, string Answer) tuple)
+        private void FillAnswer(QuestionTile questionTile, (string Question, string Answer) tuple)
         {
-            // Generate text for the question tile
-            Point directionPoint = directions[direction];
-            string arrow = (directionPoint.X == 1) ? "►" : "▼";
-
+            // Generate Coordinates for the direction
+            Point directionPoint = directions[questionTile.Direction];
 
             // Get the tile after the answer
             Point tileAfterAnswerPos = new Point(questionTile.GetPosition().X + (directionPoint.X * (tuple.Answer.Length + 1)), questionTile.GetPosition().Y + (directionPoint.Y * (tuple.Answer.Length + 1)));
             // Out of bounds check
             if (tileAfterAnswerPos.Y < grid.GetLength(0) && tileAfterAnswerPos.X < grid.GetLength(1))
             {
+                if (!(grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X] is EmptyTile))
+                    throw new Exception("Tile after the answer is not an EmptyTile, previous check in HighlightCandidateSubtiles() failed");
+
                 EmptyTile tileAfterAnswer = grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X] as EmptyTile;
                 // Reserve the tile
                 tileAfterAnswer.Reserved = true;
-
-                // Link the reserved tile to the question tile that points to it
-                questionTile.LinkedLetterTiles.Add(grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X]);
             }
 
             // Fill the answer into the grid letter by letter
@@ -258,10 +255,30 @@ namespace MiniKreuzwortraetsel
             {
                 int letterX = questionTile.GetPosition().X + (directionPoint.X * (c + 1));
                 int letterY = questionTile.GetPosition().Y + (directionPoint.Y * (c + 1));
-                grid[letterY, letterX].SetText(tuple.Answer[c].ToString());
+                Tile tile = grid[letterY, letterX];
+                // Tile can be EmptyTile or (matching) LetterTile
+                if (tile is EmptyTile)
+                {
+                    EmptyTile emptyTile = tile as EmptyTile;
+                    // Convert the EmptyTile to LetterTile
+                    LetterTile letterTile = emptyTile.ToLetterTile(grid);
+                    // Set the letter in LetterTile
+                    letterTile.Text = tuple.Answer[c].ToString();
+                    // Link this LetterTile to the QuestionTile
+                    questionTile.LinkedLetterTiles.Add(letterTile);
+                }
+                else if (tile is LetterTile)
+                {
+                    LetterTile letterTile = tile as LetterTile;
+                    if (letterTile.Text != tuple.Answer[c].ToString())
+                        throw new Exception("HightlightCandidateSubtiles() failed to see a non-matching letter in the path of the answer");
+                    // Link this LetterTile to the QuestionTile
+                    questionTile.LinkedLetterTiles.Add(letterTile);
+                }
+                else if (tile is QuestionTile)
+                    throw new Exception("HighlightCandidateSubtiles() failed to see that a QuestionTile is in the way of the answer");
 
                 // Link the current letter tile to the question tile that points to it
-                questionTile.AddLinkedLetterTile(grid[letterY, letterX]);
             }
 
             gridPB.Refresh();
@@ -291,21 +308,20 @@ namespace MiniKreuzwortraetsel
                     {
                         Tile tile = grid[y, x];
                         // has content
-                        if (tile.GetText(out string text))
-                        { 
-                            // question tile
-                            if (tile.IsQuestionTile())
-                                html += "<td style='border: 2px solid black; color: red'>" + text + "</td>";
-                            // baseWord tile
-                            else if (tile.IsBaseWordTile)
-                                html += "<td style='border: 2px solid black'>" + text + "</td>";
-                            // question letter -> dont show letter / show text field
+                        // question tile
+                        if (tile is QuestionTile)
+                        {
+                            QuestionTile questionTile = tile as QuestionTile;
+                            if (questionTile.HasNumber())
+                                html += "<td style='border: 2px solid black'>" + questionTile.Text + "</td>";
                             else
-                                html += "<td style='border: 2px solid black'><input type='text'></input></td>";
-
+                                html += "<td style='border: 2px solid black; color: red'>" + questionTile.Text + "</td>";
                         }
+                        // LetterTile -> dont show letter / show text field
+                        else if (tile is LetterTile)
+                            html += "<td style='border: 2px solid black'><input type='text'></input></td>";
                         // empty
-                        else
+                        else if (tile is EmptyTile)
                             html += "<td style='border: 2px solid white'></td>";
                     }
 
@@ -314,10 +330,10 @@ namespace MiniKreuzwortraetsel
 
                 html += "</table><p>";
                 // Legende
-                List<Tile> questionTileList = Tile.GetQuestionTileList();
+                List<QuestionTile> questionTileList = QuestionTile.questionTileList;
                 for (int i = 0; i < questionTileList.Count; i++)
                 {
-                    html += i + 1 + ". " + questionTileList[i].GetQuestion() + "<br/>";
+                    html += i + 1 + ". " + questionTileList[i].Question + "<br/>";
                 }
                 html += "</p>";
 
@@ -447,7 +463,7 @@ namespace MiniKreuzwortraetsel
                 mousePosition.X <= grid.GetUpperBound(1) * ts && mousePosition.Y <= grid.GetUpperBound(0) * ts )
             {
                 // The tile the mouse is hovering over: 
-                tile = grid[mousePosition.X / ts, mousePosition.Y / ts];
+                tile = grid[mousePosition.Y / ts, mousePosition.X / ts];
                 // Question tile?
                 if (tile is QuestionTile)
                 {
@@ -468,7 +484,7 @@ namespace MiniKreuzwortraetsel
                     if (!questionTile.HasNumber())
                     {
                         // Show popup
-                        Popup.Text = questionTile.GetQuestion();
+                        Popup.Text = questionTile.Question;
                         Popup.Location = new Point(e.X + ts / 2, e.Y - ts / 2);
                         Popup.Visible = true;
                         gridPB.Refresh();
@@ -506,7 +522,7 @@ namespace MiniKreuzwortraetsel
                             SubTile.HoverSubTile = newHoveringSubTile;
 
                             // Activate extendedHover for adjacent tiles
-                            Point directionPoint = directions[SubTile.HoverSubTile.Direction == "horizontal" ? 0 : 1];
+                            Point directionPoint = directions[SubTile.HoverSubTile.Direction];
                             for (int i = 0; i < Tile.TupleToBeFilled.Answer.Length; i++)
                             {
                                 int letterX = SubTile.HoverSubTile.ParentTile.GetPosition().X + directionPoint.X * (1 + i);
@@ -581,8 +597,9 @@ namespace MiniKreuzwortraetsel
             {
                 EmptyTile.RemoveAllHighlights(grid);
                 Tile.RemoveAllExtendedHover(grid);
-                int hoverSubTile = SubTile.HoverSubTile.Direction == "horizontal" ? 0 : 1;
-                FillAnswer(SubTile.HoverSubTile.ParentTile, hoverSubTile, Tile.TupleToBeFilled);
+                EmptyTile emptyTile = SubTile.HoverSubTile.ParentTile;
+                QuestionTile questionTile = emptyTile.ToQuestionTile(grid, Tile.TupleToBeFilled.Question, SubTile.HoverSubTile.Direction);
+                FillAnswer(questionTile, Tile.TupleToBeFilled);
             }
             // Am I hovering over the delete Button?
             else if (deleteButton.GetHover())

@@ -10,27 +10,29 @@ namespace MiniKreuzwortraetsel
 {
     class QuestionTile : Tile
     {
-        static readonly List<Tile> questionTileList = new List<Tile>();
+        static public readonly List<QuestionTile> questionTileList = new List<QuestionTile>();
 
         public string Question;
         public string Text = "";
+        public int Direction;
         public readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
 
-        public QuestionTile(Point position, string question) : base(position)
+        public QuestionTile(Point position, string question, int direction) : base(position)
         {
             foregroundColor = Brushes.Red;
             font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
             Question = question;
+            Direction = direction;
             // normal question tile
+            string arrow = SubTile.GetArrow(direction);
             if (!string.IsNullOrEmpty(Question))
             {
                 questionTileList.Add(this);
-                string arrow = SubTile.Arrows[];
                 Text = questionTileList.Count + arrow;
             }
             // base word
             else
-                questionTile.SetText(arrow);
+                Text = arrow;
         }
 
         public bool HasNumber()

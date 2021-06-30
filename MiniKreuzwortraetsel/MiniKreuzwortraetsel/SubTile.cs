@@ -16,10 +16,18 @@ namespace MiniKreuzwortraetsel
                                                                  { "horizontal", new Point[3] { new Point(0, 0), new Point(Form1.ts, 0),  new Point(Form1.ts, Form1.ts) } },
                                                                  { "vertical",   new Point[3] { new Point(0, 0), new Point(Form1.ts, Form1.ts), new Point(0, Form1.ts) } },
                                                               };
-        static public readonly Dictionary<string, string> Arrows = new Dictionary<string, string>() {
+        static readonly Dictionary<string, string> Arrows = new Dictionary<string, string>() {
                                                                     { "horizontal", "►" },
-                                                                    { "vertical", "▼" }
-                                                                 };
+                                                                    { "vertical", "▼" } };
+        static public string GetArrow(string direction)
+        {
+            return Arrows[direction];
+        }
+        static public string GetArrow(int direction)
+        {
+            return Arrows.ElementAt(direction).Value;
+        }
+
         static readonly Dictionary<string, Point> arrowPositions = new Dictionary<string, Point>() {
                                                                        { "horizontal", new Point(Form1.ts / 3, 0) },
                                                                        { "vertical", new Point(-3, 2 * (Form1.ts / 5)) },
@@ -29,10 +37,10 @@ namespace MiniKreuzwortraetsel
         static public readonly Color MinColor = Color.FromArgb(0x00ff14);
 
         Brush color = Brushes.White;
-        public string Direction { get; }
+        public int Direction { get; }
         public EmptyTile ParentTile { get; }
 
-        public SubTile(string direction, EmptyTile parentTile)
+        public SubTile(int direction, EmptyTile parentTile)
         {
             Direction = direction;
             ParentTile = parentTile;
@@ -55,17 +63,26 @@ namespace MiniKreuzwortraetsel
 
         public Point[] GetSubTilePolygon()
         {
-            return subTilePolygons[Direction];
+            if (Direction == 0)
+                return subTilePolygons["horizontal"];
+            else
+                return subTilePolygons["vertical"];
         }
 
-        public string GetHoverArrow()
+        public string GetArrow()
         {
-            return Arrows[Direction];
+            if (Direction == 0)
+                return Arrows["horizontal"];
+            else
+                return Arrows["vertical"];
         }
 
         public Point GetArrowPosition()
         {
-            return arrowPositions[Direction];
+            if (Direction == 0)
+                return arrowPositions["horizontal"];
+            else
+                return arrowPositions["vertical"];
         }  
     }
 }
