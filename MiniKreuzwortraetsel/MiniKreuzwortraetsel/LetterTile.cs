@@ -28,7 +28,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public override Image GetGraphics(int ts)
+        public override Image GetImage(int ts)
         {
             // Dispose Image and Graphics to prevent memory leak
             Image canvas = new Bitmap(ts, ts);

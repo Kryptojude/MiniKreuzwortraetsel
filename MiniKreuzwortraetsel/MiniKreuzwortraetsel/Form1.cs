@@ -12,12 +12,10 @@ namespace MiniKreuzwortraetsel
     public partial class Form1 : Form
     {
         Tile[,] grid = new Tile[20,20];
-        static public int ts = 30;
+        public const int TS = 30;
         Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
         (Point Location, string Text, bool Visible) Popup = (new Point(), "", false);
-        DeleteButton deleteButton = new DeleteButton();
         MySqlQueries mySqlQueries;
-        Pen deleteButtonPen = new Pen(Brushes.Red, 1.7f);
 
         // TODO: 
         /*
@@ -40,13 +38,16 @@ namespace MiniKreuzwortraetsel
             }
 
             // Test database connection
-            //mySqlQueries = new MySqlQueries("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
-            //if (mySqlQueries.TestConnection())
-            //{
-            //    // Fill tableMenu with the tables in database
-            //    UpdateTableMenu();
-            //}
-            //else
+            if (false)
+            {
+                mySqlQueries = new MySqlQueries("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
+                if (mySqlQueries.TestConnection())
+                {
+                    // Fill tableMenu with the tables in database
+                    UpdateTableMenu();
+                }
+            }
+            else
             {
                 // Replace normal interface with non-DB interface
                 UIPanel.Visible = false;
@@ -223,8 +224,7 @@ namespace MiniKreuzwortraetsel
                         float colorLevel = 0;
                         if (maxMatches > 0)
                             colorLevel = (float)candidates[i].matches / maxMatches;
-                        else
-                            colorLevel = 0;
+
                         candidates[i].potentialQuestionTile.SubTiles[candidates[i].direction].SetHighlight(colorLevel);
                     }
                     Tile.TupleToBeFilled = tuple;
@@ -456,38 +456,32 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         private void GridPB_MouseMove(object sender, MouseEventArgs e)
         {
-            Tile tile;
+            bool refresh = false;
             // Out of bounds check
             Point mousePosition = new Point(e.X, e.Y);
             if (mousePosition.X >= 0 && mousePosition.Y >= 0 &&
-                mousePosition.X <= grid.GetUpperBound(1) * ts && mousePosition.Y <= grid.GetUpperBound(0) * ts )
+                mousePosition.X <= grid.GetUpperBound(1) * TS && mousePosition.Y <= grid.GetUpperBound(0) * TS )
             {
                 // The tile the mouse is hovering over: 
-                tile = grid[mousePosition.Y / ts, mousePosition.X / ts];
-                // Question tile?
+                Tile tile = grid[mousePosition.Y / TS, mousePosition.X / TS];
+                // Question tile
                 if (tile is QuestionTile)
                 {
                     QuestionTile questionTile = tile as QuestionTile;
-                    // Show delete button
-                    deleteButton.SetVisible();
-                    deleteButton.Location = questionTile.GetWorldPosition(ts);
-
-                    // Check if mouse is over the delete button
-                    int buttonSize = (int)(DeleteButton.buttonSizeFactor * ts);
-                    if (e.X - questionTile.GetWorldPosition(ts).X > ts - buttonSize &&
-                        e.Y - questionTile.GetWorldPosition(ts).Y < buttonSize)
-                        deleteButton.SetHover(true);
-                    else
-                        deleteButton.SetHover(false);
+                    questionTile.MouseMove(e, out bool needs_refresh);
+                    if (needs_refresh)
+                    {
+                        refresh = true;
+                    }
 
                     // Normal question questionTile?
                     if (!questionTile.HasNumber())
                     {
                         // Show popup
                         Popup.Text = questionTile.Question;
-                        Popup.Location = new Point(e.X + ts / 2, e.Y - ts / 2);
+                        Popup.Location = new Point(e.X + TS / 2, e.Y - TS / 2);
                         Popup.Visible = true;
-                        gridPB.Refresh();
+                        refresh = true;
                     }
                 }
                 // Not a question tile
@@ -502,7 +496,7 @@ namespace MiniKreuzwortraetsel
                         EmptyTile emptyTile = tile as EmptyTile;
                         // Determine the subtile the mouse is hovering over
                         int mouseSubtile = 0;
-                        if (e.X - tile.GetWorldPosition(ts).X < e.Y - tile.GetWorldPosition(ts).Y)
+                        if (e.X - tile.GetWorldPosition(TS).X < e.Y - tile.GetWorldPosition(TS).Y)
                             mouseSubtile = 1;
                         newHoveringSubTile = emptyTile.SubTiles[mouseSubtile];
                     }
@@ -513,6 +507,7 @@ namespace MiniKreuzwortraetsel
                     // If old and new hoveringSubTile are different objects, then old hoveringSubTile is not hovering anymore
                     if (oldHoveringSubTile != newHoveringSubTile)
                     {   
+                        refresh = true;
                         SubTile.HoverSubTile = null;
                         Tile.RemoveAllExtendedHover(grid);
 
@@ -542,22 +537,20 @@ namespace MiniKreuzwortraetsel
                                 }
                             }                    
                         }
-                        gridPB.Refresh();
                     }
-
-
-
 
                     // Deactivate popup and delete button
                     if (Popup.Visible)
                     {
                         Popup.Visible = false;
-                        deleteButton.SetInvisible();
-                        gridPB.Refresh();
+                        DeleteButton.SetInvisible();
+                        refresh = true; ;
                     }
                 }
-                
             }
+
+            if (refresh)
+                gridPB.Refresh();
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
@@ -567,8 +560,8 @@ namespace MiniKreuzwortraetsel
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
                     Tile tile = grid[y, x];
-                    Image canvas = tile.GetGraphics(ts);
-                    e.Graphics.DrawImage(canvas, x * ts, y * ts);
+                    Image canvas = tile.GetImage(TS);
+                    e.Graphics.DrawImage(canvas, x * TS, y * TS);
                     canvas.Dispose();
                 }
             }
@@ -576,22 +569,13 @@ namespace MiniKreuzwortraetsel
             // Draw Popup
             if (Popup.Visible)
                 e.Graphics.DrawString(Popup.Text, Font, Brushes.Black, Popup.Location);
-
-            // Draw Delete Button
-            if (deleteButton.IsVisible())
-            {
-                e.Graphics.TranslateTransform(deleteButton.Location.X - deleteButtonPen.Width, deleteButton.Location.Y);
-                int buttonSize = (int)(DeleteButton.buttonSizeFactor * ts);
-                e.Graphics.DrawRectangle(deleteButtonPen, ts - buttonSize, 0, buttonSize, buttonSize);
-                e.Graphics.DrawLine(deleteButtonPen, ts - buttonSize, 0, ts, buttonSize);
-                e.Graphics.DrawLine(deleteButtonPen, ts - buttonSize, buttonSize, ts, 0);
-            }
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and on hover tile
         /// </summary>
         private void GridPB_MouseClick(object sender, MouseEventArgs e)
         {
+            Tile clickedTile = grid[e.Y / TS, e.X / TS];
             // Am I hovering over a Highlight?
             if (SubTile.HoverSubTile != null)
             {
@@ -601,24 +585,20 @@ namespace MiniKreuzwortraetsel
                 QuestionTile questionTile = emptyTile.ToQuestionTile(grid, Tile.TupleToBeFilled.Question, SubTile.HoverSubTile.Direction);
                 FillAnswer(questionTile, Tile.TupleToBeFilled);
             }
-            // Am I hovering over the delete Button?
-            else if (deleteButton.GetHover())
+            else if (clickedTile is QuestionTile)
             {
-                // Get clicked tile
-                Tile clickedTile = grid[e.Y / ts, e.X / ts];
-                if (clickedTile is QuestionTile)
-                {
-                    QuestionTile clickedQuestionTile = (QuestionTile)grid[e.Y / ts, e.X / ts];
-                    // Reset all letterTiles that belong to this questionTile
-                    List<LetterTile> linkedLetterTiles = clickedQuestionTile.LinkedLetterTiles;
-                    foreach (LetterTile letterTile in linkedLetterTiles)
-                        letterTile.ToEmptyTile(grid);
+                QuestionTile clickedQuestionTile = clickedTile as QuestionTile;
+                clickedQuestionTile.MouseClick(e, grid);
 
-                    // Reset the questionTile
-                    clickedQuestionTile.ToEmptyTile(grid);
+                // Reset all letterTiles that belong to this questionTile
+                List<LetterTile> linkedLetterTiles = clickedQuestionTile.LinkedLetterTiles;
+                foreach (LetterTile letterTile in linkedLetterTiles)
+                    letterTile.ToEmptyTile(grid);
 
-                    gridPB.Refresh();
-                }
+                // Reset the questionTile
+                clickedQuestionTile.ToEmptyTile(grid);
+
+                gridPB.Refresh();
             }
         }
         // Methods that call PutAnswerIntoCrossWord(tuple);

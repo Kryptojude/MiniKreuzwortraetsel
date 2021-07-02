@@ -16,6 +16,7 @@ namespace MiniKreuzwortraetsel
         public string Text = "";
         public int Direction;
         public readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
+        DeleteButton deleteButton = new DeleteButton();
 
         public QuestionTile(Point position, string question, int direction) : base(position)
         {
@@ -42,14 +43,17 @@ namespace MiniKreuzwortraetsel
 
         public void ToEmptyTile(Tile[,] grid)
         {
+            // Inserts a new EmptyTile instance into the grid at this tile's position, 
             grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
+            // removes this instance from the questionTileList,
             questionTileList.Remove(this);
+            // removes the letter tiles associated with this questionTile
         }
 
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public override Image GetGraphics(int ts)
+        public override Image GetImage(int ts)
         {
             // Dispose Image and Graphics to prevent memory leak
             Image canvas = new Bitmap(ts, ts);
@@ -63,8 +67,29 @@ namespace MiniKreuzwortraetsel
 
                 // Draw Rectangle
                 graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
-                
+
+                // Draw X
+                graphics.DrawImage(deleteButton.GetImage(), DeleteButton.bounds_tile_space);
+
                 return canvas;
+            }
+        }
+
+        public void MouseMove(MouseEventArgs e, out bool needs_refresh)
+        {
+            // DeleteButton is visible when hovering over a question tile
+            deleteButton.SetVisible(out needs_refresh);
+
+            deleteButton.MouseMove(e, this);
+        }
+
+        public void MouseClick(MouseEventArgs e, Tile[,] grid)
+        {
+            // If the click was on the deleteButton
+            if (deleteButton.IsMouseOverMe(e, this))
+            {
+                // Then delete this question
+                ToEmptyTile(grid);
             }
         }
     }

@@ -13,8 +13,8 @@ namespace MiniKreuzwortraetsel
 
         static public readonly Font HOVER_ARROW_FONT = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
         static readonly Dictionary<string, Point[]> subTilePolygons = new Dictionary<string, Point[]>() {
-                                                                 { "horizontal", new Point[3] { new Point(0, 0), new Point(Form1.ts, 0),  new Point(Form1.ts, Form1.ts) } },
-                                                                 { "vertical",   new Point[3] { new Point(0, 0), new Point(Form1.ts, Form1.ts), new Point(0, Form1.ts) } },
+                                                                 { "horizontal", new Point[3] { new Point(0, 0), new Point(Form1.TS, 0),  new Point(Form1.TS, Form1.TS) } },
+                                                                 { "vertical",   new Point[3] { new Point(0, 0), new Point(Form1.TS, Form1.TS), new Point(0, Form1.TS) } },
                                                               };
         static readonly Dictionary<string, string> Arrows = new Dictionary<string, string>() {
                                                                     { "horizontal", "►" },
@@ -29,12 +29,12 @@ namespace MiniKreuzwortraetsel
         }
 
         static readonly Dictionary<string, Point> arrowPositions = new Dictionary<string, Point>() {
-                                                                       { "horizontal", new Point(Form1.ts / 3, 0) },
-                                                                       { "vertical", new Point(-3, 2 * (Form1.ts / 5)) },
+                                                                       { "horizontal", new Point(Form1.TS / 3, 0) },
+                                                                       { "vertical", new Point(-3, 2 * (Form1.TS / 5)) },
                                                                    };
 
-        static public readonly Color MaxColor = Color.FromArgb(0x9be8a1);
-        static public readonly Color MinColor = Color.FromArgb(0x00ff14);
+        static public readonly Color MinColor = Color.FromArgb(0x9be8a1);
+        static public readonly Color MaxColor = Color.FromArgb(0x00ff14);
 
         Brush color = Brushes.White;
         public int Direction { get; }

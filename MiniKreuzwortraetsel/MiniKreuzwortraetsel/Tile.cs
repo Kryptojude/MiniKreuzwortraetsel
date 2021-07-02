@@ -49,7 +49,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public abstract Image GetGraphics(int ts);
+        public abstract Image GetImage(int ts);
 
         public Point GetPosition()
         {
