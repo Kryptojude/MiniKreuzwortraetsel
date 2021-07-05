@@ -21,7 +21,7 @@ namespace MiniKreuzwortraetsel
             }
         }
 
-        public bool Reserved = false;
+        bool reserved = false;
         public SubTile[] SubTiles { get; } = new SubTile[2];
 
         public EmptyTile(Point position) : base(position)
@@ -98,6 +98,22 @@ namespace MiniKreuzwortraetsel
 
                 return canvas;
             }
+
+        }
+
+        public void Reserve()
+        {
+            reserved = true;
+        }
+
+        public void Unreserve()
+        {
+            reserved = false;
+        }
+
+        public bool IsReserved()
+        {
+            return reserved;
         }
     }
 }

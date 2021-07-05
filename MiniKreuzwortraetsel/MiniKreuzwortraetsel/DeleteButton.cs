@@ -17,8 +17,11 @@ namespace MiniKreuzwortraetsel
         static DeleteButton lastVisibleDeleteButton;
         public static void SetInvisible()
         {
-            lastVisibleDeleteButton.visible = false;
-            lastVisibleDeleteButton = null;
+            if (lastVisibleDeleteButton != null)
+            {
+                lastVisibleDeleteButton.visible = false;
+                lastVisibleDeleteButton = null;
+            }
         }
 
         bool visible = false;
@@ -40,14 +43,28 @@ namespace MiniKreuzwortraetsel
         public void SetVisible(out bool needs_refresh)
         {
             // Check if there has been a change
+            // Same deleteButton, no change
             if (this == lastVisibleDeleteButton)
+                needs_refresh = false;
+            // null to this
+            else if (lastVisibleDeleteButton == null)
+            {
+                lastVisibleDeleteButton = this;
                 needs_refresh = true;
+            }
+            // other deleteButton to this
+            else if (lastVisibleDeleteButton != null && this != lastVisibleDeleteButton)
+            {
+                lastVisibleDeleteButton.visible = false;
+                lastVisibleDeleteButton = this;
+                needs_refresh = true;
+            }
             else
             {
-                visible = true;
-                lastVisibleDeleteButton = this;
-                needs_refresh = false;
+                throw new Exception("");
             }
+
+            visible = true;
         }
 
         void SetHover(bool hover)
@@ -88,9 +105,11 @@ namespace MiniKreuzwortraetsel
                 graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
                 if (IsVisible())
                 {
-                    graphics.DrawRectangle(pen, Form1.TS - absoluteSize, 0, absoluteSize, absoluteSize);
-                    graphics.DrawLine(pen, Form1.TS - absoluteSize, 0, Form1.TS, absoluteSize);
-                    graphics.DrawLine(pen, Form1.TS - absoluteSize, absoluteSize, Form1.TS, 0);
+                    graphics.DrawRectangle(pen, 0, 0, absoluteSize, absoluteSize - 1);
+                    graphics.DrawLine(pen, 0, 0, absoluteSize, absoluteSize - 1);
+                    graphics.DrawLine(pen, 0, absoluteSize - 1, absoluteSize, 0);
+
+                    //graphics.FillRectangle(Brushes.Black, 0, 0, absoluteSize, absoluteSize);
                 }
 
                 return canvas;

@@ -58,7 +58,7 @@ namespace MiniKreuzwortraetsel
 
             // Unreserve the reserved tile of the questionTile
             if (LinkedReservedTile != null)
-                LinkedReservedTile.Reserved = false;
+                LinkedReservedTile.Unreserve();
 
             // Insert a new EmptyTile instance into the grid at this tile's position, 
             grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());

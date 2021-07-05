@@ -172,7 +172,7 @@ namespace MiniKreuzwortraetsel
                                             else if (potentialLetterTile is EmptyTile)
                                             {
                                                 // Answer can't go over reserved EmptyTile
-                                                if ((potentialLetterTile as EmptyTile).Reserved)
+                                                if ((potentialLetterTile as EmptyTile).IsReserved())
                                                     answerFits = false;
                                             }
                                             // Tile is LetterTile
@@ -247,7 +247,7 @@ namespace MiniKreuzwortraetsel
 
                 EmptyTile tileAfterAnswer = grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X] as EmptyTile;
                 // Reserve the tile and link to questionTile
-                tileAfterAnswer.Reserved = true;
+                tileAfterAnswer.Reserve();
                 questionTile.LinkedReservedTile = tileAfterAnswer;
             }
 
@@ -488,6 +488,8 @@ namespace MiniKreuzwortraetsel
                 // Not a question tile
                 else
                 {
+                    DeleteButton.SetInvisible();
+
                     SubTile oldHoveringSubTile = SubTile.HoverSubTile;
 
                     SubTile newHoveringSubTile;
@@ -544,7 +546,6 @@ namespace MiniKreuzwortraetsel
                     if (Popup.Visible)
                     {
                         Popup.Visible = false;
-                        DeleteButton.SetInvisible();
                         refresh = true; ;
                     }
                 }
@@ -558,6 +559,7 @@ namespace MiniKreuzwortraetsel
             // Call the Paint function of all tiles
             for (int y = 0; y < grid.GetLength(0); y++)
             {
+                //if (y == )
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
                     Tile tile = grid[y, x];
