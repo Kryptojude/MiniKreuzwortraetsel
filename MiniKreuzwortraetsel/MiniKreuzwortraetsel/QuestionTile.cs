@@ -16,6 +16,7 @@ namespace MiniKreuzwortraetsel
         public string Text = "";
         public int Direction;
         public readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
+        public EmptyTile LinkedReservedTile;
         DeleteButton deleteButton = new DeleteButton();
 
         public QuestionTile(Point position, string question, int direction) : base(position)
@@ -43,11 +44,27 @@ namespace MiniKreuzwortraetsel
 
         public void ToEmptyTile(Tile[,] grid)
         {
-            // Inserts a new EmptyTile instance into the grid at this tile's position, 
+            // Turn the letter tiles associated with this questionTile into emptyTiles
+            foreach (LetterTile letterTile in LinkedLetterTiles)
+            {
+                List<QuestionTile> letterTile_QuestionTileList = letterTile.GetQuestionTiles();
+                // If the letterTile only belongs to this questionTile, then make into EmptyTile
+                if (letterTile_QuestionTileList.Count == 1)
+                    letterTile.ToEmptyTile(grid);
+                // If the letterTile belongs to multiple QuestionTiles, just remove this QuestionTile from its question tile list
+                else
+                    letterTile_QuestionTileList.Remove(this);
+            }
+
+            // Unreserve the reserved tile of the questionTile
+            if (LinkedReservedTile != null)
+                LinkedReservedTile.Reserved = false;
+
+            // Insert a new EmptyTile instance into the grid at this tile's position, 
             grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
-            // removes this instance from the questionTileList,
+            
+            // Remove this instance from the questionTileList,
             questionTileList.Remove(this);
-            // removes the letter tiles associated with this questionTile
         }
 
         /// <summary>
@@ -69,7 +86,8 @@ namespace MiniKreuzwortraetsel
                 graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
 
                 // Draw X
-                graphics.DrawImage(deleteButton.GetImage(), DeleteButton.bounds_tile_space);
+                using (Image deleteButtonImage = deleteButton.GetImage())
+                    graphics.DrawImage(deleteButtonImage, DeleteButton.bounds_tile_space);
 
                 return canvas;
             }

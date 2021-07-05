@@ -246,8 +246,9 @@ namespace MiniKreuzwortraetsel
                     throw new Exception("Tile after the answer is not an EmptyTile, previous check in HighlightCandidateSubtiles() failed");
 
                 EmptyTile tileAfterAnswer = grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X] as EmptyTile;
-                // Reserve the tile
+                // Reserve the tile and link to questionTile
                 tileAfterAnswer.Reserved = true;
+                questionTile.LinkedReservedTile = tileAfterAnswer;
             }
 
             // Fill the answer into the grid letter by letter
@@ -261,7 +262,7 @@ namespace MiniKreuzwortraetsel
                 {
                     EmptyTile emptyTile = tile as EmptyTile;
                     // Convert the EmptyTile to LetterTile
-                    LetterTile letterTile = emptyTile.ToLetterTile(grid);
+                    LetterTile letterTile = emptyTile.ToLetterTile(grid, questionTile);
                     // Set the letter in LetterTile
                     letterTile.Text = tuple.Answer[c].ToString();
                     // Link this LetterTile to the QuestionTile
@@ -560,9 +561,8 @@ namespace MiniKreuzwortraetsel
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
                     Tile tile = grid[y, x];
-                    Image canvas = tile.GetImage(TS);
-                    e.Graphics.DrawImage(canvas, x * TS, y * TS);
-                    canvas.Dispose();
+                    using (Image tileVisuals = tile.GetImage(TS))
+                        e.Graphics.DrawImage(tileVisuals, x * TS, y * TS);
                 }
             }
 
@@ -589,14 +589,6 @@ namespace MiniKreuzwortraetsel
             {
                 QuestionTile clickedQuestionTile = clickedTile as QuestionTile;
                 clickedQuestionTile.MouseClick(e, grid);
-
-                // Reset all letterTiles that belong to this questionTile
-                List<LetterTile> linkedLetterTiles = clickedQuestionTile.LinkedLetterTiles;
-                foreach (LetterTile letterTile in linkedLetterTiles)
-                    letterTile.ToEmptyTile(grid);
-
-                // Reset the questionTile
-                clickedQuestionTile.ToEmptyTile(grid);
 
                 gridPB.Refresh();
             }

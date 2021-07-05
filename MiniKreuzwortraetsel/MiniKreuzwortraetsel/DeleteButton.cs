@@ -64,7 +64,7 @@ namespace MiniKreuzwortraetsel
             // Calculate mouse position in tile space
             Point mousePosition_tile_space = new Point(e.X - parentTile.GetWorldPosition(Form1.TS).X, e.Y - parentTile.GetWorldPosition(Form1.TS).Y);
             // Check if mouse is over deleteButton
-            if (bounds_tile_space.X <= mousePosition_tile_space.Y && bounds_tile_space.Height >= mousePosition_tile_space.Y)
+            if (bounds_tile_space.X <= mousePosition_tile_space.X && bounds_tile_space.Height >= mousePosition_tile_space.Y)
                 return true;
             else
                 return false;

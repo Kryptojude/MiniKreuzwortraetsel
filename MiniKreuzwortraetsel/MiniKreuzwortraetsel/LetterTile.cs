@@ -16,9 +16,9 @@ namespace MiniKreuzwortraetsel
         readonly List<QuestionTile> questionTiles = new List<QuestionTile>();
         public string Text = "";
 
-        public LetterTile(Point position) : base(position)
+        public LetterTile(Point position, QuestionTile questionTile) : base(position)
         {
-
+            questionTiles.Add(questionTile);
         }
 
         public void ToEmptyTile(Tile[,] grid)
@@ -68,6 +68,11 @@ namespace MiniKreuzwortraetsel
 
                 return canvas;
             }
+        }
+
+        public List<QuestionTile> GetQuestionTiles()
+        {
+            return questionTiles;
         }
     }
 }

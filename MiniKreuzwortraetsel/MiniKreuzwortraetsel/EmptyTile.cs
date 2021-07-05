@@ -34,9 +34,9 @@ namespace MiniKreuzwortraetsel
             SubTiles[0] = new SubTile(direction: 0, parentTile: this);
             SubTiles[1] = new SubTile(direction: 1, parentTile: this);
         }
-        public LetterTile ToLetterTile(Tile[,] grid)
+        public LetterTile ToLetterTile(Tile[,] grid, QuestionTile questionTile)
         {
-            grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition());
+            grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), questionTile);
             return grid[GetPosition().Y, GetPosition().X] as LetterTile;
         }
         public QuestionTile ToQuestionTile(Tile[,] grid, string question, int direction)
