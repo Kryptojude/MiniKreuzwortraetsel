@@ -16,14 +16,20 @@ namespace MiniKreuzwortraetsel
         readonly List<QuestionTile> questionTiles = new List<QuestionTile>();
         public string Text = "";
 
-        public LetterTile(Point position, QuestionTile questionTile) : base(position)
+        public LetterTile(Point position, QuestionTile questionTile, string text) : base(position)
         {
-            questionTiles.Add(questionTile);
+            AddQuestionTile(questionTile);
+            Text = text;
         }
 
-        public void ToEmptyTile(Tile[,] grid)
+        public void ToEmptyTile(Tile[,] grid, QuestionTile questionTile)
         {
-            grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
+            // If the letterTile only belongs to this questionTile, then make into EmptyTile
+            if (questionTiles.Count == 1)
+                grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
+            // If the letterTile belongs to multiple QuestionTiles, just remove this QuestionTile from its question tile list
+            else
+                questionTiles.Remove(questionTile);
         }
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
@@ -70,9 +76,9 @@ namespace MiniKreuzwortraetsel
             }
         }
 
-        public List<QuestionTile> GetQuestionTiles()
+        public void AddQuestionTile(QuestionTile questionTile)
         {
-            return questionTiles;
+            questionTiles.Add(questionTile);
         }
     }
 }

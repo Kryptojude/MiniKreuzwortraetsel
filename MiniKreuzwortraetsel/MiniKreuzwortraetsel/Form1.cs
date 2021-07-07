@@ -262,11 +262,8 @@ namespace MiniKreuzwortraetsel
                 {
                     EmptyTile emptyTile = tile as EmptyTile;
                     // Convert the EmptyTile to LetterTile
-                    LetterTile letterTile = emptyTile.ToLetterTile(grid, questionTile);
-                    // Set the letter in LetterTile
-                    letterTile.Text = tuple.Answer[c].ToString();
-                    // Link this LetterTile to the QuestionTile
-                    questionTile.LinkedLetterTiles.Add(letterTile);
+                    string text = tuple.Answer[c].ToString();
+                    LetterTile letterTile = emptyTile.ToLetterTile(grid, questionTile, text);
                 }
                 else if (tile is LetterTile)
                 {
@@ -274,12 +271,10 @@ namespace MiniKreuzwortraetsel
                     if (letterTile.Text != tuple.Answer[c].ToString())
                         throw new Exception("HightlightCandidateSubtiles() failed to see a non-matching letter in the path of the answer");
                     // Link this LetterTile to the QuestionTile
-                    questionTile.LinkedLetterTiles.Add(letterTile);
+                    questionTile.AddLinkedLetterTile(letterTile);
                 }
                 else if (tile is QuestionTile)
                     throw new Exception("HighlightCandidateSubtiles() failed to see that a QuestionTile is in the way of the answer");
-
-                // Link the current letter tile to the question tile that points to it
             }
 
             gridPB.Refresh();
@@ -469,7 +464,7 @@ namespace MiniKreuzwortraetsel
                 if (tile is QuestionTile)
                 {
                     QuestionTile questionTile = tile as QuestionTile;
-                    questionTile.MouseMove(e, out bool needs_refresh);
+                    questionTile.MouseMove(e, out bool needs_refresh, gridPB);
                     if (needs_refresh)
                     {
                         refresh = true;
@@ -488,7 +483,7 @@ namespace MiniKreuzwortraetsel
                 // Not a question tile
                 else
                 {
-                    DeleteButton.SetInvisible();
+                    DeleteButton.SetInvisible(gridPB);
 
                     SubTile oldHoveringSubTile = SubTile.HoverSubTile;
 
@@ -542,7 +537,7 @@ namespace MiniKreuzwortraetsel
                         }
                     }
 
-                    // Deactivate popup and delete button
+                    // Deactivate popup
                     if (Popup.Visible)
                     {
                         Popup.Visible = false;

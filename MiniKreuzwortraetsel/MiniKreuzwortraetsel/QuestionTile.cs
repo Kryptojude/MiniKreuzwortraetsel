@@ -15,7 +15,7 @@ namespace MiniKreuzwortraetsel
         public string Question;
         public string Text = "";
         public int Direction;
-        public readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
+        readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
         public EmptyTile LinkedReservedTile;
         DeleteButton deleteButton = new DeleteButton();
 
@@ -46,15 +46,7 @@ namespace MiniKreuzwortraetsel
         {
             // Turn the letter tiles associated with this questionTile into emptyTiles
             foreach (LetterTile letterTile in LinkedLetterTiles)
-            {
-                List<QuestionTile> letterTile_QuestionTileList = letterTile.GetQuestionTiles();
-                // If the letterTile only belongs to this questionTile, then make into EmptyTile
-                if (letterTile_QuestionTileList.Count == 1)
-                    letterTile.ToEmptyTile(grid);
-                // If the letterTile belongs to multiple QuestionTiles, just remove this QuestionTile from its question tile list
-                else
-                    letterTile_QuestionTileList.Remove(this);
-            }
+                letterTile.ToEmptyTile(grid, this);
 
             // Unreserve the reserved tile of the questionTile
             if (LinkedReservedTile != null)
@@ -93,12 +85,18 @@ namespace MiniKreuzwortraetsel
             }
         }
 
-        public void MouseMove(MouseEventArgs e, out bool needs_refresh)
+        public void AddLinkedLetterTile(LetterTile letterTile)
+        {
+            LinkedLetterTiles.Add(letterTile);
+            letterTile.AddQuestionTile(this);
+        }
+
+        public void MouseMove(MouseEventArgs e, out bool needs_refresh, PictureBox pb)
         {
             // DeleteButton is visible when hovering over a question tile
             deleteButton.SetVisible(out needs_refresh);
 
-            deleteButton.MouseMove(e, this);
+            deleteButton.MouseMove(e, this, pb);
         }
 
         public void MouseClick(MouseEventArgs e, Tile[,] grid)

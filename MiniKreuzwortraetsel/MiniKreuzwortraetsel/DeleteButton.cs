@@ -15,12 +15,13 @@ namespace MiniKreuzwortraetsel
         static readonly int absoluteSize;
         public static readonly Rectangle bounds_tile_space;
         static DeleteButton lastVisibleDeleteButton;
-        public static void SetInvisible()
+        public static void SetInvisible(PictureBox pb)
         {
             if (lastVisibleDeleteButton != null)
             {
                 lastVisibleDeleteButton.visible = false;
                 lastVisibleDeleteButton = null;
+                pb.Cursor = Cursors.Default;
             }
         }
 
@@ -51,29 +52,29 @@ namespace MiniKreuzwortraetsel
             {
                 lastVisibleDeleteButton = this;
                 needs_refresh = true;
+                visible = true;
             }
             // other deleteButton to this
             else if (lastVisibleDeleteButton != null && this != lastVisibleDeleteButton)
             {
                 lastVisibleDeleteButton.visible = false;
                 lastVisibleDeleteButton = this;
+                visible = true;
                 needs_refresh = true;
             }
             else
             {
-                throw new Exception("");
+                throw new Exception("impossible branch reached in SetVisible()");
             }
-
-            visible = true;
         }
 
-        void SetHover(bool hover)
+        void SetHover(bool hover, PictureBox pb)
         {
             this.hover = hover;
             if (hover)
-                Cursor.Current = Cursors.Hand;
+                pb.Cursor = Cursors.Hand;
             else
-                Cursor.Current = Cursors.Default;
+                pb.Cursor = Cursors.Default;
         }
 
         public bool IsMouseOverMe(MouseEventArgs e, QuestionTile parentTile)
@@ -88,12 +89,12 @@ namespace MiniKreuzwortraetsel
         }
 
         // Checks if mouse is hovering over deleteButton and makes hover visible
-        public void MouseMove(MouseEventArgs e, QuestionTile parentTile)
+        public void MouseMove(MouseEventArgs e, QuestionTile parentTile, PictureBox pb)
         {
             if (IsMouseOverMe(e, parentTile))
-                SetHover(true);
+                SetHover(true, pb);
             else
-                SetHover(false);
+                SetHover(false, pb);
         }
 
         public Image GetImage()
