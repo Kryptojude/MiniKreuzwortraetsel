@@ -40,14 +40,11 @@ namespace MiniKreuzwortraetsel
             popup = new Popup();
 
             // Test database connection
-            if (false)
+            mySqlQueries = new MySqlQueries("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
+            if (mySqlQueries.TestConnection())
             {
-                mySqlQueries = new MySqlQueries("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
-                if (mySqlQueries.TestConnection())
-                {
-                    // Fill tableMenu with the tables in database
-                    UpdateTableMenu();
-                }
+                // Fill tableMenu with the tables in database
+                UpdateTableMenu();
             }
             else
             {
