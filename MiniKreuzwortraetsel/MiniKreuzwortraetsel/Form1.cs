@@ -14,12 +14,11 @@ namespace MiniKreuzwortraetsel
         Tile[,] grid = new Tile[20,20];
         public const int TS = 30;
         Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
-        (Point Location, string Text, bool Visible) Popup = (new Point(), "", false);
+        Popup popup;
         MySqlQueries mySqlQueries;
 
         // TODO: 
         /*
-           wörter löschen können
            hilfswort einfärben
            automatisches einfügen
            datenbankverbindungsfehler abfangen
@@ -36,6 +35,9 @@ namespace MiniKreuzwortraetsel
                     grid[y, x] = new EmptyTile(new Point(x, y));
                 }
             }
+
+            // Instantiate Popup
+            popup = new Popup();
 
             // Test database connection
             if (false)
@@ -470,14 +472,24 @@ namespace MiniKreuzwortraetsel
                         refresh = true;
                     }
 
-                    // Normal question questionTile?
-                    if (!questionTile.HasNumber())
+                    // Normal question questionTile? -> Show the popup
+                    if (questionTile.HasNumber())
                     {
                         // Show popup
-                        Popup.Text = questionTile.Question;
-                        Popup.Location = new Point(e.X + TS / 2, e.Y - TS / 2);
-                        Popup.Visible = true;
+                        popup.SetText(questionTile.Question);
+                        popup.SetPosition(new Point(e.X + TS / 2, e.Y - TS / 2));
+                        popup.Show();
                         refresh = true;
+                    }
+                    // Baseword questionTile
+                    else
+                    {
+                        //questionTile without question doesn't need popup
+                        if (popup.IsVisible())
+                        {
+                            popup.Hide();
+                            refresh = true;
+                        }
                     }
                 }
                 // Not a question tile
@@ -538,10 +550,10 @@ namespace MiniKreuzwortraetsel
                     }
 
                     // Deactivate popup
-                    if (Popup.Visible)
+                    if (popup.IsVisible())
                     {
-                        Popup.Visible = false;
-                        refresh = true; ;
+                        popup.Hide();
+                        refresh = true;
                     }
                 }
             }
@@ -564,8 +576,8 @@ namespace MiniKreuzwortraetsel
             }
 
             // Draw Popup
-            if (Popup.Visible)
-                e.Graphics.DrawString(Popup.Text, Font, Brushes.Black, Popup.Location);
+            if (popup.IsVisible())
+                e.Graphics.DrawString(popup.GetText(), Font, Brushes.Black, popup.GetPosition());
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and on hover tile
@@ -580,6 +592,7 @@ namespace MiniKreuzwortraetsel
                 Tile.RemoveAllExtendedHover(grid);
                 EmptyTile emptyTile = SubTile.HoverSubTile.ParentTile;
                 QuestionTile questionTile = emptyTile.ToQuestionTile(grid, Tile.TupleToBeFilled.Question, SubTile.HoverSubTile.Direction);
+                SubTile.HoverSubTile = null;
                 FillAnswer(questionTile, Tile.TupleToBeFilled);
             }
             else if (clickedTile is QuestionTile)

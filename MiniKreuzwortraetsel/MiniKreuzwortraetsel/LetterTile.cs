@@ -18,7 +18,7 @@ namespace MiniKreuzwortraetsel
 
         public LetterTile(Point position, QuestionTile questionTile, string text) : base(position)
         {
-            AddQuestionTile(questionTile);
+            questionTile.AddLinkedLetterTile(this);
             Text = text;
         }
 
