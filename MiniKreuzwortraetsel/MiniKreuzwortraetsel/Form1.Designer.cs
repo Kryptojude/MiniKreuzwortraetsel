@@ -34,6 +34,7 @@ namespace MiniKreuzwortraetsel
             this.baseWordTB = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.UIPanel = new System.Windows.Forms.Panel();
+            this.showMatchesBTN = new System.Windows.Forms.Button();
             this.deleteTupleBTN = new System.Windows.Forms.Button();
             this.deleteCollectionBTN = new System.Windows.Forms.Button();
             this.newTupleBTN = new System.Windows.Forms.Button();
@@ -45,6 +46,7 @@ namespace MiniKreuzwortraetsel
             this.tableMenu = new System.Windows.Forms.ComboBox();
             this.exportBTN = new System.Windows.Forms.Button();
             this.NoDBPanel = new System.Windows.Forms.Panel();
+            this.NoDBShowMatchesBTN = new System.Windows.Forms.Button();
             this.NoDBExportBTN = new System.Windows.Forms.Button();
             this.NoDBErrorLBL = new System.Windows.Forms.Label();
             this.NoDBInsertTupleBTN = new System.Windows.Forms.Button();
@@ -81,6 +83,7 @@ namespace MiniKreuzwortraetsel
             // UIPanel
             // 
             this.UIPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.UIPanel.Controls.Add(this.showMatchesBTN);
             this.UIPanel.Controls.Add(this.deleteTupleBTN);
             this.UIPanel.Controls.Add(this.deleteCollectionBTN);
             this.UIPanel.Controls.Add(this.newTupleBTN);
@@ -98,6 +101,16 @@ namespace MiniKreuzwortraetsel
             this.UIPanel.Name = "UIPanel";
             this.UIPanel.Size = new System.Drawing.Size(384, 600);
             this.UIPanel.TabIndex = 3;
+            // 
+            // showMatchesBTN
+            // 
+            this.showMatchesBTN.Location = new System.Drawing.Point(9, 516);
+            this.showMatchesBTN.Name = "showMatchesBTN";
+            this.showMatchesBTN.Size = new System.Drawing.Size(191, 46);
+            this.showMatchesBTN.TabIndex = 13;
+            this.showMatchesBTN.Text = "Übereinstimmungen anzeigen";
+            this.showMatchesBTN.UseVisualStyleBackColor = true;
+            this.showMatchesBTN.Click += new System.EventHandler(this.ShowMatchesBTN_Click);
             // 
             // deleteTupleBTN
             // 
@@ -202,7 +215,7 @@ namespace MiniKreuzwortraetsel
             // 
             // exportBTN
             // 
-            this.exportBTN.Location = new System.Drawing.Point(118, 517);
+            this.exportBTN.Location = new System.Drawing.Point(233, 516);
             this.exportBTN.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.exportBTN.Name = "exportBTN";
             this.exportBTN.Size = new System.Drawing.Size(135, 53);
@@ -214,6 +227,7 @@ namespace MiniKreuzwortraetsel
             // NoDBPanel
             // 
             this.NoDBPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.NoDBPanel.Controls.Add(this.NoDBShowMatchesBTN);
             this.NoDBPanel.Controls.Add(this.NoDBExportBTN);
             this.NoDBPanel.Controls.Add(this.NoDBErrorLBL);
             this.NoDBPanel.Controls.Add(this.NoDBInsertTupleBTN);
@@ -221,16 +235,26 @@ namespace MiniKreuzwortraetsel
             this.NoDBPanel.Controls.Add(this.label3);
             this.NoDBPanel.Controls.Add(this.NoDBAnswerTB);
             this.NoDBPanel.Controls.Add(this.NoDBQuestionTB);
-            this.NoDBPanel.Location = new System.Drawing.Point(134, 443);
+            this.NoDBPanel.Location = new System.Drawing.Point(161, 128);
             this.NoDBPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.NoDBPanel.Name = "NoDBPanel";
             this.NoDBPanel.Size = new System.Drawing.Size(384, 600);
             this.NoDBPanel.TabIndex = 6;
             this.NoDBPanel.Visible = false;
             // 
+            // NoDBShowMatchesBTN
+            // 
+            this.NoDBShowMatchesBTN.Location = new System.Drawing.Point(117, 198);
+            this.NoDBShowMatchesBTN.Name = "NoDBShowMatchesBTN";
+            this.NoDBShowMatchesBTN.Size = new System.Drawing.Size(191, 46);
+            this.NoDBShowMatchesBTN.TabIndex = 12;
+            this.NoDBShowMatchesBTN.Text = "Übereinstimmungen anzeigen";
+            this.NoDBShowMatchesBTN.UseVisualStyleBackColor = true;
+            this.NoDBShowMatchesBTN.Click += new System.EventHandler(this.NoDBShowMatchesBTN_Click);
+            // 
             // NoDBExportBTN
             // 
-            this.NoDBExportBTN.Location = new System.Drawing.Point(20, 251);
+            this.NoDBExportBTN.Location = new System.Drawing.Point(20, 262);
             this.NoDBExportBTN.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.NoDBExportBTN.Name = "NoDBExportBTN";
             this.NoDBExportBTN.Size = new System.Drawing.Size(135, 53);
@@ -352,6 +376,8 @@ namespace MiniKreuzwortraetsel
         private System.Windows.Forms.TextBox NoDBQuestionTB;
         private System.Windows.Forms.Label NoDBErrorLBL;
         private System.Windows.Forms.Button NoDBExportBTN;
+        private System.Windows.Forms.Button showMatchesBTN;
+        private System.Windows.Forms.Button NoDBShowMatchesBTN;
     }
 }
 

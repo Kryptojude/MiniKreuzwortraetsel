@@ -23,6 +23,7 @@ namespace MiniKreuzwortraetsel
            automatisches einfügen
            datenbankverbindungsfehler abfangen
            Baseword class?
+           einstellungs menü zbsp für datenbank verbindung
         */
         public Form1()
         {
@@ -613,13 +614,8 @@ namespace MiniKreuzwortraetsel
         }
         private void InsertTupleBTN_Click(object sender, EventArgs e)
         {
-            if (tuplesListBox.SelectedItem != null)
-            {
-                string selectedItem = tuplesListBox.SelectedItem.ToString();
-                string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
-                (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
-                HighlightCandidateSubtiles(tuple);
-            }
+            throw new NotImplementedException();
+            // soll automatisch wort einfügen
         }
         private void BaseWordBTN_Click(object sender, EventArgs e)
         {
@@ -628,9 +624,23 @@ namespace MiniKreuzwortraetsel
         }
         private void NoDBInsertTupleBTN_Click(object sender, EventArgs e)
         {
+            throw new NotImplementedException();
+            // soll automatisch wort einfügen
+        }
+        private void NoDBShowMatchesBTN_Click(object sender, EventArgs e)
+        {
             (string Question, string Answer) tuple = (ReplaceUmlaute(NoDBQuestionTB.Text), ReplaceUmlaute(NoDBAnswerTB.Text).ToUpper());
             HighlightCandidateSubtiles(tuple);
         }
-
+        private void ShowMatchesBTN_Click(object sender, EventArgs e)
+        {
+            if (tuplesListBox.SelectedItem != null)
+            {
+                string selectedItem = tuplesListBox.SelectedItem.ToString();
+                string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
+                (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
+                HighlightCandidateSubtiles(tuple);
+            }
+        }
     }
 }
