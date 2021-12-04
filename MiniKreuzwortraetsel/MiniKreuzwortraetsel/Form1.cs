@@ -19,6 +19,7 @@ namespace MiniKreuzwortraetsel
 
         // TODO: 
         /*
+           automatisches einfügen macht das wort immer so weit oben rechts wie möglich
            hilfswort einfärben
            automatisches einfügen
            datenbankverbindungsfehler abfangen
@@ -111,7 +112,7 @@ namespace MiniKreuzwortraetsel
         /// 2. ranks the "candidates" by how many intersections with existing words there are, 
         /// 3. highlights the candidate subtiles with green background color
         /// </summary>
-        private void HighlightCandidateSubtiles((string Question, string Answer) tuple)
+        private void DetermineCandidateSubtiles((string Question, string Answer) tuple, bool highlightCandidates)
         {
             // Reset Highlights
             EmptyTile.RemoveAllHighlights(grid);
@@ -213,22 +214,35 @@ namespace MiniKreuzwortraetsel
                 else if (candidates.Count == 1)
                 {       
                     // Fill answer into that position, convert the EmptyTile to QuestionTile
-                    FillAnswer(candidates[0].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[0].direction),
-                               tuple);
+                    FillAnswer(candidates[0].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[0].direction), tuple);
                 }
                 else if (candidates.Count > 1)
                 {
-                    // Highlight candidates
-                    for (int i = 0; i < candidates.Count; i++)
+                    if (highlightCandidates)
                     {
-                        float colorLevel = 0;
-                        if (maxMatches > 0)
-                            colorLevel = (float)candidates[i].matches / maxMatches;
+                        // There are multiple candidates and they should be highlighted
+                        for (int i = 0; i < candidates.Count; i++)
+                        {
+                            float colorLevel = 0;
+                            if (maxMatches > 0)
+                                colorLevel = (float)candidates[i].matches / maxMatches;
 
-                        candidates[i].potentialQuestionTile.SubTiles[candidates[i].direction].SetHighlight(colorLevel);
+                            candidates[i].potentialQuestionTile.SubTiles[candidates[i].direction].SetHighlight(colorLevel);
+                        }
+                        Tile.TupleToBeFilled = tuple;
+                        gridPB.Refresh();
                     }
-                    Tile.TupleToBeFilled = tuple;
-                    gridPB.Refresh();
+                    else
+                    {
+                        // There are multiple candidates and the best one should be autofilled, no highlights
+                        // Autofill the first candidate with max matches that is found
+                        for (int i = 0; i < candidates.Count; i++)
+                            if (candidates[i].matches == maxMatches)
+                            {
+                                FillAnswer(candidates[i].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[i].direction), tuple);
+                                break;
+                            }
+                    }
                 }
             }
         }
@@ -609,28 +623,33 @@ namespace MiniKreuzwortraetsel
                 string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
                 (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
-                HighlightCandidateSubtiles(tuple);
+                DetermineCandidateSubtiles(tuple, highlightCandidates: false);
             }
         }
         private void InsertTupleBTN_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
-            // soll automatisch wort einfügen
+            if (tuplesListBox.SelectedItem != null)
+            {
+                string selectedItem = tuplesListBox.SelectedItem.ToString();
+                string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
+                (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
+                DetermineCandidateSubtiles(tuple, highlightCandidates: false);
+            }
         }
         private void BaseWordBTN_Click(object sender, EventArgs e)
         {
             (string Question, string Answer) tuple = ("", baseWordTB.Text.ToUpper());
-            HighlightCandidateSubtiles(tuple);
+            DetermineCandidateSubtiles(tuple, highlightCandidates: true);
         }
         private void NoDBInsertTupleBTN_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
-            // soll automatisch wort einfügen
+            (string Question, string Answer) tuple = (ReplaceUmlaute(NoDBQuestionTB.Text), ReplaceUmlaute(NoDBAnswerTB.Text).ToUpper());
+            DetermineCandidateSubtiles(tuple, highlightCandidates: false);
         }
         private void NoDBShowMatchesBTN_Click(object sender, EventArgs e)
         {
             (string Question, string Answer) tuple = (ReplaceUmlaute(NoDBQuestionTB.Text), ReplaceUmlaute(NoDBAnswerTB.Text).ToUpper());
-            HighlightCandidateSubtiles(tuple);
+            DetermineCandidateSubtiles(tuple, highlightCandidates: true);
         }
         private void ShowMatchesBTN_Click(object sender, EventArgs e)
         {
@@ -639,7 +658,7 @@ namespace MiniKreuzwortraetsel
                 string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
                 (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
-                HighlightCandidateSubtiles(tuple);
+                DetermineCandidateSubtiles(tuple, highlightCandidates: true);
             }
         }
     }
