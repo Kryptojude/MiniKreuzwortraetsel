@@ -19,9 +19,11 @@ namespace MiniKreuzwortraetsel
 
         // TODO: 
         /*
+         * im NoDBPanel keine Möglichkeit für Hilfswort
+           Exportieren Fehler beim Anzeigen
+           DB Verbindung retry knopf
            automatisches einfügen macht das wort immer so weit oben rechts wie möglich
            hilfswort einfärben
-           automatisches einfügen
            datenbankverbindungsfehler abfangen
            Baseword class?
            einstellungs menü zbsp für datenbank verbindung
@@ -41,6 +43,12 @@ namespace MiniKreuzwortraetsel
             // Instantiate Popup
             popup = new Popup();
 
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // Shows program to user while attempting DB connection
+            Show();
             // Test database connection
             mySqlQueries = new MySqlQueries("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
             if (mySqlQueries.TestConnection())

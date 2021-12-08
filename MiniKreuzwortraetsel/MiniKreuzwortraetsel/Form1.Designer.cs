@@ -30,6 +30,7 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.baseWordTB = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -55,6 +56,7 @@ namespace MiniKreuzwortraetsel
             this.NoDBAnswerTB = new System.Windows.Forms.TextBox();
             this.NoDBQuestionTB = new System.Windows.Forms.TextBox();
             this.gridPB = new System.Windows.Forms.PictureBox();
+            this.HilfswortToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.UIPanel.SuspendLayout();
             this.NoDBPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridPB)).BeginInit();
@@ -79,6 +81,7 @@ namespace MiniKreuzwortraetsel
             this.label1.Size = new System.Drawing.Size(78, 16);
             this.label1.TabIndex = 2;
             this.label1.Text = "Hilfswort:";
+            this.HilfswortToolTip.SetToolTip(this.label1, "Das Hilfswort ist immer sichtbar für den Nutzer");
             // 
             // UIPanel
             // 
@@ -344,6 +347,7 @@ namespace MiniKreuzwortraetsel
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "KreuzworträtselMacher";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.UIPanel.ResumeLayout(false);
             this.UIPanel.PerformLayout();
             this.NoDBPanel.ResumeLayout(false);
@@ -378,6 +382,7 @@ namespace MiniKreuzwortraetsel
         private System.Windows.Forms.Button NoDBExportBTN;
         private System.Windows.Forms.Button showMatchesBTN;
         private System.Windows.Forms.Button NoDBShowMatchesBTN;
+        private System.Windows.Forms.ToolTip HilfswortToolTip;
     }
 }
 
