@@ -52,11 +52,12 @@ namespace MiniKreuzwortraetsel
             this.NoDBErrorLBL = new System.Windows.Forms.Label();
             this.NoDBInsertTupleBTN = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.NoDBQuestionLBL = new System.Windows.Forms.Label();
             this.NoDBAnswerTB = new System.Windows.Forms.TextBox();
             this.NoDBQuestionTB = new System.Windows.Forms.TextBox();
             this.gridPB = new System.Windows.Forms.PictureBox();
             this.HilfswortToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.NoDBBaseWordCHBox = new System.Windows.Forms.CheckBox();
             this.UIPanel.SuspendLayout();
             this.NoDBPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridPB)).BeginInit();
@@ -230,12 +231,13 @@ namespace MiniKreuzwortraetsel
             // NoDBPanel
             // 
             this.NoDBPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.NoDBPanel.Controls.Add(this.NoDBBaseWordCHBox);
             this.NoDBPanel.Controls.Add(this.NoDBShowMatchesBTN);
             this.NoDBPanel.Controls.Add(this.NoDBExportBTN);
             this.NoDBPanel.Controls.Add(this.NoDBErrorLBL);
             this.NoDBPanel.Controls.Add(this.NoDBInsertTupleBTN);
             this.NoDBPanel.Controls.Add(this.label4);
-            this.NoDBPanel.Controls.Add(this.label3);
+            this.NoDBPanel.Controls.Add(this.NoDBQuestionLBL);
             this.NoDBPanel.Controls.Add(this.NoDBAnswerTB);
             this.NoDBPanel.Controls.Add(this.NoDBQuestionTB);
             this.NoDBPanel.Location = new System.Drawing.Point(161, 128);
@@ -296,14 +298,14 @@ namespace MiniKreuzwortraetsel
             this.label4.TabIndex = 3;
             this.label4.Text = "Antwort eingeben: ";
             // 
-            // label3
+            // NoDBQuestionLBL
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(20, 70);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(130, 16);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Frage eingeben: ";
+            this.NoDBQuestionLBL.AutoSize = true;
+            this.NoDBQuestionLBL.Location = new System.Drawing.Point(20, 70);
+            this.NoDBQuestionLBL.Name = "NoDBQuestionLBL";
+            this.NoDBQuestionLBL.Size = new System.Drawing.Size(130, 16);
+            this.NoDBQuestionLBL.TabIndex = 2;
+            this.NoDBQuestionLBL.Text = "Frage eingeben: ";
             // 
             // NoDBAnswerTB
             // 
@@ -333,6 +335,18 @@ namespace MiniKreuzwortraetsel
             this.gridPB.Paint += new System.Windows.Forms.PaintEventHandler(this.GridPB_Paint);
             this.gridPB.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GridPB_MouseClick);
             this.gridPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GridPB_MouseMove);
+            // 
+            // NoDBBaseWordCHBox
+            // 
+            this.NoDBBaseWordCHBox.AutoSize = true;
+            this.NoDBBaseWordCHBox.Location = new System.Drawing.Point(184, 69);
+            this.NoDBBaseWordCHBox.Name = "NoDBBaseWordCHBox";
+            this.NoDBBaseWordCHBox.Size = new System.Drawing.Size(92, 20);
+            this.NoDBBaseWordCHBox.TabIndex = 13;
+            this.NoDBBaseWordCHBox.Text = "Hilfswort";
+            this.HilfswortToolTip.SetToolTip(this.NoDBBaseWordCHBox, "Das Hilfswort ist immer sichtbar für den Nutzer");
+            this.NoDBBaseWordCHBox.UseVisualStyleBackColor = true;
+            this.NoDBBaseWordCHBox.CheckedChanged += new System.EventHandler(this.NoDBBaseWordCHBox_CheckedChanged);
             // 
             // Form1
             // 
@@ -375,7 +389,7 @@ namespace MiniKreuzwortraetsel
         private System.Windows.Forms.Panel NoDBPanel;
         private System.Windows.Forms.Button NoDBInsertTupleBTN;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label NoDBQuestionLBL;
         private System.Windows.Forms.TextBox NoDBAnswerTB;
         private System.Windows.Forms.TextBox NoDBQuestionTB;
         private System.Windows.Forms.Label NoDBErrorLBL;
@@ -383,6 +397,7 @@ namespace MiniKreuzwortraetsel
         private System.Windows.Forms.Button showMatchesBTN;
         private System.Windows.Forms.Button NoDBShowMatchesBTN;
         private System.Windows.Forms.ToolTip HilfswortToolTip;
+        private System.Windows.Forms.CheckBox NoDBBaseWordCHBox;
     }
 }
 

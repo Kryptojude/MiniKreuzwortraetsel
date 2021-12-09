@@ -19,7 +19,8 @@ namespace MiniKreuzwortraetsel
 
         // TODO: 
         /*
-         * im NoDBPanel keine Möglichkeit für Hilfswort
+         * Title des HTML-Dokuments sollte nicht ganzer Pfad sein
+         * HTML-Dokument zeigt Hilfsworte nicht
            Exportieren Fehler beim Anzeigen
            DB Verbindung retry knopf
            automatisches einfügen macht das wort immer so weit oben rechts wie möglich
@@ -668,6 +669,12 @@ namespace MiniKreuzwortraetsel
                 (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
                 DetermineCandidateSubtiles(tuple, highlightCandidates: true);
             }
+        }
+
+        private void NoDBBaseWordCHBox_CheckedChanged(object sender, EventArgs e)
+        {
+            NoDBQuestionTB.Enabled = !(sender as CheckBox).Checked;
+            NoDBQuestionLBL.Enabled = !(sender as CheckBox).Checked;
         }
     }
 }
