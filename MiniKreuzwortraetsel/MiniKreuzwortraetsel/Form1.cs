@@ -19,6 +19,7 @@ namespace MiniKreuzwortraetsel
 
         // TODO: 
         /*
+         * leere frage abfangen
          * Title des HTML-Dokuments sollte nicht ganzer Pfad sein
          * HTML-Dokument zeigt Hilfsworte nicht
            Exportieren Fehler beim Anzeigen
@@ -313,10 +314,11 @@ namespace MiniKreuzwortraetsel
                 reader.Close();
 
                 // Generate dynamic part of html
-                html += "<title>" + dialog.FileName + "</title>" + 
+                string crosswordTitle = Path.GetFileNameWithoutExtension(dialog.FileName.Substring(dialog.FileName.LastIndexOf('\\') + 1));
+                html += "<title>" + crosswordTitle + "</title>" + 
                         "</head>" +
                         "<body>" +
-                        "<h1>" + Path.GetFileNameWithoutExtension(dialog.FileName) + "</h1>" +
+                        "<h1>" + crosswordTitle + "</h1>" +
                         "<table>";
 
                 for (int y = 0; y < grid.GetLength(0); y++)
@@ -624,7 +626,13 @@ namespace MiniKreuzwortraetsel
                 gridPB.Refresh();
             }
         }
-        // Methods that call PutAnswerIntoCrossWord(tuple);
+        private void NoDBBaseWordCHBox_CheckedChanged(object sender, EventArgs e)
+        {
+            NoDBQuestionTB.Enabled = !(sender as CheckBox).Checked;
+            NoDBQuestionLBL.Enabled = !(sender as CheckBox).Checked;
+        }
+
+        // Methods that call DetermineCandidateSubtiles();
         private void TuplesListBox_DoubleClick(object sender, EventArgs e)
         {
             if (tuplesListBox.SelectedItem != null)
@@ -669,12 +677,6 @@ namespace MiniKreuzwortraetsel
                 (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
                 DetermineCandidateSubtiles(tuple, highlightCandidates: true);
             }
-        }
-
-        private void NoDBBaseWordCHBox_CheckedChanged(object sender, EventArgs e)
-        {
-            NoDBQuestionTB.Enabled = !(sender as CheckBox).Checked;
-            NoDBQuestionLBL.Enabled = !(sender as CheckBox).Checked;
         }
     }
 }
