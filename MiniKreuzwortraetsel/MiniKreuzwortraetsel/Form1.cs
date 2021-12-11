@@ -61,9 +61,15 @@ namespace MiniKreuzwortraetsel
             else
             {
                 // Replace normal interface with non-DB interface
-                UIPanel.Visible = false;
-                NoDBPanel.Visible = true;
-                NoDBPanel.Location = UIPanel.Location;
+                questionAnswerPanel.Visible = true;
+                questionAnswerPanel.Parent = UIContainerPanel;
+                questionAnswerPanel.Dock = DockStyle.Top;
+
+                NoDBErrorLBL.Visible = true;
+                NoDBErrorLBL.Parent = UIContainerPanel;
+                NoDBErrorLBL.Dock = DockStyle.Top;
+
+                collectionsPanel.Visible = false;
             }
         }
 
@@ -126,132 +132,129 @@ namespace MiniKreuzwortraetsel
         {
             // Reset Highlights
             EmptyTile.RemoveAllHighlights(grid);
-            if (tuple.Answer != "")
+            // Find all possible ways the answer can be placed
+            // and save how many letters are crossed
+            List<(EmptyTile potentialQuestionTile, EmptyTile tileAfterAnswer, int direction, int matches)> candidates = new List<(EmptyTile, EmptyTile, int, int)>();
+            int maxMatches = 0;
+            for (int direction = 0; direction < 2; direction++)
             {
-                // Find all possible ways the answer can be placed
-                // and save how many letters are crossed
-                List<(EmptyTile potentialQuestionTile, EmptyTile tileAfterAnswer, int direction, int matches)> candidates = new List<(EmptyTile, EmptyTile, int, int)>();
-                int maxMatches = 0;
-                for (int direction = 0; direction < 2; direction++)
+                Point directionPoint = directions[direction];
+                for (int y = 0; y < grid.GetLength(0); y++)
                 {
-                    Point directionPoint = directions[direction];
-                    for (int y = 0; y < grid.GetLength(0); y++)
+                    for (int x = 0; x < grid.GetLength(1); x++)
                     {
-                        for (int x = 0; x < grid.GetLength(1); x++)
+                        // Does question tile fit?
+                        bool questionTileFits = true;
+                        if (!(grid[y, x] is EmptyTile))
+                            questionTileFits = false;
+                        else
                         {
-                            // Does question tile fit?
-                            bool questionTileFits = true;
-                            if (!(grid[y, x] is EmptyTile))
-                                questionTileFits = false;
-                            else
+                            EmptyTile potentialQuestionTile = grid[y, x] as EmptyTile;
+
+                            // Free space after answer?
+                            EmptyTile tileAfterAnswer = null;
+                            Point tileAfterAnswerPoint = new Point(x + (directionPoint.X * (tuple.Answer.Length + 1)), y + (directionPoint.Y * (tuple.Answer.Length + 1)));
+                            // Out of bounds check
+                            if (tileAfterAnswerPoint.Y < grid.GetLength(0) && tileAfterAnswerPoint.X < grid.GetLength(1))
                             {
-                                EmptyTile potentialQuestionTile = grid[y, x] as EmptyTile;
-
-                                // Free space after answer?
-                                EmptyTile tileAfterAnswer = null;
-                                Point tileAfterAnswerPoint = new Point(x + (directionPoint.X * (tuple.Answer.Length + 1)), y + (directionPoint.Y * (tuple.Answer.Length + 1)));
-                                // Out of bounds check
-                                if (tileAfterAnswerPoint.Y < grid.GetLength(0) && tileAfterAnswerPoint.X < grid.GetLength(1))
+                                // Is the tile after the answer empty?
+                                if (!(grid[tileAfterAnswerPoint.Y, tileAfterAnswerPoint.X] is EmptyTile))
                                 {
-                                    // Is the tile after the answer empty?
-                                    if (!(grid[tileAfterAnswerPoint.Y, tileAfterAnswerPoint.X] is EmptyTile))
-                                    {
-                                        tileAfterAnswer = grid[tileAfterAnswerPoint.Y, tileAfterAnswerPoint.X] as EmptyTile;
-                                        questionTileFits = false;
-                                    }
+                                    tileAfterAnswer = grid[tileAfterAnswerPoint.Y, tileAfterAnswerPoint.X] as EmptyTile;
+                                    questionTileFits = false;
                                 }
+                            }
 
-                                // Question tile fits into the spot, now find out if the answer fits
-                                if (questionTileFits)
+                            // Question tile fits into the spot, now find out if the answer fits
+                            if (questionTileFits)
+                            {
+                                int matchesForCurrentAnswer = 0;
+                                bool answerFits = true;
+                                // This loop goes along the path that the answer takes in the grid
+                                for (int i = 0; i < tuple.Answer.Length && answerFits == true; i++)
                                 {
-                                    int matchesForCurrentAnswer = 0;
-                                    bool answerFits = true;
-                                    // This loop goes along the path that the answer takes in the grid
-                                    for (int i = 0; i < tuple.Answer.Length && answerFits == true; i++)
+                                    int letterX = potentialQuestionTile.GetPosition().X + directionPoint.X + i * directionPoint.X;
+                                    int letterY = potentialQuestionTile.GetPosition().Y + directionPoint.Y + i * directionPoint.Y;
+                                    // Are the selected coordinates in the grid?
+                                    if (letterX >= 0 && letterX <= grid.GetUpperBound(1) && letterY >= 0 && letterY <= grid.GetUpperBound(0))
                                     {
-                                        int letterX = potentialQuestionTile.GetPosition().X + directionPoint.X + i * directionPoint.X;
-                                        int letterY = potentialQuestionTile.GetPosition().Y + directionPoint.Y + i * directionPoint.Y;
-                                        // Are the selected coordinates in the grid?
-                                        if (letterX >= 0 && letterX <= grid.GetUpperBound(1) && letterY >= 0 && letterY <= grid.GetUpperBound(0))
-                                        {
-                                            Tile potentialLetterTile = grid[letterY, letterX];
-                                            // Tile is QuestionTile
-                                            if (potentialLetterTile is QuestionTile)
-                                                // Answer can't go over a QuestionTile
-                                                answerFits = false;
-                                            // Tile is EmptyTile
-                                            else if (potentialLetterTile is EmptyTile)
-                                            {
-                                                // Answer can't go over reserved EmptyTile
-                                                if ((potentialLetterTile as EmptyTile).IsReserved())
-                                                    answerFits = false;
-                                            }
-                                            // Tile is LetterTile
-                                            else if (potentialLetterTile is LetterTile)
-                                            {
-                                                // Answer can't go over LetterTile with different letter
-                                                string text = (potentialLetterTile as LetterTile).Text;
-                                                // Letter matches
-                                                if (text == tuple.Answer[i].ToString())
-                                                    matchesForCurrentAnswer++;
-                                                // Letter doesn't match
-                                                else
-                                                    answerFits = false;
-                                            }
-                                        }
-                                        else
+                                        Tile potentialLetterTile = grid[letterY, letterX];
+                                        // Tile is QuestionTile
+                                        if (potentialLetterTile is QuestionTile)
+                                            // Answer can't go over a QuestionTile
                                             answerFits = false;
+                                        // Tile is EmptyTile
+                                        else if (potentialLetterTile is EmptyTile)
+                                        {
+                                            // Answer can't go over reserved EmptyTile
+                                            if ((potentialLetterTile as EmptyTile).IsReserved())
+                                                answerFits = false;
+                                        }
+                                        // Tile is LetterTile
+                                        else if (potentialLetterTile is LetterTile)
+                                        {
+                                            // Answer can't go over LetterTile with different letter
+                                            string text = (potentialLetterTile as LetterTile).Text;
+                                            // Letter matches
+                                            if (text == tuple.Answer[i].ToString())
+                                                matchesForCurrentAnswer++;
+                                            // Letter doesn't match
+                                            else
+                                                answerFits = false;
+                                        }
                                     }
+                                    else
+                                        answerFits = false;
+                                }
 
-                                    // Did the whole answer fit?
-                                    if (answerFits)
-                                    {
-                                        // Then save the properties for later
-                                        candidates.Add((potentialQuestionTile, tileAfterAnswer, direction, matchesForCurrentAnswer));
-                                        // Save maxMatches number for later
-                                        if (matchesForCurrentAnswer >= maxMatches)
-                                            maxMatches = matchesForCurrentAnswer;
-                                    }
+                                // Did the whole answer fit?
+                                if (answerFits)
+                                {
+                                    // Then save the properties for later
+                                    candidates.Add((potentialQuestionTile, tileAfterAnswer, direction, matchesForCurrentAnswer));
+                                    // Save maxMatches number for later
+                                    if (matchesForCurrentAnswer >= maxMatches)
+                                        maxMatches = matchesForCurrentAnswer;
                                 }
                             }
                         }
                     }
-                }
 
-                // Candidate analysis
-                if (candidates.Count == 0)
-                    MessageBox.Show("Keine passende Stelle gefunden");
-                else if (candidates.Count == 1)
-                {       
-                    // Fill answer into that position, convert the EmptyTile to QuestionTile
-                    FillAnswer(candidates[0].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[0].direction), tuple);
-                }
-                else if (candidates.Count > 1)
-                {
-                    if (highlightCandidates)
+                    // Candidate analysis
+                    if (candidates.Count == 0)
+                        MessageBox.Show("Keine passende Stelle gefunden");
+                    else if (candidates.Count == 1)
                     {
-                        // There are multiple candidates and they should be highlighted
-                        for (int i = 0; i < candidates.Count; i++)
-                        {
-                            float colorLevel = 0;
-                            if (maxMatches > 0)
-                                colorLevel = (float)candidates[i].matches / maxMatches;
-
-                            candidates[i].potentialQuestionTile.SubTiles[candidates[i].direction].SetHighlight(colorLevel);
-                        }
-                        Tile.TupleToBeFilled = tuple;
-                        gridPB.Refresh();
+                        // Fill answer into that position, convert the EmptyTile to QuestionTile
+                        FillAnswer(candidates[0].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[0].direction), tuple);
                     }
-                    else
+                    else if (candidates.Count > 1)
                     {
-                        // There are multiple candidates and the best one should be autofilled, no highlights
-                        // Autofill the first candidate with max matches that is found
-                        for (int i = 0; i < candidates.Count; i++)
-                            if (candidates[i].matches == maxMatches)
+                        if (highlightCandidates)
+                        {
+                            // There are multiple candidates and they should be highlighted
+                            for (int i = 0; i < candidates.Count; i++)
                             {
-                                FillAnswer(candidates[i].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[i].direction), tuple);
-                                break;
+                                float colorLevel = 0;
+                                if (maxMatches > 0)
+                                    colorLevel = (float)candidates[i].matches / maxMatches;
+
+                                candidates[i].potentialQuestionTile.SubTiles[candidates[i].direction].SetHighlight(colorLevel);
                             }
+                            Tile.TupleToBeFilled = tuple;
+                            gridPB.Refresh();
+                        }
+                        else
+                        {
+                            // There are multiple candidates and the best one should be autofilled, no highlights
+                            // Autofill the first candidate with max matches that is found
+                            for (int i = 0; i < candidates.Count; i++)
+                                if (candidates[i].matches == maxMatches)
+                                {
+                                    FillAnswer(candidates[i].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[i].direction), tuple);
+                                    break;
+                                }
+                        }
                     }
                 }
             }
@@ -333,10 +336,10 @@ namespace MiniKreuzwortraetsel
                         if (tile is QuestionTile)
                         {
                             QuestionTile questionTile = tile as QuestionTile;
-                            if (questionTile.HasNumber())
-                                html += "<td style='border: 2px solid black'>" + questionTile.Text + "</td>";
-                            else
+                            if (questionTile.IsBaseWord())
                                 html += "<td style='border: 2px solid black; color: red'>" + questionTile.Text + "</td>";
+                            else
+                                html += "<td style='border: 2px solid black'>" + questionTile.Text + "</td>";
                         }
                         // LetterTile -> dont show letter / show text field
                         else if (tile is LetterTile)
@@ -468,9 +471,9 @@ namespace MiniKreuzwortraetsel
         private void BaseWordTB_TextChanged(object sender, EventArgs e)
         {
             if ((sender as TextBox).Text == "")
-                baseWordBTN.Enabled = false;
+                InsertBaseWordBTN.Enabled = false;
             else
-                baseWordBTN.Enabled = true;
+                InsertBaseWordBTN.Enabled = true;
         }
         /// <summary>
         /// Hover effects
@@ -495,24 +498,22 @@ namespace MiniKreuzwortraetsel
                         refresh = true;
                     }
 
-                    // Normal question questionTile? -> Show the popup
-                    if (questionTile.HasNumber())
+                    // Baseword questionTile -> No popup
+                    if (questionTile.IsBaseWord())
                     {
-                        // Show popup
-                        popup.SetText(questionTile.Question);
-                        popup.SetPosition(new Point(e.X + TS / 2, e.Y - TS / 2));
-                        popup.Show();
-                        refresh = true;
-                    }
-                    // Baseword questionTile
-                    else
-                    {
-                        //questionTile without question doesn't need popup
                         if (popup.IsVisible())
                         {
                             popup.Hide();
                             refresh = true;
                         }
+                    }
+                    // Normal question questionTil -> Show the popup
+                    else
+                    {
+                        popup.SetText(questionTile.Question);
+                        popup.SetPosition(new Point(e.X + TS / 2, e.Y - TS / 2));
+                        popup.Show();
+                        refresh = true;
                     }
                 }
                 // Not a question tile
@@ -629,10 +630,24 @@ namespace MiniKreuzwortraetsel
         private void NoDBBaseWordCHBox_CheckedChanged(object sender, EventArgs e)
         {
             NoDBQuestionTB.Enabled = !(sender as CheckBox).Checked;
+            NoDBQuestionTB.Text = "";
             NoDBQuestionLBL.Enabled = !(sender as CheckBox).Checked;
         }
 
-        // Methods that call DetermineCandidateSubtiles();
+        /// <summary>
+        /// Checks if the tuple is legal, if yes, then call DetermineCandidateSubtiles();
+        /// </summary>
+        private void ValidateTuple((string Answer, string Question) tuple, bool highlightCandidates, bool makeBaseWord)
+        {
+            if (tuple.Answer != "")
+                MessageBox.Show("Antwort kann nicht leer sein");
+            else if (tuple.Question != "" || makeBaseWord)
+                // Question can't be empty unless it's a baseWord
+                MessageBox.Show("Frage kann nicht leer sein");
+            else
+                DetermineCandidateSubtiles(tuple, highlightCandidates);
+        }
+        // Methods that call ValidateTuple()
         private void TuplesListBox_DoubleClick(object sender, EventArgs e)
         {
             if (tuplesListBox.SelectedItem != null)
@@ -640,7 +655,7 @@ namespace MiniKreuzwortraetsel
                 string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
                 (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
-                DetermineCandidateSubtiles(tuple, highlightCandidates: false);
+                ValidateTuple(tuple, highlightCandidates: false, makeBaseWord: false);
             }
         }
         private void InsertTupleBTN_Click(object sender, EventArgs e)
@@ -650,23 +665,28 @@ namespace MiniKreuzwortraetsel
                 string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
                 (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
-                DetermineCandidateSubtiles(tuple, highlightCandidates: false);
+                ValidateTuple(tuple, highlightCandidates: false, makeBaseWord: false);
             }
         }
-        private void BaseWordBTN_Click(object sender, EventArgs e)
+        private void InsertBaseWordBTN_Click(object sender, EventArgs e)
         {
             (string Question, string Answer) tuple = ("", baseWordTB.Text.ToUpper());
-            DetermineCandidateSubtiles(tuple, highlightCandidates: true);
+            ValidateTuple(tuple, highlightCandidates: true, makeBaseWord: true);
+        }
+        private void NoDBInsertBaseWordBTN_Click(object sender, EventArgs e)
+        {
+            (string Question, string Answer) tuple = ("", baseWordTB.Text.ToUpper());
+            ValidateTuple(tuple, highlightCandidates: true, makeBaseWord: true);
         }
         private void NoDBInsertTupleBTN_Click(object sender, EventArgs e)
         {
             (string Question, string Answer) tuple = (ReplaceUmlaute(NoDBQuestionTB.Text), ReplaceUmlaute(NoDBAnswerTB.Text).ToUpper());
-            DetermineCandidateSubtiles(tuple, highlightCandidates: false);
+            ValidateTuple(tuple, highlightCandidates: false, makeBaseWord: false);
         }
         private void NoDBShowMatchesBTN_Click(object sender, EventArgs e)
         {
             (string Question, string Answer) tuple = (ReplaceUmlaute(NoDBQuestionTB.Text), ReplaceUmlaute(NoDBAnswerTB.Text).ToUpper());
-            DetermineCandidateSubtiles(tuple, highlightCandidates: true);
+            ValidateTuple(tuple, highlightCandidates: true, makeBaseWord: false);
         }
         private void ShowMatchesBTN_Click(object sender, EventArgs e)
         {
@@ -675,8 +695,9 @@ namespace MiniKreuzwortraetsel
                 string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
                 (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
-                DetermineCandidateSubtiles(tuple, highlightCandidates: true);
+                ValidateTuple(tuple, highlightCandidates: true, makeBaseWord: false);
             }
         }
+
     }
 }

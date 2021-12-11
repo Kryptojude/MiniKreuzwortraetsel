@@ -37,9 +37,9 @@ namespace MiniKreuzwortraetsel
                 Text = arrow;
         }
 
-        public bool HasNumber()
+        public bool IsBaseWord()
         {
-            return !string.IsNullOrEmpty(Question);
+            return string.IsNullOrEmpty(Question);
         }
 
         public void ToEmptyTile(Tile[,] grid)
