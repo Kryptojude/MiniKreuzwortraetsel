@@ -19,6 +19,9 @@ namespace MiniKreuzwortraetsel
 
         // TODO: 
         /*
+         * Üvbereinstimmngen anzeigen knöpfe enabled/disabled
+         * Wort einfügen abbrechen können + erklärung was zu tun ist wenn Highlights gezeigt werden
+         * Wartefenster anzeigen während DB-Verbindung versucht wird
          * leere frage abfangen
          * Title des HTML-Dokuments sollte nicht ganzer Pfad sein
          * HTML-Dokument zeigt Hilfsworte nicht
@@ -53,23 +56,27 @@ namespace MiniKreuzwortraetsel
             Show();
             // Test database connection
             mySqlQueries = new MySqlQueries("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
-            if (mySqlQueries.TestConnection())
+            //if (mySqlQueries.TestConnection())
+            if (false)
             {
+                // DB connection suffessful
+                // Becomes enabled when there are elements in the listBox
+                InsertTupleBTN.Enabled = false;
+
                 // Fill tableMenu with the tables in database
-                UpdateTableMenu();
+                //UpdateTableMenu();
             }
             else
             {
-                // Replace normal interface with non-DB interface
-                questionAnswerPanel.Visible = true;
-                questionAnswerPanel.Parent = UIContainerPanel;
-                questionAnswerPanel.Dock = DockStyle.Top;
+                // DB connection failed
+                // Show error message at the top
+                UIContainerPanel.Controls.Add(NoDBErrorLBL);
 
-                NoDBErrorLBL.Visible = true;
-                NoDBErrorLBL.Parent = UIContainerPanel;
-                NoDBErrorLBL.Dock = DockStyle.Top;
+                // Replace collectionsPanel with questionAnswerPanel
+                UIContainerPanel.Controls.Add(questionAnswerPanel);
+                UIContainerPanel.Controls.SetChildIndex(questionAnswerPanel, UIContainerPanel.Controls.GetChildIndex(collectionsPanel));
+                UIContainerPanel.Controls.Remove(collectionsPanel);
 
-                collectionsPanel.Visible = false;
             }
         }
 
@@ -92,7 +99,7 @@ namespace MiniKreuzwortraetsel
             // No tables
             else
             {
-                insertTupleBTN.Enabled = false;
+                InsertTupleBTN.Enabled = false;
                 newTupleBTN.Enabled = false;
                 deleteTupleBTN.Enabled = false;
                 deleteCollectionBTN.Enabled = false;
@@ -113,13 +120,13 @@ namespace MiniKreuzwortraetsel
                 {
                     tuplesListBox.SelectedIndex = 0;
                     deleteTupleBTN.Enabled = true;
-                    insertTupleBTN.Enabled = true;
+                    InsertTupleBTN.Enabled = true;
                 }
                 // No tuples in table
                 else
                 {
                     deleteTupleBTN.Enabled = false;
-                    insertTupleBTN.Enabled = false;
+                    InsertTupleBTN.Enabled = false;
                 }
             }
         }
@@ -466,14 +473,19 @@ namespace MiniKreuzwortraetsel
             }
         }
         /// <summary>
-        /// Prevents empty baseword
+        /// Enables/Disables different buttons based on whether different textboxes are empty
         /// </summary>
-        private void BaseWordTB_TextChanged(object sender, EventArgs e)
+        private void TextBoxes_TextChanged(object sender, EventArgs e)
         {
-            if ((sender as TextBox).Text == "")
-                InsertBaseWordBTN.Enabled = false;
-            else
-                InsertBaseWordBTN.Enabled = true;
+            TextBox senderTBox = sender as TextBox;
+            // Determine which textBox is the sender
+            if (senderTBox == baseWordTB)
+                InsertBaseWordBTN.Enabled = senderTBox.Text != "";
+            else if (senderTBox == QuestionTBox || senderTBox == AnswerTBox)
+                if (AnswerTBox.Text != "" && QuestionTBox.Text != "")
+                    InsertTupleBTN.Enabled = true;
+                else
+                    InsertTupleBTN.Enabled = false;
         }
         /// <summary>
         /// Hover effects
@@ -629,64 +641,68 @@ namespace MiniKreuzwortraetsel
         }
         private void NoDBBaseWordCHBox_CheckedChanged(object sender, EventArgs e)
         {
-            NoDBQuestionTB.Enabled = !(sender as CheckBox).Checked;
-            NoDBQuestionTB.Text = "";
+            QuestionTBox.Enabled = !(sender as CheckBox).Checked;
+            QuestionTBox.Text = "";
             NoDBQuestionLBL.Enabled = !(sender as CheckBox).Checked;
         }
 
         /// <summary>
         /// Checks if the tuple is legal, if yes, then call DetermineCandidateSubtiles();
         /// </summary>
-        private void ValidateTuple((string Answer, string Question) tuple, bool highlightCandidates, bool makeBaseWord)
+        private void ValidateTuple((string Answer, string Question) tuple, bool highlightCandidates)
         {
             if (tuple.Answer != "")
                 MessageBox.Show("Antwort kann nicht leer sein");
-            else if (tuple.Question != "" || makeBaseWord)
-                // Question can't be empty unless it's a baseWord
+            else if (tuple.Question != "")
+                // Question can't be empty
                 MessageBox.Show("Frage kann nicht leer sein");
             else
+            {
+                // Replace illegal characters, uppercase answer
+                tuple.Answer = ReplaceUmlaute(tuple.Answer).ToUpper();
+                tuple.Question = ReplaceUmlaute(tuple.Question);
                 DetermineCandidateSubtiles(tuple, highlightCandidates);
+            }
+        }
+        private void ValidateBaseWord(string baseWord)
+        {
+
         }
         // Methods that call ValidateTuple()
+        private void InsertTupleBTN_Click(object sender, EventArgs e)
+        {
+            // Check whether to use tuplesListBox or questionAnswerPanel
+            if (UIContainerPanel.Controls.Contains(tuplesListBox))
+            {
+                if (tuplesListBox.SelectedItem != null)
+                {
+                    string selectedItem = tuplesListBox.SelectedItem.ToString();
+                    string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
+                    (string Question, string Answer) tuple = (array[0], array[1]);
+                    ValidateTuple(tuple, highlightCandidates: false);
+                }
+            }
+            // Use questionAnswerPanel
+            else
+            {
+                (string Question, string Answer) tuple = (QuestionTBox.Text, AnswerTBox.Text);
+                ValidateTuple(tuple, highlightCandidates: false);
+            }
+        }
+        private void InsertBaseWordBTN_Click(object sender, EventArgs e)
+        {
+            (string Question, string Answer) tuple = ("", baseWordTB.Text);
+            ValidateTuple(tuple, highlightCandidates: true);
+        }
         private void TuplesListBox_DoubleClick(object sender, EventArgs e)
         {
             if (tuplesListBox.SelectedItem != null)
             {
                 string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
-                (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
-                ValidateTuple(tuple, highlightCandidates: false, makeBaseWord: false);
+                (string Question, string Answer) tuple = (array[0], array[1]);
+                ValidateTuple(tuple, highlightCandidates: false);
             }
-        }
-        private void InsertTupleBTN_Click(object sender, EventArgs e)
-        {
-            if (tuplesListBox.SelectedItem != null)
-            {
-                string selectedItem = tuplesListBox.SelectedItem.ToString();
-                string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
-                (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
-                ValidateTuple(tuple, highlightCandidates: false, makeBaseWord: false);
-            }
-        }
-        private void InsertBaseWordBTN_Click(object sender, EventArgs e)
-        {
-            (string Question, string Answer) tuple = ("", baseWordTB.Text.ToUpper());
-            ValidateTuple(tuple, highlightCandidates: true, makeBaseWord: true);
-        }
-        private void NoDBInsertBaseWordBTN_Click(object sender, EventArgs e)
-        {
-            (string Question, string Answer) tuple = ("", baseWordTB.Text.ToUpper());
-            ValidateTuple(tuple, highlightCandidates: true, makeBaseWord: true);
-        }
-        private void NoDBInsertTupleBTN_Click(object sender, EventArgs e)
-        {
-            (string Question, string Answer) tuple = (ReplaceUmlaute(NoDBQuestionTB.Text), ReplaceUmlaute(NoDBAnswerTB.Text).ToUpper());
-            ValidateTuple(tuple, highlightCandidates: false, makeBaseWord: false);
-        }
-        private void NoDBShowMatchesBTN_Click(object sender, EventArgs e)
-        {
-            (string Question, string Answer) tuple = (ReplaceUmlaute(NoDBQuestionTB.Text), ReplaceUmlaute(NoDBAnswerTB.Text).ToUpper());
-            ValidateTuple(tuple, highlightCandidates: true, makeBaseWord: false);
         }
         private void ShowMatchesBTN_Click(object sender, EventArgs e)
         {
@@ -694,10 +710,13 @@ namespace MiniKreuzwortraetsel
             {
                 string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
-                (string Question, string Answer) tuple = (array[0], array[1].ToUpper());
-                ValidateTuple(tuple, highlightCandidates: true, makeBaseWord: false);
+                (string Question, string Answer) tuple = (array[0], array[1]);
+                ValidateTuple(tuple, highlightCandidates: true);
             }
         }
+        private void showMatchesBaseWordBTN_Click(object sender, EventArgs e)
+        {
 
+        }
     }
 }
