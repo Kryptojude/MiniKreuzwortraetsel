@@ -16,9 +16,12 @@ namespace MiniKreuzwortraetsel
         Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
         Popup popup;
         MySqlQueries mySqlQueries;
+        enum UI_mode_enum { normal, noDB };
+        UI_mode_enum UI_mode;
 
         // TODO: 
         /*
+         * Tabellennamen sollten groß statt klein sein
          * Üvbereinstimmngen anzeigen knöpfe enabled/disabled
          * Wort einfügen abbrechen können + erklärung was zu tun ist wenn Highlights gezeigt werden
          * Wartefenster anzeigen während DB-Verbindung versucht wird
@@ -55,23 +58,24 @@ namespace MiniKreuzwortraetsel
             // Shows program to user while attempting DB connection
             Show();
             // Test database connection
-            mySqlQueries = new MySqlQueries("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
-            //if (mySqlQueries.TestConnection())
-            if (false)
+            //mySqlQueries = new MySqlQueries("Server=192.168.120.9;Database=cbecker;Uid=cbecker;Pwd=mGdkqGBxuawVbqob;");
+            mySqlQueries = new MySqlQueries("Server=localhost;Database=mini_kreuzwort_raetsel;Uid=root;Pwd=;");
+            if (mySqlQueries.TestConnection())
+            //if (true)
             {
-                // DB connection suffessful
+                // DB connection successful
+                UI_mode = UI_mode_enum.normal;
                 // Becomes enabled when there are elements in the listBox
                 InsertTupleBTN.Enabled = false;
-
                 // Fill tableMenu with the tables in database
-                //UpdateTableMenu();
+                UpdateTableMenu();
             }
             else
             {
                 // DB connection failed
+                UI_mode = UI_mode_enum.noDB;
                 // Show error message at the top
                 UIContainerPanel.Controls.Add(NoDBErrorLBL);
-
                 // Replace collectionsPanel with questionAnswerPanel
                 UIContainerPanel.Controls.Add(questionAnswerPanel);
                 UIContainerPanel.Controls.SetChildIndex(questionAnswerPanel, UIContainerPanel.Controls.GetChildIndex(collectionsPanel));
@@ -103,10 +107,10 @@ namespace MiniKreuzwortraetsel
                 newTupleBTN.Enabled = false;
                 deleteTupleBTN.Enabled = false;
                 deleteCollectionBTN.Enabled = false;
-                UpdateTuples(null,  null);
+                UpdateTuplesListBox();
             }
         }
-        private void UpdateTuples(object sender, EventArgs e)
+        private void UpdateTuplesListBox()
         {
             tuplesListBox.Items.Clear();
             if (tableMenu.Items.Count > 0)
@@ -137,6 +141,8 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         private void DetermineCandidateSubtiles((string Question, string Answer) tuple, bool highlightCandidates)
         {
+            // Format tuple
+            tuple.Answer = ReplaceUmlaute(tuple.Answer).ToUpper();
             // Reset Highlights
             EmptyTile.RemoveAllHighlights(grid);
             // Find all possible ways the answer can be placed
@@ -313,7 +319,7 @@ namespace MiniKreuzwortraetsel
 
             gridPB.Refresh();
         }
-        private void ExportToHTML(object sender, EventArgs e)
+        private void exportBTN_Click(object sender, EventArgs e)
         {
             SaveFileDialog dialog = new SaveFileDialog { Filter = "HTML-Datei|.html" };
             if (dialog.ShowDialog() == DialogResult.OK)
@@ -408,7 +414,7 @@ namespace MiniKreuzwortraetsel
                     {
                         mySqlQueries.INSERT( (string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, new string[] { textDialogForm.userInputs[0], ReplaceUmlaute(textDialogForm.userInputs[1]) } );
                         error = false;
-                        UpdateTuples(null, null);
+                        UpdateTuplesListBox();
                     }
                     // error
                     else
@@ -421,7 +427,7 @@ namespace MiniKreuzwortraetsel
         private void DeleteTupleBTN_Click(object sender, EventArgs e)
         {
             mySqlQueries.DELETE((string)tableMenu.SelectedItem, new string[] { "Question", "Answer" }, tuplesListBox.SelectedItem.ToString().Split(new string[] { " <---> " }, StringSplitOptions.None));
-            UpdateTuples(null, null);
+            UpdateTuplesListBox();
         }
         private void NewCollectionBTN_Click(object sender, EventArgs e)
         {
@@ -475,17 +481,42 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Enables/Disables different buttons based on whether different textboxes are empty
         /// </summary>
-        private void TextBoxes_TextChanged(object sender, EventArgs e)
+        private void Update_UI()
         {
+            // Possible senders for this method:
+            // - TextChanged: baseWordTBox, QuestionTBox, AnswerTBox
+            // - Click: newCollectionBTN, deleteCollectionBTN, newTupleBTN, deleteTupleBTN
+            // - DoubleClick: tuplesListBox
+
+
             TextBox senderTBox = sender as TextBox;
-            // Determine which textBox is the sender
-            if (senderTBox == baseWordTB)
-                InsertBaseWordBTN.Enabled = senderTBox.Text != "";
-            else if (senderTBox == QuestionTBox || senderTBox == AnswerTBox)
-                if (AnswerTBox.Text != "" && QuestionTBox.Text != "")
-                    InsertTupleBTN.Enabled = true;
+            // Determine actions based on sender
+            if (senderTBox == baseWordTBox)
+            {
+                if (senderTBox.Text != "")
+                {
+                    InsertBaseWordBTN.Enabled = true;
+                    showMatchesBaseWordBTN.Enabled = true;
+                }
                 else
+                {
+                    InsertBaseWordBTN.Enabled = false;
+                    showMatchesBaseWordBTN.Enabled = false;
+                }
+            }
+            else if (senderTBox == QuestionTBox || senderTBox == AnswerTBox)
+            {
+                if (AnswerTBox.Text != "" && QuestionTBox.Text != "")
+                {
+                    InsertTupleBTN.Enabled = true;
+                    showMatchesBTN.Enabled = true;
+                }
+                else
+                {
                     InsertTupleBTN.Enabled = false;
+                    showMatchesBTN.Enabled = false;
+                }
+            }
         }
         /// <summary>
         /// Hover effects
@@ -691,7 +722,7 @@ namespace MiniKreuzwortraetsel
         }
         private void InsertBaseWordBTN_Click(object sender, EventArgs e)
         {
-            (string Question, string Answer) tuple = ("", baseWordTB.Text);
+            (string Question, string Answer) tuple = ("", baseWordTBox.Text);
             ValidateTuple(tuple, highlightCandidates: true);
         }
         private void TuplesListBox_DoubleClick(object sender, EventArgs e)
@@ -716,7 +747,48 @@ namespace MiniKreuzwortraetsel
         }
         private void showMatchesBaseWordBTN_Click(object sender, EventArgs e)
         {
+            string baseWord = baseWordTBox.Text;
+            if (baseWord != "")
+            {
+                (string Question, string Answer) tuple = ("", baseWord);
+                DetermineCandidateSubtiles(tuple, highlightCandidates: true);
+            }
+            else
+                MessageBox.Show("Hilfswort darf nicht leer sein");
+        }
 
+        private void baseWordTBox_TextChanged(object sender, EventArgs e)
+        {
+            TextBox senderTBox = sender as TextBox;
+            if (senderTBox.Text != "")
+            {
+                InsertBaseWordBTN.Enabled = true;
+                showMatchesBaseWordBTN.Enabled = true;
+            }
+            else
+            {
+                InsertBaseWordBTN.Enabled = false;
+                showMatchesBaseWordBTN.Enabled = false;
+            }
+        }
+
+        private void QuestionTBox_Or_AnswerTBox_TextChanged(object sender, EventArgs e)
+        {
+            if (QuestionTBox.Text != "" && AnswerTBox.Text != "")
+            {
+                InsertTupleBTN.Enabled = true;
+                showMatchesBTN.Enabled = true;
+            }
+            else
+            {
+                InsertTupleBTN.Enabled = false;
+                showMatchesBTN.Enabled = false;
+            }
+        }
+
+        private void tableMenu_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateTuplesListBox();
         }
     }
 }

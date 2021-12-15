@@ -32,7 +32,7 @@ namespace MiniKreuzwortraetsel
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.baseWordTB = new System.Windows.Forms.TextBox();
+            this.baseWordTBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.UIContainerPanel = new System.Windows.Forms.Panel();
             this.exportBTN = new System.Windows.Forms.Button();
@@ -47,7 +47,7 @@ namespace MiniKreuzwortraetsel
             this.newCollectionBTN = new System.Windows.Forms.Button();
             this.newTupleBTN = new System.Windows.Forms.Button();
             this.baseWordPanel = new System.Windows.Forms.Panel();
-            this.showMatchesBaseWord = new System.Windows.Forms.Button();
+            this.showMatchesBaseWordBTN = new System.Windows.Forms.Button();
             this.InsertBaseWordBTN = new System.Windows.Forms.Button();
             this.questionAnswerPanel = new System.Windows.Forms.Panel();
             this.label4 = new System.Windows.Forms.Label();
@@ -66,14 +66,14 @@ namespace MiniKreuzwortraetsel
             this.miscUIElements.SuspendLayout();
             this.SuspendLayout();
             // 
-            // baseWordTB
+            // baseWordTBox
             // 
-            this.baseWordTB.Location = new System.Drawing.Point(5, 32);
-            this.baseWordTB.Margin = new System.Windows.Forms.Padding(4);
-            this.baseWordTB.Name = "baseWordTB";
-            this.baseWordTB.Size = new System.Drawing.Size(148, 23);
-            this.baseWordTB.TabIndex = 1;
-            this.baseWordTB.TextChanged += new System.EventHandler(this.TextBoxes_TextChanged);
+            this.baseWordTBox.Location = new System.Drawing.Point(5, 32);
+            this.baseWordTBox.Margin = new System.Windows.Forms.Padding(4);
+            this.baseWordTBox.Name = "baseWordTBox";
+            this.baseWordTBox.Size = new System.Drawing.Size(148, 23);
+            this.baseWordTBox.TabIndex = 1;
+            this.baseWordTBox.TextChanged += new System.EventHandler(this.baseWordTBox_TextChanged);
             // 
             // label1
             // 
@@ -110,7 +110,7 @@ namespace MiniKreuzwortraetsel
             this.exportBTN.TabIndex = 4;
             this.exportBTN.Text = "Kreuzworträtsel exportieren";
             this.exportBTN.UseVisualStyleBackColor = true;
-            this.exportBTN.Click += new System.EventHandler(this.ExportToHTML);
+            this.exportBTN.Click += new System.EventHandler(this.exportBTN_Click);
             // 
             // showMatchesBTN
             // 
@@ -124,13 +124,13 @@ namespace MiniKreuzwortraetsel
             this.showMatchesBTN.UseVisualStyleBackColor = true;
             this.showMatchesBTN.Click += new System.EventHandler(this.ShowMatchesBTN_Click);
             // 
-            // insertTupleBTN
+            // InsertTupleBTN
             // 
             this.InsertTupleBTN.Dock = System.Windows.Forms.DockStyle.Top;
             this.InsertTupleBTN.Enabled = false;
             this.InsertTupleBTN.Location = new System.Drawing.Point(0, 513);
             this.InsertTupleBTN.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.InsertTupleBTN.Name = "insertTupleBTN";
+            this.InsertTupleBTN.Name = "InsertTupleBTN";
             this.InsertTupleBTN.Size = new System.Drawing.Size(382, 27);
             this.InsertTupleBTN.TabIndex = 5;
             this.InsertTupleBTN.Text = "Auswahl einfügen";
@@ -170,7 +170,7 @@ namespace MiniKreuzwortraetsel
             this.tableMenu.Name = "tableMenu";
             this.tableMenu.Size = new System.Drawing.Size(131, 24);
             this.tableMenu.TabIndex = 5;
-            this.tableMenu.SelectedIndexChanged += new System.EventHandler(this.UpdateTuples);
+            this.tableMenu.SelectedIndexChanged += new System.EventHandler(this.tableMenu_SelectedIndexChanged);
             // 
             // deleteTupleBTN
             // 
@@ -233,8 +233,8 @@ namespace MiniKreuzwortraetsel
             // baseWordPanel
             // 
             this.baseWordPanel.Controls.Add(this.label1);
-            this.baseWordPanel.Controls.Add(this.showMatchesBaseWord);
-            this.baseWordPanel.Controls.Add(this.baseWordTB);
+            this.baseWordPanel.Controls.Add(this.showMatchesBaseWordBTN);
+            this.baseWordPanel.Controls.Add(this.baseWordTBox);
             this.baseWordPanel.Controls.Add(this.InsertBaseWordBTN);
             this.baseWordPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.baseWordPanel.Location = new System.Drawing.Point(0, 0);
@@ -242,15 +242,16 @@ namespace MiniKreuzwortraetsel
             this.baseWordPanel.Size = new System.Drawing.Size(382, 95);
             this.baseWordPanel.TabIndex = 18;
             // 
-            // showMatchesBaseWord
+            // showMatchesBaseWordBTN
             // 
-            this.showMatchesBaseWord.Enabled = false;
-            this.showMatchesBaseWord.Location = new System.Drawing.Point(173, 32);
-            this.showMatchesBaseWord.Name = "showMatchesBaseWord";
-            this.showMatchesBaseWord.Size = new System.Drawing.Size(191, 46);
-            this.showMatchesBaseWord.TabIndex = 17;
-            this.showMatchesBaseWord.Text = "Übereinstimmungen anzeigen";
-            this.showMatchesBaseWord.UseVisualStyleBackColor = true;
+            this.showMatchesBaseWordBTN.Enabled = false;
+            this.showMatchesBaseWordBTN.Location = new System.Drawing.Point(173, 32);
+            this.showMatchesBaseWordBTN.Name = "showMatchesBaseWordBTN";
+            this.showMatchesBaseWordBTN.Size = new System.Drawing.Size(191, 46);
+            this.showMatchesBaseWordBTN.TabIndex = 17;
+            this.showMatchesBaseWordBTN.Text = "Übereinstimmungen anzeigen";
+            this.showMatchesBaseWordBTN.UseVisualStyleBackColor = true;
+            this.showMatchesBaseWordBTN.Click += new System.EventHandler(this.showMatchesBaseWordBTN_Click);
             // 
             // InsertBaseWordBTN
             // 
@@ -303,7 +304,7 @@ namespace MiniKreuzwortraetsel
             this.AnswerTBox.Name = "AnswerTBox";
             this.AnswerTBox.Size = new System.Drawing.Size(248, 23);
             this.AnswerTBox.TabIndex = 1;
-            this.AnswerTBox.TextChanged += new System.EventHandler(this.TextBoxes_TextChanged);
+            this.AnswerTBox.TextChanged += new System.EventHandler(this.QuestionTBox_Or_AnswerTBox_TextChanged);
             // 
             // QuestionTBox
             // 
@@ -312,7 +313,7 @@ namespace MiniKreuzwortraetsel
             this.QuestionTBox.Name = "QuestionTBox";
             this.QuestionTBox.Size = new System.Drawing.Size(249, 23);
             this.QuestionTBox.TabIndex = 0;
-            this.QuestionTBox.TextChanged += new System.EventHandler(this.TextBoxes_TextChanged);
+            this.QuestionTBox.TextChanged += new System.EventHandler(this.QuestionTBox_Or_AnswerTBox_TextChanged);
             // 
             // gridPB
             // 
@@ -376,7 +377,7 @@ namespace MiniKreuzwortraetsel
         }
 
         #endregion
-        private System.Windows.Forms.TextBox baseWordTB;
+        private System.Windows.Forms.TextBox baseWordTBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel UIContainerPanel;
         private System.Windows.Forms.Button exportBTN;
@@ -398,7 +399,7 @@ namespace MiniKreuzwortraetsel
         private System.Windows.Forms.Button showMatchesBTN;
         private System.Windows.Forms.ToolTip HilfswortToolTip;
         private System.Windows.Forms.Panel baseWordPanel;
-        private System.Windows.Forms.Button showMatchesBaseWord;
+        private System.Windows.Forms.Button showMatchesBaseWordBTN;
         private System.Windows.Forms.Label NoDBErrorLBL;
         private System.Windows.Forms.Panel collectionsPanel;
         private System.Windows.Forms.Panel miscUIElements;
