@@ -111,7 +111,7 @@ namespace MiniKreuzwortraetsel
             reserved = false;
         }
 
-        public bool IsReserved()
+        public bool IsReservedForQuestionTile()
         {
             return reserved;
         }
