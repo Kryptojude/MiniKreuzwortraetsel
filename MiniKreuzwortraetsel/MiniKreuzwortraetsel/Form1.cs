@@ -22,7 +22,6 @@ namespace MiniKreuzwortraetsel
 
         // TODO: 
         /*
-         * Update number of question tiles when deleting a question tile
          * Tabellennamen sollten groß statt klein sein
          * Üvbereinstimmngen anzeigen knöpfe enabled/disabled
          * Wort einfügen abbrechen können + erklärung was zu tun ist wenn Highlights gezeigt werden

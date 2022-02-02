@@ -28,9 +28,18 @@ namespace MiniKreuzwortraetsel
             // normal question tile
             string arrow = SubTile.GetArrow(direction);
             if (!string.IsNullOrEmpty(Question))
-            {
                 questionTileList.Add(this);
-                Text = questionTileList.Count + arrow;
+
+            GenerateText();
+        }
+
+        private void GenerateText()
+        {
+            // normal question tile
+            string arrow = SubTile.GetArrow(Direction);
+            if (!string.IsNullOrEmpty(Question))
+            {
+                Text = questionTileList.IndexOf(this) + 1 + arrow;
             }
             // base word
             else
@@ -54,9 +63,15 @@ namespace MiniKreuzwortraetsel
 
             // Insert a new EmptyTile instance into the grid at this tile's position, 
             grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
-            
+
+            // Save this index
+            int indexOfThisQuestionTile = questionTileList.IndexOf(this);
             // Remove this instance from the questionTileList,
             questionTileList.Remove(this);
+            // Now indexOfThisQuestionTile points to the next questionTile
+            // Lower the number of every questionTile that comes after this one
+            for (int i = indexOfThisQuestionTile; i < questionTileList.Count; i++)
+                questionTileList[i].GenerateText();
         }
 
         /// <summary>
