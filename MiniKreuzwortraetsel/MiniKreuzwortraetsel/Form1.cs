@@ -22,6 +22,7 @@ namespace MiniKreuzwortraetsel
 
         // TODO: 
         /*
+         * cross doesnt disappear going from questionTile to letterTile
          * Tabellennamen sollten groß statt klein sein
          * Üvbereinstimmngen anzeigen knöpfe enabled/disabled
          * Wort einfügen abbrechen können + erklärung was zu tun ist wenn Highlights gezeigt werden
@@ -139,12 +140,12 @@ namespace MiniKreuzwortraetsel
         /// 2. ranks the "candidates" by how many intersections with existing words there are, 
         /// 3. highlights the candidate subtiles with green background color
         /// </summary>
-        private void DetermineCandidateSubtiles((string Question, string Answer) tuple, bool highlightCandidates)
+        private void DetermineCandidateSubtiles((string Question, string Answer) tuple, bool highlightCandidates, bool baseWord)
         {
             // Check tuple
             if (tuple.Answer == "")
                 MessageBox.Show("Antwort kann nicht leer sein");
-            else if (tuple.Question == "")
+            else if (tuple.Question == "" && !baseWord)
                 // Question can't be empty
                 MessageBox.Show("Frage kann nicht leer sein");
             else
@@ -559,7 +560,7 @@ namespace MiniKreuzwortraetsel
             // Out of bounds check
             Point mousePosition = new Point(e.X, e.Y);
             if (mousePosition.X >= 0 && mousePosition.Y >= 0 &&
-                mousePosition.X <= grid.GetUpperBound(1) * TS && mousePosition.Y <= grid.GetUpperBound(0) * TS )
+                mousePosition.X <= grid.GetLength(1) * TS && mousePosition.Y <= grid.GetLength(0) * TS)
             {
                 // The tile the mouse is hovering over: 
                 Tile tile = grid[mousePosition.Y / TS, mousePosition.X / TS];
@@ -721,20 +722,20 @@ namespace MiniKreuzwortraetsel
                     string selectedItem = tuplesListBox.SelectedItem.ToString();
                     string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
                     (string Question, string Answer) tuple = (array[0], array[1]);
-                    DetermineCandidateSubtiles(tuple, highlightCandidates: false);
+                    DetermineCandidateSubtiles(tuple, highlightCandidates: false, baseWord: false);
                 }
             }
             else
             {
                 // Use questionAnswerPanel
                 (string Question, string Answer) tuple = (QuestionTBox.Text, AnswerTBox.Text);
-                DetermineCandidateSubtiles(tuple, highlightCandidates: false);
+                DetermineCandidateSubtiles(tuple, highlightCandidates: false, baseWord: false);
             }
         }
         private void InsertBaseWordBTN_Click(object sender, EventArgs e)
         {
             (string Question, string Answer) tuple = ("", baseWordTBox.Text);
-            DetermineCandidateSubtiles(tuple, highlightCandidates: true);
+            DetermineCandidateSubtiles(tuple, highlightCandidates: false, baseWord: true);
         }
         private void TuplesListBox_DoubleClick(object sender, EventArgs e)
         {
@@ -743,7 +744,7 @@ namespace MiniKreuzwortraetsel
                 string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
                 (string Question, string Answer) tuple = (array[0], array[1]);
-                DetermineCandidateSubtiles(tuple, highlightCandidates: false);
+                DetermineCandidateSubtiles(tuple, highlightCandidates: false, baseWord: false);
             }
         }
         private void ShowMatchesBTN_Click(object sender, EventArgs e)
@@ -753,7 +754,7 @@ namespace MiniKreuzwortraetsel
                 string selectedItem = tuplesListBox.SelectedItem.ToString();
                 string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
                 (string Question, string Answer) tuple = (array[0], array[1]);
-                DetermineCandidateSubtiles(tuple, highlightCandidates: true);
+                DetermineCandidateSubtiles(tuple, highlightCandidates: true, baseWord: false);
             }
         }
         private void showMatchesBaseWordBTN_Click(object sender, EventArgs e)
@@ -762,7 +763,7 @@ namespace MiniKreuzwortraetsel
             if (baseWord != "")
             {
                 (string Question, string Answer) tuple = ("", baseWord);
-                DetermineCandidateSubtiles(tuple, highlightCandidates: true);
+                DetermineCandidateSubtiles(tuple, highlightCandidates: true, baseWord: true);
             }
             else
                 MessageBox.Show("Hilfswort darf nicht leer sein");
