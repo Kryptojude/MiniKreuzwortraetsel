@@ -22,7 +22,7 @@ namespace MiniKreuzwortraetsel
 
         // TODO: 
         /*
-         * cross doesnt disappear going from questionTile to letterTile
+         * processor use when hovering with mouse on emptyTiles
          * Tabellennamen sollten groß statt klein sein
          * Üvbereinstimmngen anzeigen knöpfe enabled/disabled
          * Wort einfügen abbrechen können + erklärung was zu tun ist wenn Highlights gezeigt werden
@@ -595,7 +595,11 @@ namespace MiniKreuzwortraetsel
                 // Not a question tile
                 else
                 {
-                    DeleteButton.SetInvisible(gridPB);
+                    DeleteButton.SetInvisible(gridPB, out bool needs_refresh);
+                    if (needs_refresh)
+                    {
+                        refresh = true;
+                    }
 
                     SubTile oldHoveringSubTile = SubTile.HoverSubTile;
 

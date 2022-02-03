@@ -15,13 +15,20 @@ namespace MiniKreuzwortraetsel
         static readonly int absoluteSize;
         public static readonly Rectangle bounds_tile_space;
         static DeleteButton lastVisibleDeleteButton;
-        public static void SetInvisible(PictureBox pb)
+        public static void SetInvisible(PictureBox pb, out bool needs_refresh)
         {
             if (lastVisibleDeleteButton != null)
             {
+                // A deleteButton instance is currently visible, so turn it invisible and save refresh
                 lastVisibleDeleteButton.visible = false;
                 lastVisibleDeleteButton = null;
                 pb.Cursor = Cursors.Default;
+                needs_refresh = true;
+            }
+            else
+            {
+                // No deleteButton instance was visible, so don't do anything, no refresh
+                needs_refresh = false;
             }
         }
 
