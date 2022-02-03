@@ -19,10 +19,11 @@ namespace MiniKreuzwortraetsel
         enum UI_mode_enum { normal, noDB };
         UI_mode_enum UI_mode;
         Random random = new Random();
+        int d = 0;
 
         // TODO: 
         /*
-         * processor use when hovering with mouse on emptyTiles
+         * Currently working on: recoding mousemove function to reduce unnecessary processor use
          * Tabellennamen sollten groß statt klein sein
          * Üvbereinstimmngen anzeigen knöpfe enabled/disabled
          * Wort einfügen abbrechen können + erklärung was zu tun ist wenn Highlights gezeigt werden
@@ -554,6 +555,117 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Hover effects
         /// </summary>
+        //private void GridPB_MouseMove(object sender, MouseEventArgs e)
+        //{
+        //    bool refresh = false;
+        //    // Out of bounds check
+        //    Point mousePosition = new Point(e.X, e.Y);
+        //    if (mousePosition.X >= 0 && mousePosition.Y >= 0 &&
+        //        mousePosition.X <= grid.GetLength(1) * TS && mousePosition.Y <= grid.GetLength(0) * TS)
+        //    {
+        //        // The tile the mouse is hovering over: 
+        //        Tile tile = grid[mousePosition.Y / TS, mousePosition.X / TS];
+        //        // Question tile
+        //        if (tile is QuestionTile)
+        //        {
+        //            QuestionTile questionTile = tile as QuestionTile;
+        //            questionTile.MouseMove(e, out bool needs_refresh, gridPB);
+        //            if (needs_refresh)
+        //            {
+        //                refresh = true;
+        //            }
+
+        //            // Baseword questionTile -> No popup
+        //            if (questionTile.IsBaseWord())
+        //            {
+        //                if (popup.IsVisible())
+        //                {
+        //                    popup.Hide();
+        //                    refresh = true;
+        //                }
+        //            }
+        //            // Normal questionTile -> Show the popup
+        //            else
+        //            {
+        //                popup.SetText(questionTile.Question);
+        //                popup.SetPosition(new Point(e.X + TS / 2, e.Y - TS / 2));
+        //                popup.Show();
+        //                refresh = true;
+        //            }
+        //        }
+        //        // Not a question tile
+        //        else
+        //        {
+        //            DeleteButton.SetInvisible(gridPB, out bool needs_refresh);
+        //            if (needs_refresh)
+        //            {
+        //                refresh = true;
+        //            }
+
+        //            SubTile oldHoveringSubTile = SubTile.HoverSubTile;
+
+        //            SubTile newHoveringSubTile;
+        //            // Does the new tile have subtiles?
+        //            if (tile is EmptyTile)
+        //            {
+        //                EmptyTile emptyTile = tile as EmptyTile;
+        //                // Determine the subtile the mouse is hovering over
+        //                int mouseSubtile = 0;
+        //                if (e.X - tile.GetWorldPosition(TS).X < e.Y - tile.GetWorldPosition(TS).Y)
+        //                    mouseSubtile = 1;
+        //                newHoveringSubTile = emptyTile.SubTiles[mouseSubtile];
+        //            }
+        //            // Letter tile
+        //            else
+        //                newHoveringSubTile = null;
+
+        //            // If old and new hoveringSubTile are different objects, then old hoveringSubTile is not hovering anymore
+        //            if (oldHoveringSubTile != newHoveringSubTile)
+        //            {   
+        //                SubTile.HoverSubTile = null;
+        //                refresh = true;
+        //                Tile.RemoveAllExtendedHover(grid);
+
+        //                // Check if newHoveringSubTile should be set to hover
+        //                if (newHoveringSubTile?.IsHighlighted() == true)
+        //                {
+        //                    SubTile.HoverSubTile = newHoveringSubTile;
+
+        //                    // Activate extendedHover for adjacent tiles
+        //                    Point directionPoint = directions[SubTile.HoverSubTile.Direction];
+        //                    for (int i = 0; i < Tile.TupleToBeFilled.Answer.Length; i++)
+        //                    {
+        //                        int letterX = SubTile.HoverSubTile.ParentTile.GetPosition().X + directionPoint.X * (1 + i);
+        //                        int letterY = SubTile.HoverSubTile.ParentTile.GetPosition().Y + directionPoint.Y * (1 + i);
+        //                        // Out of bounds check
+        //                        if (letterX <= grid.GetUpperBound(1) && letterY <= grid.GetUpperBound(0))
+        //                        {
+        //                            // End or middle outline
+        //                            if (i < Tile.TupleToBeFilled.Answer.Length - 1)
+        //                                grid[letterY, letterX].extendedHover = Tile.ExtendedHover.Two_Outlines_Horizontal;
+        //                            else
+        //                                grid[letterY, letterX].extendedHover = Tile.ExtendedHover.Three_Outlines_Horizontal;
+
+        //                            // Vertical mode
+        //                            if (directionPoint.Y == 1)
+        //                                grid[letterY, letterX].extendedHover += 2;
+        //                        }
+        //                    }                    
+        //                }
+        //            }
+
+        //            // Deactivate popup
+        //            if (popup.IsVisible())
+        //            {
+        //                popup.Hide();
+        //                refresh = true;
+        //            }
+        //        }
+        //    }
+
+        //    if (refresh)
+        //        gridPB.Refresh();
+        //}
         private void GridPB_MouseMove(object sender, MouseEventArgs e)
         {
             bool refresh = false;
@@ -562,115 +674,49 @@ namespace MiniKreuzwortraetsel
             if (mousePosition.X >= 0 && mousePosition.Y >= 0 &&
                 mousePosition.X <= grid.GetLength(1) * TS && mousePosition.Y <= grid.GetLength(0) * TS)
             {
+                // Visual things that can change by moving the mouse:
+                // - Hover Effect Visuals
+                // - Delete Button Visuals
+                // - Popup Visuals
+
+                // Check change in hover effect first
+                // Determine newState
+                SubTile newBlueHoverSubTile;
                 // The tile the mouse is hovering over: 
                 Tile tile = grid[mousePosition.Y / TS, mousePosition.X / TS];
-                // Question tile
-                if (tile is QuestionTile)
+                if (tile is EmptyTile)
                 {
-                    QuestionTile questionTile = tile as QuestionTile;
-                    questionTile.MouseMove(e, out bool needs_refresh, gridPB);
-                    if (needs_refresh)
-                    {
-                        refresh = true;
-                    }
-
-                    // Baseword questionTile -> No popup
-                    if (questionTile.IsBaseWord())
-                    {
-                        if (popup.IsVisible())
-                        {
-                            popup.Hide();
-                            refresh = true;
-                        }
-                    }
-                    // Normal question questionTil -> Show the popup
+                    EmptyTile emptyTile = tile as EmptyTile;
+                    // Determine the subtile the mouse is hovering over
+                    int mouseSubtile;
+                    if (e.X - tile.GetWorldPosition(TS).X < e.Y - tile.GetWorldPosition(TS).Y)
+                        mouseSubtile = 1;
                     else
-                    {
-                        popup.SetText(questionTile.Question);
-                        popup.SetPosition(new Point(e.X + TS / 2, e.Y - TS / 2));
-                        popup.Show();
-                        refresh = true;
-                    }
+                        mouseSubtile = 0;
+
+                    // Is this subtile highlighted?
+                    if (emptyTile.SubTiles[mouseSubtile].IsHighlighted())
+                        newBlueHoverSubTile = emptyTile.SubTiles[mouseSubtile];
+                    else
+                        newBlueHoverSubTile = null;
                 }
-                // Not a question tile
                 else
                 {
-                    DeleteButton.SetInvisible(gridPB, out bool needs_refresh);
-                    if (needs_refresh)
-                    {
-                        refresh = true;
-                    }
-
-                    SubTile oldHoveringSubTile = SubTile.HoverSubTile;
-
-                    SubTile newHoveringSubTile;
-                    // Does the new tile have subtiles?
-                    if (tile is EmptyTile)
-                    {
-                        EmptyTile emptyTile = tile as EmptyTile;
-                        // Determine the subtile the mouse is hovering over
-                        int mouseSubtile = 0;
-                        if (e.X - tile.GetWorldPosition(TS).X < e.Y - tile.GetWorldPosition(TS).Y)
-                            mouseSubtile = 1;
-                        newHoveringSubTile = emptyTile.SubTiles[mouseSubtile];
-                    }
-                    // Letter tile
-                    else
-                        newHoveringSubTile = null;
-
-                    // If old and new hoveringSubTile are different objects, then old hoveringSubTile is not hovering anymore
-                    if (oldHoveringSubTile != newHoveringSubTile)
-                    {   
-                        refresh = true;
-                        SubTile.HoverSubTile = null;
-                        Tile.RemoveAllExtendedHover(grid);
-
-                        // Check if newHoveringSubTile should be set to hover
-                        if (newHoveringSubTile?.IsHighlighted() == true)
-                        {
-                            SubTile.HoverSubTile = newHoveringSubTile;
-
-                            // Activate extendedHover for adjacent tiles
-                            Point directionPoint = directions[SubTile.HoverSubTile.Direction];
-                            for (int i = 0; i < Tile.TupleToBeFilled.Answer.Length; i++)
-                            {
-                                int letterX = SubTile.HoverSubTile.ParentTile.GetPosition().X + directionPoint.X * (1 + i);
-                                int letterY = SubTile.HoverSubTile.ParentTile.GetPosition().Y + directionPoint.Y * (1 + i);
-                                // Out of bounds check
-                                if (letterX <= grid.GetUpperBound(1) && letterY <= grid.GetUpperBound(0))
-                                {
-                                    // End or middle outline
-                                    if (i < Tile.TupleToBeFilled.Answer.Length - 1)
-                                        grid[letterY, letterX].extendedHover = Tile.ExtendedHover.Two_Outlines_Horizontal;
-                                    else
-                                        grid[letterY, letterX].extendedHover = Tile.ExtendedHover.Three_Outlines_Horizontal;
-
-                                    // Vertical mode
-                                    if (directionPoint.Y == 1)
-                                        grid[letterY, letterX].extendedHover += 2;
-                                }
-                            }                    
-                        }
-                    }
-
-                    // Deactivate popup
-                    if (popup.IsVisible())
-                    {
-                        popup.Hide();
-                        refresh = true;
-                    }
+                    // Not an EmptyTile, so no subtiles
+                    newBlueHoverSubTile = null;
                 }
+                // Did a change occur in hover effect?
+                SubTile.ChangeBlueHoverSubTile(newBlueHoverSubTile, out refresh);
+                if (refresh)
+                    gridPB.Refresh();
             }
-
-            if (refresh)
-                gridPB.Refresh();
         }
+
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
             // Call the Paint function of all tiles
             for (int y = 0; y < grid.GetLength(0); y++)
             {
-                //if (y == )
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
                     Tile tile = grid[y, x];
@@ -690,13 +736,13 @@ namespace MiniKreuzwortraetsel
         {
             Tile clickedTile = grid[e.Y / TS, e.X / TS];
             // Am I hovering over a Highlight?
-            if (SubTile.HoverSubTile != null)
+            if (SubTile.BlueHoverSubTile != null)
             {
                 EmptyTile.RemoveAllHighlights(grid);
                 Tile.RemoveAllExtendedHover(grid);
-                EmptyTile emptyTile = SubTile.HoverSubTile.ParentTile;
-                QuestionTile questionTile = emptyTile.ToQuestionTile(grid, Tile.TupleToBeFilled.Question, SubTile.HoverSubTile.Direction);
-                SubTile.HoverSubTile = null;
+                EmptyTile emptyTile = SubTile.BlueHoverSubTile.ParentTile;
+                QuestionTile questionTile = emptyTile.ToQuestionTile(grid, Tile.TupleToBeFilled.Question, SubTile.BlueHoverSubTile.Direction);
+                SubTile.BlueHoverSubTile = null;
                 FillAnswer(questionTile, Tile.TupleToBeFilled);
             }
             else if (clickedTile is QuestionTile)
