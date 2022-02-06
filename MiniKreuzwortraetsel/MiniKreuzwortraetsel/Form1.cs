@@ -22,6 +22,7 @@ namespace MiniKreuzwortraetsel
 
         // TODO: 
         /*
+         * Lokale Kopie der Datenbank machen und diese benutzen falls Verbindung fehlschlägt
          * Üvbereinstimmngen anzeigen knöpfe enabled/disabled
          * Wort einfügen abbrechen können + erklärung was zu tun ist wenn Highlights gezeigt werden
          * Wartefenster anzeigen während DB-Verbindung versucht wird
