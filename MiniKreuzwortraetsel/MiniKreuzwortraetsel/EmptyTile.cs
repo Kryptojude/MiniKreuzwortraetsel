@@ -60,9 +60,9 @@ namespace MiniKreuzwortraetsel
                     graphics.FillPolygon(SubTiles[i].GetColor(), SubTiles[i].GetSubTilePolygon());
                 }
 
-                SubTile hoverSubTile = SubTile.BlueHoverSubTile;
+                SubTile hoverSubTile = SubTile.HoverSubTile;
                 // Draw hover effect
-                if (SubTile.BlueHoverSubTile?.ParentTile == this)
+                if (SubTile.HoverSubTile?.ParentTile == this)
                 {
                     graphics.FillPolygon(Brushes.Blue, hoverSubTile.GetSubTilePolygon());
                     graphics.DrawString(hoverSubTile.GetArrow(), SubTile.HOVER_ARROW_FONT, Brushes.Red, hoverSubTile.GetArrowPosition());

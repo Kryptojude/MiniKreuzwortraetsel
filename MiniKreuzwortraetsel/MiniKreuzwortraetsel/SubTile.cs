@@ -9,19 +9,7 @@ namespace MiniKreuzwortraetsel
 {
     class SubTile
     {
-        static public SubTile BlueHoverSubTile;
-        static public void ChangeBlueHoverSubTile(SubTile newBlueHoverSubTile, out bool refresh)
-        {
-            if (newBlueHoverSubTile != BlueHoverSubTile)
-            {
-                BlueHoverSubTile = newBlueHoverSubTile;
-                refresh = true;
-            }
-            else
-            {
-                refresh = false;
-            }
-        }
+        static public SubTile HoverSubTile;
 
         static public readonly Font HOVER_ARROW_FONT = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
         static readonly Dictionary<string, Point[]> subTilePolygons = new Dictionary<string, Point[]>() {
