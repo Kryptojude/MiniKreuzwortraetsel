@@ -661,6 +661,7 @@ namespace MiniKreuzwortraetsel
                     }
                 }
 <<<<<<< HEAD
+<<<<<<< HEAD
                 // Did a change occur in hover effect?
                 SubTile.ChangeBlueHoverSubTile(newBlueHoverSubTile, out refreshCounter);
 
@@ -681,6 +682,8 @@ namespace MiniKreuzwortraetsel
 
                 if (refreshCounter > 0)
                     gridPB.Refresh();
+=======
+>>>>>>> parent of 09e6a32 (in the process of recoding mousemove function to reduce unnecessary processor use)
 =======
 >>>>>>> parent of 09e6a32 (in the process of recoding mousemove function to reduce unnecessary processor use)
             }
