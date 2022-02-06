@@ -81,7 +81,7 @@ namespace MiniKreuzwortraetsel
             this.label1.Location = new System.Drawing.Point(4, 7);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(78, 16);
+            this.label1.Size = new System.Drawing.Size(77, 16);
             this.label1.TabIndex = 2;
             this.label1.Text = "Hilfswort:";
             this.HilfswortToolTip.SetToolTip(this.label1, "Das Hilfswort ist immer sichtbar für den Nutzer");
@@ -157,7 +157,7 @@ namespace MiniKreuzwortraetsel
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(3, 4);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(172, 16);
+            this.label2.Size = new System.Drawing.Size(171, 16);
             this.label2.TabIndex = 6;
             this.label2.Text = "Sammlung auswählen:";
             // 
@@ -232,6 +232,7 @@ namespace MiniKreuzwortraetsel
             // 
             // baseWordPanel
             // 
+            this.baseWordPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.baseWordPanel.Controls.Add(this.label1);
             this.baseWordPanel.Controls.Add(this.showMatchesBaseWordBTN);
             this.baseWordPanel.Controls.Add(this.baseWordTBox);
@@ -284,7 +285,7 @@ namespace MiniKreuzwortraetsel
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(3, 63);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(146, 16);
+            this.label4.Size = new System.Drawing.Size(145, 16);
             this.label4.TabIndex = 3;
             this.label4.Text = "Antwort eingeben: ";
             // 
@@ -293,7 +294,7 @@ namespace MiniKreuzwortraetsel
             this.NoDBQuestionLBL.AutoSize = true;
             this.NoDBQuestionLBL.Location = new System.Drawing.Point(3, 4);
             this.NoDBQuestionLBL.Name = "NoDBQuestionLBL";
-            this.NoDBQuestionLBL.Size = new System.Drawing.Size(130, 16);
+            this.NoDBQuestionLBL.Size = new System.Drawing.Size(129, 16);
             this.NoDBQuestionLBL.TabIndex = 2;
             this.NoDBQuestionLBL.Text = "Frage eingeben: ";
             // 

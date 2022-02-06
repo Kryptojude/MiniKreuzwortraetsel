@@ -22,8 +22,6 @@ namespace MiniKreuzwortraetsel
 
         // TODO: 
         /*
-         * processor use when hovering with mouse on emptyTiles
-         * Tabellennamen sollten groß statt klein sein
          * Üvbereinstimmngen anzeigen knöpfe enabled/disabled
          * Wort einfügen abbrechen können + erklärung was zu tun ist wenn Highlights gezeigt werden
          * Wartefenster anzeigen während DB-Verbindung versucht wird
@@ -660,19 +658,6 @@ namespace MiniKreuzwortraetsel
                         refresh = true;
                     }
                 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-                // Did a change occur in hover effect?
-                SubTile.ChangeBlueHoverSubTile(newBlueHoverSubTile, out refresh);
-                if (refresh)
-                    gridPB.Refresh();
-=======
->>>>>>> parent of 09e6a32 (in the process of recoding mousemove function to reduce unnecessary processor use)
-=======
->>>>>>> parent of 09e6a32 (in the process of recoding mousemove function to reduce unnecessary processor use)
-=======
->>>>>>> parent of 09e6a32 (in the process of recoding mousemove function to reduce unnecessary processor use)
             }
 
             if (refresh)
