@@ -556,7 +556,7 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         private void GridPB_MouseMove(object sender, MouseEventArgs e)
         {
-            int refreshCounter = 0;
+            bool refresh = false;
             // Out of bounds check
             Point mousePosition = new Point(e.X, e.Y);
             if (mousePosition.X >= 0 && mousePosition.Y >= 0 &&
@@ -664,24 +664,8 @@ namespace MiniKreuzwortraetsel
 <<<<<<< HEAD
 <<<<<<< HEAD
                 // Did a change occur in hover effect?
-                SubTile.ChangeBlueHoverSubTile(newBlueHoverSubTile, out refreshCounter);
-
-
-                // Now check change in Delete Button Visuals
-                if (tile is QuestionTile)
-                {
-                    QuestionTile questionTile = tile as QuestionTile;
-                    // Call method that handles this stuff
-                    questionTile.MouseMove(e, out refreshCounter, gridPB);
-                }
-                else
-                {
-
-                }
-
-
-
-                if (refreshCounter > 0)
+                SubTile.ChangeBlueHoverSubTile(newBlueHoverSubTile, out refresh);
+                if (refresh)
                     gridPB.Refresh();
 =======
 >>>>>>> parent of 09e6a32 (in the process of recoding mousemove function to reduce unnecessary processor use)
