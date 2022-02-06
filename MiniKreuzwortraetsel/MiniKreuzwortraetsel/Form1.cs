@@ -668,7 +668,7 @@ namespace MiniKreuzwortraetsel
         //}
         private void GridPB_MouseMove(object sender, MouseEventArgs e)
         {
-            bool refresh = false;
+            int refreshCounter = 0;
             // Out of bounds check
             Point mousePosition = new Point(e.X, e.Y);
             if (mousePosition.X >= 0 && mousePosition.Y >= 0 &&
@@ -706,8 +706,24 @@ namespace MiniKreuzwortraetsel
                     newBlueHoverSubTile = null;
                 }
                 // Did a change occur in hover effect?
-                SubTile.ChangeBlueHoverSubTile(newBlueHoverSubTile, out refresh);
-                if (refresh)
+                SubTile.ChangeBlueHoverSubTile(newBlueHoverSubTile, out refreshCounter);
+
+
+                // Now check change in Delete Button Visuals
+                if (tile is QuestionTile)
+                {
+                    QuestionTile questionTile = tile as QuestionTile;
+                    // Call method that handles this stuff
+                    questionTile.MouseMove(e, out refreshCounter, gridPB);
+                }
+                else
+                {
+
+                }
+
+
+
+                if (refreshCounter > 0)
                     gridPB.Refresh();
             }
         }
