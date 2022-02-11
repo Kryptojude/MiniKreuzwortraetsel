@@ -32,6 +32,11 @@ namespace MiniKreuzwortraetsel
         }
 
         // TODO: 
+        // Right now this should hand down the MouseMove Event to the affected tiles
+        // they will then update their properties based on the mouse position
+        // Then they should call CheckVisualChange() which hashes their properties and determines a potential visual change
+        // If a change occured, then it will call Paint() method which calculates new bitmap for tile and writes that into the screenBuffer
+        // Then the screenBuffer setter will call a refresh which will simply display the new screenbuffer
         /*
          * Lokale Kopie der Datenbank machen und diese benutzen falls Verbindung fehlschlägt
          * Üvbereinstimmngen anzeigen knöpfe enabled/disabled
@@ -171,7 +176,6 @@ namespace MiniKreuzwortraetsel
 
                 // Reset Highlights
                 EmptyTile.RemoveAllHighlights(grid);
-                AddAllTilesToRefreshList();
 
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed ("matched")
@@ -575,33 +579,23 @@ namespace MiniKreuzwortraetsel
         {
             // Get old mouse tile
             Tile oldMouseTile = grid[oldMousePosition.Y / TS, oldMousePosition.X / TS];
-            // Right now this should hand down the MouseMove Event to the affected tiles
-            // they will then update their properties based on the mouse position
-            // Then they should call CheckVisualChange() which hashes their properties and determines a potential visual change
-            // If a change occured, then it will call Paint() method which calculates new bitmap for tile and writes that into the screenBuffer
-            // Then the screenBuffer setter will call a refresh which will simply display the new screenbuffer
+            // Hand down event
+            oldMouseTile.MouseMove(e, out bool needs_refresh, gridPB, TS);
             // Get new mouse tile
             Tile newMouseTile = grid[e.Y / TS, e.X / TS];
             // Check if new mouse tile is different from old mouse tile
             if (oldMouseTile != newMouseTile)
-                 refreshList.Add(newMouseTile);
+                // Hand down event
+                newMouseTile.MouseMove(e, out needs_refresh, gridPB, TS);
+                 
 
-            // Save old mouse position
+            // Update old mouse position
             oldMousePosition = new Point(e.X, e.Y);
 
             gridPB.Refresh();
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
-            // Call the Paint function of all tiles in refreshList
-            foreach (Tile tile in refreshList)
-            {
-                tile.Paint(TS, ScreenBuffer);
-            }
-
-            // Clear refreshList
-            refreshList.Clear();
-
             // Draw screenBuffer
             e.Graphics.DrawImage(ScreenBuffer, 0, 0);
 
@@ -615,23 +609,7 @@ namespace MiniKreuzwortraetsel
         private void GridPB_MouseClick(object sender, MouseEventArgs e)
         {
             Tile clickedTile = grid[e.Y / TS, e.X / TS];
-            // Am I hovering over a Highlight?
-            if (SubTile.HoverSubTile != null)
-            {
-                EmptyTile.RemoveAllHighlights(grid);
-                Tile.RemoveAllExtendedHover(grid);
-                EmptyTile emptyTile = SubTile.HoverSubTile.ParentTile;
-                QuestionTile questionTile = emptyTile.ToQuestionTile(grid, Tile.TupleToBeFilled.Question, SubTile.HoverSubTile.Direction);
-                SubTile.HoverSubTile = null;
-                FillAnswer(questionTile, Tile.TupleToBeFilled);
-            }
-            else if (clickedTile is QuestionTile)
-            {
-                QuestionTile clickedQuestionTile = clickedTile as QuestionTile;
-                clickedQuestionTile.MouseClick(e, grid);
-
-                gridPB.Refresh();
-            }
+            clickedTile.MouseClick(e, grid, TS);
         }
         private void NoDBBaseWordCHBox_CheckedChanged(object sender, EventArgs e)
         {

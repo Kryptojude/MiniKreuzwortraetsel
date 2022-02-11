@@ -84,10 +84,10 @@ namespace MiniKreuzwortraetsel
                 pb.Cursor = Cursors.Default;
         }
 
-        public bool IsMouseOverMe(MouseEventArgs e, QuestionTile parentTile)
+        public bool IsMouseOverMe(MouseEventArgs e, QuestionTile parentTile, int ts)
         {
             // Calculate mouse position in tile space
-            Point mousePosition_tile_space = new Point(e.X - parentTile.GetWorldPosition(Form1.TS).X, e.Y - parentTile.GetWorldPosition(Form1.TS).Y);
+            Point mousePosition_tile_space = new Point(e.X - parentTile.GetWorldPosition(ts).X, e.Y - parentTile.GetWorldPosition(ts).Y);
             // Check if mouse is over deleteButton
             if (bounds_tile_space.X <= mousePosition_tile_space.X && bounds_tile_space.Height >= mousePosition_tile_space.Y)
                 return true;
@@ -96,9 +96,9 @@ namespace MiniKreuzwortraetsel
         }
 
         // Checks if mouse is hovering over deleteButton and makes hover visible
-        public void MouseMove(MouseEventArgs e, QuestionTile parentTile, PictureBox pb)
+        public void MouseMove(MouseEventArgs e, QuestionTile parentTile, PictureBox pb, int ts)
         {
-            if (IsMouseOverMe(e, parentTile))
+            if (IsMouseOverMe(e, parentTile, ts))
                 SetHover(true, pb);
             else
                 SetHover(false, pb);

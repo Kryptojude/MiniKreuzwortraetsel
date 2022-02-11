@@ -58,11 +58,11 @@ namespace MiniKreuzwortraetsel
                 letterTile.ToEmptyTile(grid, this);
 
             // Unreserve the reserved tile of the questionTile
-            if (LinkedReservedTile != null)
-                LinkedReservedTile.Unreserve();
+            LinkedReservedTile?.Unreserve();
 
             // Insert a new EmptyTile instance into the grid at this tile's position, 
-            grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
+            Point position = GetPosition();
+            grid[position.Y, position.X] = new EmptyTile(position);
 
             // Save this index
             int indexOfThisQuestionTile = questionTileList.IndexOf(this);
@@ -106,18 +106,18 @@ namespace MiniKreuzwortraetsel
             letterTile.AddQuestionTile(this);
         }
 
-        public void MouseMove(MouseEventArgs e, out bool needs_refresh, PictureBox pb)
+        public override void MouseMove(MouseEventArgs e, out bool needs_refresh, PictureBox pb, int ts)
         {
             // DeleteButton is visible when hovering over a question tile
             deleteButton.SetVisible(out needs_refresh);
 
-            deleteButton.MouseMove(e, this, pb);
+            deleteButton.MouseMove(e, this, pb, ts);
         }
 
-        public void MouseClick(MouseEventArgs e, Tile[,] grid)
+        public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts)
         {
             // If the click was on the deleteButton
-            if (deleteButton.IsMouseOverMe(e, this))
+            if (deleteButton.IsMouseOverMe(e, this, ts))
             {
                 // Then delete this question
                 ToEmptyTile(grid);

@@ -68,5 +68,8 @@ namespace MiniKreuzwortraetsel
                 screenBufferGfx.DrawImage(tileBitmap, GetWorldPosition(ts));
             }
         }
+        public abstract void MouseMove(MouseEventArgs e, out bool needs_refresh, PictureBox pb, int ts);
+        public abstract void MouseClick(MouseEventArgs e, Tile[,] grid, int ts);
+
     }
 }

@@ -100,5 +100,14 @@ namespace MiniKreuzwortraetsel
 
             // In case of change, add this tile to refreshList
         }
+
+        public override void MouseMove(MouseEventArgs e, out bool needs_refresh, PictureBox pb, int ts)
+        {
+            needs_refresh = false;
+        }
+        public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts)
+        {
+
+        }
     }
 }
