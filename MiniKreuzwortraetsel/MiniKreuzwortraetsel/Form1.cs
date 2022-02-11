@@ -19,6 +19,17 @@ namespace MiniKreuzwortraetsel
         enum UI_mode_enum { normal, noDB };
         UI_mode_enum UI_mode;
         Random random = new Random();
+        Point oldMousePosition = new Point();
+        Bitmap screenBuffer;
+        Bitmap ScreenBuffer { 
+            get { 
+                return screenBuffer; 
+            }
+            set { 
+                screenBuffer = value;
+                gridPB.Refresh(); 
+            } 
+        }
 
         // TODO: 
         /*
@@ -40,14 +51,19 @@ namespace MiniKreuzwortraetsel
         public Form1()
         {
             InitializeComponent();
+
             // Create tile instances in grid
             for (int y = 0; y < grid.GetLength(0); y++)
             {
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    grid[y, x] = new EmptyTile(new Point(x, y));
+                    Tile tile = new EmptyTile(new Point(x, y));
+                    grid[y, x] = tile;
                 }
             }
+
+            // Instantiate screenBuffer
+            ScreenBuffer = new Bitmap(TS * grid.GetLength(1), TS * grid.GetLength(0));
 
             // Instantiate Popup
             popup = new Popup();
@@ -155,6 +171,7 @@ namespace MiniKreuzwortraetsel
 
                 // Reset Highlights
                 EmptyTile.RemoveAllHighlights(grid);
+                AddAllTilesToRefreshList();
 
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed ("matched")
@@ -304,6 +321,7 @@ namespace MiniKreuzwortraetsel
                 }
             }
         }
+
         private void FillAnswer(QuestionTile questionTile, (string Question, string Answer) tuple)
         {
             // Generate Coordinates for the direction
@@ -555,128 +573,37 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         private void GridPB_MouseMove(object sender, MouseEventArgs e)
         {
-            bool refresh = false;
-            // Out of bounds check
-            Point mousePosition = new Point(e.X, e.Y);
-            if (mousePosition.X >= 0 && mousePosition.Y >= 0 &&
-                mousePosition.X <= grid.GetLength(1) * TS && mousePosition.Y <= grid.GetLength(0) * TS)
-            {
-                // The tile the mouse is hovering over: 
-                Tile tile = grid[mousePosition.Y / TS, mousePosition.X / TS];
-                // Question tile
-                if (tile is QuestionTile)
-                {
-                    QuestionTile questionTile = tile as QuestionTile;
-                    questionTile.MouseMove(e, out bool needs_refresh, gridPB);
-                    if (needs_refresh)
-                    {
-                        refresh = true;
-                    }
+            // Get old mouse tile
+            Tile oldMouseTile = grid[oldMousePosition.Y / TS, oldMousePosition.X / TS];
+            // Right now this should hand down the MouseMove Event to the affected tiles
+            // they will then update their properties based on the mouse position
+            // Then they should call CheckVisualChange() which hashes their properties and determines a potential visual change
+            // If a change occured, then it will call Paint() method which calculates new bitmap for tile and writes that into the screenBuffer
+            // Then the screenBuffer setter will call a refresh which will simply display the new screenbuffer
+            // Get new mouse tile
+            Tile newMouseTile = grid[e.Y / TS, e.X / TS];
+            // Check if new mouse tile is different from old mouse tile
+            if (oldMouseTile != newMouseTile)
+                 refreshList.Add(newMouseTile);
 
-                    // Baseword questionTile -> No popup
-                    if (questionTile.IsBaseWord())
-                    {
-                        if (popup.IsVisible())
-                        {
-                            popup.Hide();
-                            refresh = true;
-                        }
-                    }
-                    // Normal question questionTil -> Show the popup
-                    else
-                    {
-                        popup.SetText(questionTile.Question);
-                        popup.SetPosition(new Point(e.X + TS / 2, e.Y - TS / 2));
-                        popup.Show();
-                        refresh = true;
-                    }
-                }
-                // Not a question tile
-                else
-                {
-                    DeleteButton.SetInvisible(gridPB, out bool needs_refresh);
-                    if (needs_refresh)
-                    {
-                        refresh = true;
-                    }
+            // Save old mouse position
+            oldMousePosition = new Point(e.X, e.Y);
 
-                    SubTile oldHoveringSubTile = SubTile.HoverSubTile;
-
-                    SubTile newHoveringSubTile;
-                    // Does the new tile have subtiles?
-                    if (tile is EmptyTile)
-                    {
-                        EmptyTile emptyTile = tile as EmptyTile;
-                        // Determine the subtile the mouse is hovering over
-                        int mouseSubtile = 0;
-                        if (e.X - tile.GetWorldPosition(TS).X < e.Y - tile.GetWorldPosition(TS).Y)
-                            mouseSubtile = 1;
-                        newHoveringSubTile = emptyTile.SubTiles[mouseSubtile];
-                    }
-                    // Letter tile
-                    else
-                        newHoveringSubTile = null;
-
-                    // If old and new hoveringSubTile are different objects, then old hoveringSubTile is not hovering anymore
-                    if (oldHoveringSubTile != newHoveringSubTile)
-                    {   
-                        refresh = true;
-                        SubTile.HoverSubTile = null;
-                        Tile.RemoveAllExtendedHover(grid);
-
-                        // Check if newHoveringSubTile should be set to hover
-                        if (newHoveringSubTile?.IsHighlighted() == true)
-                        {
-                            SubTile.HoverSubTile = newHoveringSubTile;
-
-                            // Activate extendedHover for adjacent tiles
-                            Point directionPoint = directions[SubTile.HoverSubTile.Direction];
-                            for (int i = 0; i < Tile.TupleToBeFilled.Answer.Length; i++)
-                            {
-                                int letterX = SubTile.HoverSubTile.ParentTile.GetPosition().X + directionPoint.X * (1 + i);
-                                int letterY = SubTile.HoverSubTile.ParentTile.GetPosition().Y + directionPoint.Y * (1 + i);
-                                // Out of bounds check
-                                if (letterX <= grid.GetUpperBound(1) && letterY <= grid.GetUpperBound(0))
-                                {
-                                    // End or middle outline
-                                    if (i < Tile.TupleToBeFilled.Answer.Length - 1)
-                                        grid[letterY, letterX].extendedHover = Tile.ExtendedHover.Two_Outlines_Horizontal;
-                                    else
-                                        grid[letterY, letterX].extendedHover = Tile.ExtendedHover.Three_Outlines_Horizontal;
-
-                                    // Vertical mode
-                                    if (directionPoint.Y == 1)
-                                        grid[letterY, letterX].extendedHover += 2;
-                                }
-                            }                    
-                        }
-                    }
-
-                    // Deactivate popup
-                    if (popup.IsVisible())
-                    {
-                        popup.Hide();
-                        refresh = true;
-                    }
-                }
-            }
-
-            if (refresh)
-                gridPB.Refresh();
+            gridPB.Refresh();
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
-            // Call the Paint function of all tiles
-            for (int y = 0; y < grid.GetLength(0); y++)
+            // Call the Paint function of all tiles in refreshList
+            foreach (Tile tile in refreshList)
             {
-                //if (y == )
-                for (int x = 0; x < grid.GetLength(1); x++)
-                {
-                    Tile tile = grid[y, x];
-                    using (Image tileVisuals = tile.GetImage(TS))
-                        e.Graphics.DrawImage(tileVisuals, x * TS, y * TS);
-                }
+                tile.Paint(TS, ScreenBuffer);
             }
+
+            // Clear refreshList
+            refreshList.Clear();
+
+            // Draw screenBuffer
+            e.Graphics.DrawImage(ScreenBuffer, 0, 0);
 
             // Draw Popup
             if (popup.IsVisible())

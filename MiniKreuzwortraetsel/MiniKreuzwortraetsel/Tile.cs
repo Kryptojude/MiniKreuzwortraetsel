@@ -34,6 +34,7 @@ namespace MiniKreuzwortraetsel
         Point position;
         protected Font font = new Font("Verdana", 9.75f, FontStyle.Bold);
         protected Brush foregroundColor = Brushes.Blue;
+        protected int oldHashCode = 0;
         /// <summary>
         /// Determines if this tile should have red outline based on question tile hover pointing to it, 
         /// -1 = off, 0 = 2 outlines horizontal, 1 = 3 outlines horizontal, 2 = 2 outlines vertical, 3 = 3 outlines vertical
@@ -49,7 +50,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public abstract Image GetImage(int ts);
+        public abstract void Paint(int ts, Bitmap screenBuffer);
 
         public Point GetPosition()
         {
@@ -58,6 +59,14 @@ namespace MiniKreuzwortraetsel
         public Point GetWorldPosition(int ts)
         {
             return new Point(position.X * ts, position.Y * ts);
+        }
+        protected void PaintToScreenBuffer(int ts, Bitmap screenBuffer, Bitmap tileBitmap)
+        {
+            // Draw the visuals into the screenBuffer
+            using (Graphics screenBufferGfx = Graphics.FromImage(screenBuffer))
+            {
+                screenBufferGfx.DrawImage(tileBitmap, GetWorldPosition(ts));
+            }
         }
     }
 }

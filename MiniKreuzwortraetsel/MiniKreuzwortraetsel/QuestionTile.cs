@@ -77,11 +77,11 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public override Image GetImage(int ts)
+        public override void Paint(int ts, Bitmap screenBuffer)
         {
             // Dispose Image and Graphics to prevent memory leak
-            Image canvas = new Bitmap(ts, ts);
-            using (Graphics graphics = Graphics.FromImage(canvas))
+            Bitmap tileBitmap = new Bitmap(ts, ts);
+            using (Graphics graphics = Graphics.FromImage(tileBitmap))
             {
                 graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
@@ -96,7 +96,7 @@ namespace MiniKreuzwortraetsel
                 using (Image deleteButtonImage = deleteButton.GetImage())
                     graphics.DrawImage(deleteButtonImage, DeleteButton.bounds_tile_space);
 
-                return canvas;
+                PaintToScreenBuffer(ts, screenBuffer, tileBitmap);
             }
         }
 
@@ -122,6 +122,26 @@ namespace MiniKreuzwortraetsel
                 // Then delete this question
                 ToEmptyTile(grid);
             }
+        }
+
+        private void CheckVisualChange(int ts, Bitmap screenBuffer)
+        {
+            int newHashCode = GetHashCode();
+            if (oldHashCode != newHashCode)
+            {
+                // Save old Hash code
+                oldHashCode = newHashCode;
+                // Call my paint function
+                Paint(ts, screenBuffer);
+            }
+
+            // Hash all visual properties in before state
+
+            // Hash all visual properties in after state
+
+            // Compare before to after state
+
+            // In case of change, add this tile to refreshList
         }
     }
 }
