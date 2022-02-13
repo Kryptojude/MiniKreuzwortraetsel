@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace MiniKreuzwortraetsel
 {
@@ -60,9 +61,9 @@ namespace MiniKreuzwortraetsel
                     graphics.FillPolygon(SubTiles[i].GetColor(), SubTiles[i].GetSubTilePolygon());
                 }
 
-                SubTile hoverSubTile = SubTile.HoverSubTile;
+                SubTile hoverSubTile = SubTile.BlueHoverSubTile;
                 // Draw hover effect
-                if (SubTile.HoverSubTile?.ParentTile == this)
+                if (SubTile.BlueHoverSubTile?.ParentTile == this)
                 {
                     graphics.FillPolygon(Brushes.Blue, hoverSubTile.GetSubTilePolygon());
                     graphics.DrawString(hoverSubTile.GetArrow(), SubTile.HOVER_ARROW_FONT, Brushes.Red, hoverSubTile.GetArrowPosition());
@@ -115,7 +116,14 @@ namespace MiniKreuzwortraetsel
         {
             return reserved;
         }
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
+        {
 
+        }
+        public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts)
+        {
+
+        }
         private bool CheckVisualChange()
         {
             if (oldHashCode != GetHashCode())

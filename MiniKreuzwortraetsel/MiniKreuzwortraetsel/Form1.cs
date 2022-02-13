@@ -32,6 +32,9 @@ namespace MiniKreuzwortraetsel
         }
 
         // TODO: 
+
+        // Implement MouseLeave method in tile class, so that when a tile is left, different logic can run from current MouseMove logic
+
         // Right now this should hand down the MouseMove Event to the affected tiles
         // they will then update their properties based on the mouse position
         // Then they should call CheckVisualChange() which hashes their properties and determines a potential visual change
@@ -532,67 +535,23 @@ namespace MiniKreuzwortraetsel
                 UpdateTableMenu();
             }
         }
-        /// <summary>
-        /// Enables/Disables different buttons based on whether different textboxes are empty
-        /// </summary>
-        //private void Update_UI()
-        //{
-        //    // Possible senders for this method:
-        //    // - TextChanged: baseWordTBox, QuestionTBox, AnswerTBox
-        //    // - Click: newCollectionBTN, deleteCollectionBTN, newTupleBTN, deleteTupleBTN
-        //    // - DoubleClick: tuplesListBox
-
-
-        //    TextBox senderTBox = sender as TextBox;
-        //    // Determine actions based on sender
-        //    if (senderTBox == baseWordTBox)
-        //    {
-        //        if (senderTBox.Text != "")
-        //        {
-        //            InsertBaseWordBTN.Enabled = true;
-        //            showMatchesBaseWordBTN.Enabled = true;
-        //        }
-        //        else
-        //        {
-        //            InsertBaseWordBTN.Enabled = false;
-        //            showMatchesBaseWordBTN.Enabled = false;
-        //        }
-        //    }
-        //    else if (senderTBox == QuestionTBox || senderTBox == AnswerTBox)
-        //    {
-        //        if (AnswerTBox.Text != "" && QuestionTBox.Text != "")
-        //        {
-        //            InsertTupleBTN.Enabled = true;
-        //            showMatchesBTN.Enabled = true;
-        //        }
-        //        else
-        //        {
-        //            InsertTupleBTN.Enabled = false;
-        //            showMatchesBTN.Enabled = false;
-        //        }
-        //    }
-        //}
-        /// <summary>
-        /// Hover effects
-        /// </summary>
+        // Implement MouseEnter and MouseLeave in the tile class? Because leaving a tile with mouse will call MouseMove of the left tile, which will then perform unnecessary calculations
         private void GridPB_MouseMove(object sender, MouseEventArgs e)
         {
             // Get old mouse tile
             Tile oldMouseTile = grid[oldMousePosition.Y / TS, oldMousePosition.X / TS];
             // Hand down event
-            oldMouseTile.MouseMove(e, out bool needs_refresh, gridPB, TS);
+            oldMouseTile.MouseMove(e, gridPB, TS, ScreenBuffer);
             // Get new mouse tile
             Tile newMouseTile = grid[e.Y / TS, e.X / TS];
             // Check if new mouse tile is different from old mouse tile
             if (oldMouseTile != newMouseTile)
                 // Hand down event
-                newMouseTile.MouseMove(e, out needs_refresh, gridPB, TS);
+                newMouseTile.MouseMove(e, gridPB, TS, ScreenBuffer);
                  
 
             // Update old mouse position
             oldMousePosition = new Point(e.X, e.Y);
-
-            gridPB.Refresh();
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
@@ -609,6 +568,7 @@ namespace MiniKreuzwortraetsel
         private void GridPB_MouseClick(object sender, MouseEventArgs e)
         {
             Tile clickedTile = grid[e.Y / TS, e.X / TS];
+            // Hand down event
             clickedTile.MouseClick(e, grid, TS);
         }
         private void NoDBBaseWordCHBox_CheckedChanged(object sender, EventArgs e)

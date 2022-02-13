@@ -14,23 +14,6 @@ namespace MiniKreuzwortraetsel
         const float sizeFactor = 0.3f;
         static readonly int absoluteSize;
         public static readonly Rectangle bounds_tile_space;
-        static DeleteButton lastVisibleDeleteButton;
-        public static void SetInvisible(PictureBox pb, out bool needs_refresh)
-        {
-            if (lastVisibleDeleteButton != null)
-            {
-                // A deleteButton instance is currently visible, so turn it invisible and save refresh
-                lastVisibleDeleteButton.visible = false;
-                lastVisibleDeleteButton = null;
-                pb.Cursor = Cursors.Default;
-                needs_refresh = true;
-            }
-            else
-            {
-                // No deleteButton instance was visible, so don't do anything, no refresh
-                needs_refresh = false;
-            }
-        }
 
         bool visible = false;
         bool hover = false;
@@ -48,31 +31,9 @@ namespace MiniKreuzwortraetsel
             return visible;
         }
 
-        public void SetVisible(out bool needs_refresh)
+        public void SetVisible(bool visible)
         {
-            // Check if there has been a change
-            // Same deleteButton, no change
-            if (this == lastVisibleDeleteButton)
-                needs_refresh = false;
-            // null to this
-            else if (lastVisibleDeleteButton == null)
-            {
-                lastVisibleDeleteButton = this;
-                needs_refresh = true;
-                visible = true;
-            }
-            // other deleteButton to this
-            else if (lastVisibleDeleteButton != null && this != lastVisibleDeleteButton)
-            {
-                lastVisibleDeleteButton.visible = false;
-                lastVisibleDeleteButton = this;
-                visible = true;
-                needs_refresh = true;
-            }
-            else
-            {
-                throw new Exception("impossible branch reached in SetVisible()");
-            }
+            this.visible = visible;
         }
 
         void SetHover(bool hover, PictureBox pb)
@@ -98,7 +59,9 @@ namespace MiniKreuzwortraetsel
         // Checks if mouse is hovering over deleteButton and makes hover visible
         public void MouseMove(MouseEventArgs e, QuestionTile parentTile, PictureBox pb, int ts)
         {
+            // Check if mouse is over me
             if (IsMouseOverMe(e, parentTile, ts))
+                // Save hover state in field (This may be redundant) and set cursor accordingly
                 SetHover(true, pb);
             else
                 SetHover(false, pb);

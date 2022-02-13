@@ -106,12 +106,50 @@ namespace MiniKreuzwortraetsel
             letterTile.AddQuestionTile(this);
         }
 
-        public override void MouseMove(MouseEventArgs e, out bool needs_refresh, PictureBox pb, int ts)
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
         {
-            // DeleteButton is visible when hovering over a question tile
-            deleteButton.SetVisible(out needs_refresh);
+            /* What can happen when you move the mouse away from a questionTile, onto a questionTile, or within a questionTile?
+             * deleteButton could appear, it can't disappear
+             * cursor could become hand or arrow (not currently being hashed) but doesnt need refresh anyway
+             * 
+             * */
 
-            deleteButton.MouseMove(e, this, pb, ts);
+            // GetHashCode for before-state
+            int beforeHashCode = GetHashCode();
+
+            // Calculate the fields of this instance based on mouse position (this may or may not result in any changes to this object)
+            // Is mouse hovering over this tile? (This check will become redundant when MouseLeave is implemented
+            if (GetWorldPosition(ts).X <= e.X && GetWorldPosition(ts).X + ts > e.X && GetWorldPosition(ts).Y <= e.Y && GetWorldPosition(ts).Y + ts > e.Y)
+            {
+                // Set deleteButton to visible
+                deleteButton.SetVisible(true);
+                // Is mouse hovering over deleteButton?
+                if (deleteButton.IsMouseOverMe(e, this, ts))
+                {
+                    // Hand down event
+                    deleteButton.MouseMove(e, this, pb, ts);
+                }
+            }
+            else
+            {
+                // Mouse is not hovering over this tile, that means that the mouse left this tile
+                // What can change based on this?
+                // deleteButton is not visible
+                deleteButton.SetVisible(false);
+                // Cursor is arrow
+                pb.Cursor = Cursors.Arrow;
+
+            }
+
+
+            // GetHashCode for after-state (this may take into account fields that are not relevant to the visual appearance of this tile, may also not take into account changes to objects that are referenced in fields)
+            int afterHashCode = GetHashCode();
+
+            // Compare before and after-state, If change occured, call this.Paint();
+            if (beforeHashCode != afterHashCode)
+                Paint(ts, screenBuffer);
+
+
         }
 
         public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts)
@@ -122,26 +160,6 @@ namespace MiniKreuzwortraetsel
                 // Then delete this question
                 ToEmptyTile(grid);
             }
-        }
-
-        private void CheckVisualChange(int ts, Bitmap screenBuffer)
-        {
-            int newHashCode = GetHashCode();
-            if (oldHashCode != newHashCode)
-            {
-                // Save old Hash code
-                oldHashCode = newHashCode;
-                // Call my paint function
-                Paint(ts, screenBuffer);
-            }
-
-            // Hash all visual properties in before state
-
-            // Hash all visual properties in after state
-
-            // Compare before to after state
-
-            // In case of change, add this tile to refreshList
         }
     }
 }

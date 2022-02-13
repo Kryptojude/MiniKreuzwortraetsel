@@ -68,8 +68,12 @@ namespace MiniKreuzwortraetsel
                 screenBufferGfx.DrawImage(tileBitmap, GetWorldPosition(ts));
             }
         }
-        public abstract void MouseMove(MouseEventArgs e, out bool needs_refresh, PictureBox pb, int ts);
+        /// <summary>
+        /// MouseMove is called for the tile that the mouse was on before it moved, 
+        /// and for the tile that the mouse is on after it moved, unless they are the same tile,
+        /// so a mouse movement can trigger two method calls, only when the mouse has crossed from one tile to the next
+        /// </summary>
+        public abstract void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer);
         public abstract void MouseClick(MouseEventArgs e, Tile[,] grid, int ts);
-
     }
 }
