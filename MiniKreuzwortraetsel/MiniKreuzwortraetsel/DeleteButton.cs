@@ -36,7 +36,7 @@ namespace MiniKreuzwortraetsel
             this.visible = visible;
         }
 
-        void SetHover(bool hover, PictureBox pb)
+        public void SetHover(bool hover, PictureBox pb)
         {
             this.hover = hover;
             if (hover)
@@ -54,17 +54,6 @@ namespace MiniKreuzwortraetsel
                 return true;
             else
                 return false;
-        }
-
-        // Checks if mouse is hovering over deleteButton and makes hover visible
-        public void MouseMove(MouseEventArgs e, QuestionTile parentTile, PictureBox pb, int ts)
-        {
-            // Check if mouse is over me
-            if (IsMouseOverMe(e, parentTile, ts))
-                // Save hover state in field (This may be redundant) and set cursor accordingly
-                SetHover(true, pb);
-            else
-                SetHover(false, pb);
         }
 
         public Image GetImage()

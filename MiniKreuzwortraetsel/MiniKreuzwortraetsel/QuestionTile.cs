@@ -77,7 +77,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public override void Paint(int ts, Bitmap screenBuffer)
+        public override void Paint(int ts, Bitmap screenBuffer, PictureBox pb)
         {
             // Dispose Image and Graphics to prevent memory leak
             Bitmap tileBitmap = new Bitmap(ts, ts);
@@ -96,7 +96,7 @@ namespace MiniKreuzwortraetsel
                 using (Image deleteButtonImage = deleteButton.GetImage())
                     graphics.DrawImage(deleteButtonImage, DeleteButton.bounds_tile_space);
 
-                PaintToScreenBuffer(ts, screenBuffer, tileBitmap);
+                PaintToScreenBuffer(ts, screenBuffer, tileBitmap, pb);
             }
         }
 
@@ -108,7 +108,7 @@ namespace MiniKreuzwortraetsel
 
         public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
         {
-            /* What can happen when you move the mouse away from a questionTile, onto a questionTile, or within a questionTile?
+            /* What can happen when you move the mouse onto a questionTile, or within a questionTile?
              * deleteButton could appear, it can't disappear
              * cursor could become hand or arrow (not currently being hashed) but doesnt need refresh anyway
              * 
@@ -119,39 +119,31 @@ namespace MiniKreuzwortraetsel
 
             // Calculate the fields of this instance based on mouse position (this may or may not result in any changes to this object)
             // Is mouse hovering over this tile? (This check will become redundant when MouseLeave is implemented
-            if (GetWorldPosition(ts).X <= e.X && GetWorldPosition(ts).X + ts > e.X && GetWorldPosition(ts).Y <= e.Y && GetWorldPosition(ts).Y + ts > e.Y)
-            {
-                // Set deleteButton to visible
-                deleteButton.SetVisible(true);
-                // Is mouse hovering over deleteButton?
-                if (deleteButton.IsMouseOverMe(e, this, ts))
-                {
-                    // Hand down event
-                    deleteButton.MouseMove(e, this, pb, ts);
-                }
-            }
+            // Set deleteButton to visible
+            deleteButton.SetVisible(true);
+            // Is mouse hovering over deleteButton?
+            if (deleteButton.IsMouseOverMe(e, this, ts))
+                // Call delete button hover logic
+                deleteButton.SetHover(true, pb);
             else
-            {
-                // Mouse is not hovering over this tile, that means that the mouse left this tile
-                // What can change based on this?
-                // deleteButton is not visible
-                deleteButton.SetVisible(false);
-                // Cursor is arrow
-                pb.Cursor = Cursors.Arrow;
-
-            }
-
+                // Mouse is not over deleteButton, 
+                // so undo deleteButton hover
+                deleteButton.SetHover(false, pb);
 
             // GetHashCode for after-state (this may take into account fields that are not relevant to the visual appearance of this tile, may also not take into account changes to objects that are referenced in fields)
             int afterHashCode = GetHashCode();
 
             // Compare before and after-state, If change occured, call this.Paint();
             if (beforeHashCode != afterHashCode)
-                Paint(ts, screenBuffer);
-
-
+                Paint(ts, screenBuffer, pb);
         }
 
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
+        {
+            // deleteButton is not visible
+            deleteButton.SetVisible(false);
+            deleteButton.SetHover(false, pb);
+        }
         public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts)
         {
             // If the click was on the deleteButton
@@ -161,5 +153,6 @@ namespace MiniKreuzwortraetsel
                 ToEmptyTile(grid);
             }
         }
+
     }
 }

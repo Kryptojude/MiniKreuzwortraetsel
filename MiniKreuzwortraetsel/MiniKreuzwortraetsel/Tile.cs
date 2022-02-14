@@ -50,7 +50,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public abstract void Paint(int ts, Bitmap screenBuffer);
+        public abstract void Paint(int ts, Bitmap screenBuffer, PictureBox pb);
 
         public Point GetPosition()
         {
@@ -60,20 +60,27 @@ namespace MiniKreuzwortraetsel
         {
             return new Point(position.X * ts, position.Y * ts);
         }
-        protected void PaintToScreenBuffer(int ts, Bitmap screenBuffer, Bitmap tileBitmap)
+        protected void PaintToScreenBuffer(int ts, Bitmap screenBuffer, Bitmap tileBitmap, PictureBox pb)
         {
             // Draw the visuals into the screenBuffer
             using (Graphics screenBufferGfx = Graphics.FromImage(screenBuffer))
             {
                 screenBufferGfx.DrawImage(tileBitmap, GetWorldPosition(ts));
+                //screenBuffer.Save("screenBuffer.jpg");
+                pb.Invalidate(new Rectangle(GetWorldPosition(ts), new Size(ts, ts)));
+                pb.Update();
             }
         }
         /// <summary>
-        /// MouseMove is called for the tile that the mouse was on before it moved, 
-        /// and for the tile that the mouse is on after it moved, unless they are the same tile,
-        /// so a mouse movement can trigger two method calls, only when the mouse has crossed from one tile to the next
+        /// This will be called when the mouse has moved, 
+        /// the called method belongs to the tile instance that the mouse is on
         /// </summary>
         public abstract void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer);
+        /// <summary>
+        /// This will be called when the mouse has moved from one tile to another,
+        /// the called method belongs to the tile instance that the mouse was on before the movement
+        /// </summary>
+        public abstract void MouseLeave(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer);
         public abstract void MouseClick(MouseEventArgs e, Tile[,] grid, int ts);
     }
 }

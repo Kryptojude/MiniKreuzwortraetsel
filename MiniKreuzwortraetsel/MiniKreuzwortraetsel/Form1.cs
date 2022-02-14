@@ -21,15 +21,7 @@ namespace MiniKreuzwortraetsel
         Random random = new Random();
         Point oldMousePosition = new Point();
         Bitmap screenBuffer;
-        Bitmap ScreenBuffer { 
-            get { 
-                return screenBuffer; 
-            }
-            set { 
-                screenBuffer = value;
-                gridPB.Refresh(); 
-            } 
-        }
+
 
         // TODO: 
 
@@ -71,7 +63,7 @@ namespace MiniKreuzwortraetsel
             }
 
             // Instantiate screenBuffer
-            ScreenBuffer = new Bitmap(TS * grid.GetLength(1), TS * grid.GetLength(0));
+            screenBuffer = new Bitmap(TS * grid.GetLength(1), TS * grid.GetLength(0));
 
             // Instantiate Popup
             popup = new Popup();
@@ -178,7 +170,7 @@ namespace MiniKreuzwortraetsel
                 tuple.Question = ReplaceUmlaute(tuple.Question);
 
                 // Reset Highlights
-                EmptyTile.RemoveAllHighlights(grid);
+                EmptyTile.RemoveAllHighlights(grid, TS, screenBuffer, gridPB);
 
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed ("matched")
@@ -308,7 +300,6 @@ namespace MiniKreuzwortraetsel
                             candidates[i].potentialQuestionTile.SubTiles[candidates[i].direction].SetHighlight(colorLevel);
                         }
                         Tile.TupleToBeFilled = tuple;
-                        gridPB.Refresh();
                     }
                     else
                     {
@@ -340,12 +331,14 @@ namespace MiniKreuzwortraetsel
             if (tileAfterAnswerPos.Y < grid.GetLength(0) && tileAfterAnswerPos.X < grid.GetLength(1))
             {
                 if (!(grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X] is EmptyTile))
-                    throw new Exception("Tile after the answer is not an EmptyTile, previous check in HighlightCandidateSubtiles() failed");
-
-                EmptyTile tileAfterAnswer = grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X] as EmptyTile;
-                // Reserve the tile and link to questionTile
-                tileAfterAnswer.Reserve();
-                questionTile.LinkedReservedTile = tileAfterAnswer;
+                    throw new Exception("Tile after the answer is not an EmptyTile, previous check in DetermineCandidateSubtiles() failed");
+                else
+                {
+                    EmptyTile tileAfterAnswer = grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X] as EmptyTile;
+                    // Reserve the tile and link to questionTile
+                    tileAfterAnswer.Reserve();
+                    questionTile.LinkedReservedTile = tileAfterAnswer;
+                }
             }
 
             // Fill the answer into the grid letter by letter
@@ -360,21 +353,22 @@ namespace MiniKreuzwortraetsel
                     EmptyTile emptyTile = tile as EmptyTile;
                     // Convert the EmptyTile to LetterTile
                     string text = tuple.Answer[c].ToString();
-                    LetterTile letterTile = emptyTile.ToLetterTile(grid, questionTile, text);
+                    emptyTile.ToLetterTile(grid, questionTile, text, TS, screenBuffer, gridPB);
                 }
                 else if (tile is LetterTile)
                 {
                     LetterTile letterTile = tile as LetterTile;
                     if (letterTile.Text != tuple.Answer[c].ToString())
                         throw new Exception("HightlightCandidateSubtiles() failed to see a non-matching letter in the path of the answer");
-                    // Link this LetterTile to the QuestionTile
-                    questionTile.AddLinkedLetterTile(letterTile);
+                    else
+                    {
+                        // Link this LetterTile to the QuestionTile
+                        questionTile.AddLinkedLetterTile(letterTile);
+                    }
                 }
                 else if (tile is QuestionTile)
                     throw new Exception("HighlightCandidateSubtiles() failed to see that a QuestionTile is in the way of the answer");
             }
-
-            gridPB.Refresh();
         }
         private void exportBTN_Click(object sender, EventArgs e)
         {
@@ -535,20 +529,24 @@ namespace MiniKreuzwortraetsel
                 UpdateTableMenu();
             }
         }
-        // Implement MouseEnter and MouseLeave in the tile class? Because leaving a tile with mouse will call MouseMove of the left tile, which will then perform unnecessary calculations
+        /// <summary>
+        /// This will call tile.MouseMove for the tile that the mouse ends up on, 
+        /// and tile.MouseLeave in case the mouse has moved from one tile to another
+        /// </summary>
         private void GridPB_MouseMove(object sender, MouseEventArgs e)
         {
+            screenBuffer.Save("screenBuffer.jpg");
             // Get old mouse tile
             Tile oldMouseTile = grid[oldMousePosition.Y / TS, oldMousePosition.X / TS];
-            // Hand down event
-            oldMouseTile.MouseMove(e, gridPB, TS, ScreenBuffer);
             // Get new mouse tile
             Tile newMouseTile = grid[e.Y / TS, e.X / TS];
+            // This will always be called, whether mouse movement was intra-tile or inter-tile
+            newMouseTile.MouseMove(e, gridPB, TS, screenBuffer);
             // Check if new mouse tile is different from old mouse tile
             if (oldMouseTile != newMouseTile)
-                // Hand down event
-                newMouseTile.MouseMove(e, gridPB, TS, ScreenBuffer);
-                 
+                // If they are different, then the mouse has moved from one tile to another, 
+                // so also call MouseLeave for old tile
+                oldMouseTile.MouseLeave(e, gridPB, TS, screenBuffer);
 
             // Update old mouse position
             oldMousePosition = new Point(e.X, e.Y);
@@ -556,8 +554,8 @@ namespace MiniKreuzwortraetsel
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
             // Draw screenBuffer
-            e.Graphics.DrawImage(ScreenBuffer, 0, 0);
-
+            e.Graphics.DrawImage(screenBuffer, 0, 0);
+            screenBuffer.Save("screenbuffer.png", System.Drawing.Imaging.ImageFormat.Png);
             // Draw Popup
             if (popup.IsVisible())
                 e.Graphics.DrawString(popup.GetText(), Font, Brushes.Black, popup.GetPosition());

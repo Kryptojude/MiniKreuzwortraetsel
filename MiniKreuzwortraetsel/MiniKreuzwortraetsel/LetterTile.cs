@@ -16,10 +16,11 @@ namespace MiniKreuzwortraetsel
         readonly List<QuestionTile> questionTiles = new List<QuestionTile>();
         public string Text = "";
 
-        public LetterTile(Point position, QuestionTile questionTile, string text) : base(position)
+        public LetterTile(Point position, QuestionTile questionTile, string text, int ts, Bitmap screenBuffer, PictureBox pb) : base(position)
         {
             questionTile.AddLinkedLetterTile(this);
             Text = text;
+            Paint(ts, screenBuffer, pb);
         }
 
         public void ToEmptyTile(Tile[,] grid, QuestionTile questionTile)
@@ -34,7 +35,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public override void Paint(int ts, Bitmap screenBuffer)
+        public override void Paint(int ts, Bitmap screenBuffer, PictureBox pb)
         {
             // Dispose Image and Graphics to prevent memory leak
             Bitmap tileBitmap = new Bitmap(ts, ts);
@@ -71,8 +72,8 @@ namespace MiniKreuzwortraetsel
                         graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
                         break;
                 }
-
-                PaintToScreenBuffer(ts, screenBuffer, tileBitmap);
+                //tileBitmap.Save("tileBitmap.jpg");
+                PaintToScreenBuffer(ts, screenBuffer, tileBitmap, pb);
             }
         }
 
@@ -81,7 +82,7 @@ namespace MiniKreuzwortraetsel
             questionTiles.Add(questionTile);
         }
 
-        private void CheckVisualChange(int ts, Bitmap screenBuffer)
+        private void CheckVisualChange(int ts, Bitmap screenBuffer, PictureBox pb)
         {
             int newHashCode = GetHashCode();
             if (oldHashCode != newHashCode)
@@ -89,7 +90,7 @@ namespace MiniKreuzwortraetsel
                 // Save old Hash code
                 oldHashCode = newHashCode;
                 // Call my paint function
-                Paint(ts, screenBuffer);
+                Paint(ts, screenBuffer, pb);
             }
 
             // Hash all visual properties in before state
@@ -104,9 +105,15 @@ namespace MiniKreuzwortraetsel
         public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
         {
         }
+
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
+        {
+
+        }        
         public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts)
         {
 
         }
+
     }
 }
