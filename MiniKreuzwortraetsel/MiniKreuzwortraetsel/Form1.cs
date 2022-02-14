@@ -20,8 +20,8 @@ namespace MiniKreuzwortraetsel
         UI_mode_enum UI_mode;
         Random random = new Random();
         Point oldMousePosition = new Point();
-        Bitmap screenBuffer;
-
+        Rectangle nextPaintArea;
+        Bitmap nextPaintBitmap;
 
         // TODO: 
 
@@ -551,11 +551,23 @@ namespace MiniKreuzwortraetsel
             // Update old mouse position
             oldMousePosition = new Point(e.X, e.Y);
         }
+
+        // What I did last time: Tile should call this method and hand over its bounds and its generated visuals, 
+        // this method then puts both into fields and invalidates the area of the bounds of the tile, then calls update
+        public void PaintSingleTile(nextPaintArea, nextPaintBitmap)
+        {
+            nextPaintArea = 
+            nextPaintBitmap = 
+
+            Invalidate();
+            Update();
+        }
+
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
-            // Draw screenBuffer
-            e.Graphics.DrawImage(screenBuffer, 0, 0);
-            screenBuffer.Save("screenbuffer.png", System.Drawing.Imaging.ImageFormat.Png);
+            // Paint single tile
+            e.Graphics.DrawImage(nextPaintBitmap, nextPaintArea);
+
             // Draw Popup
             if (popup.IsVisible())
                 e.Graphics.DrawString(popup.GetText(), Font, Brushes.Black, popup.GetPosition());

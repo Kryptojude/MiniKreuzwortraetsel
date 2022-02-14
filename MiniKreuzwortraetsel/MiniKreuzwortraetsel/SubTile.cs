@@ -48,7 +48,7 @@ namespace MiniKreuzwortraetsel
 
         public void SetHighlight(float colorLevel)
         {
-            // Working on why refresh is so slow, trying to replace all refresh calls with invalidate/update
+
             color = new SolidBrush(Color.FromArgb((int)(MinColor.R + (MaxColor.R - MinColor.R) * colorLevel), (int)(MinColor.G + (MaxColor.G - MinColor.G) * colorLevel), (int)(MinColor.B + (MaxColor.B - MinColor.B) * colorLevel)));
         }
 
