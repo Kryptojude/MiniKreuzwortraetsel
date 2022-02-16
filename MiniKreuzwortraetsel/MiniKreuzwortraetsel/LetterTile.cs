@@ -16,11 +16,11 @@ namespace MiniKreuzwortraetsel
         readonly List<QuestionTile> questionTiles = new List<QuestionTile>();
         public string Text = "";
 
-        public LetterTile(Point position, QuestionTile questionTile, string text, int ts, Bitmap screenBuffer, PictureBox pb) : base(position)
+        public LetterTile(Point position, QuestionTile questionTile, string text, int ts, PictureBox pb) : base(position)
         {
             questionTile.AddLinkedLetterTile(this);
             Text = text;
-            Paint(ts, screenBuffer, pb);
+            Paint(ts, pb);
         }
 
         public void ToEmptyTile(Tile[,] grid, QuestionTile questionTile)
@@ -35,7 +35,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public override void Paint(int ts, Bitmap screenBuffer, PictureBox pb)
+        public override void Paint(int ts, PictureBox pb)
         {
             // Dispose Image and Graphics to prevent memory leak
             Bitmap tileBitmap = new Bitmap(ts, ts);
@@ -73,7 +73,7 @@ namespace MiniKreuzwortraetsel
                         break;
                 }
                 //tileBitmap.Save("tileBitmap.jpg");
-                PaintToScreenBuffer(ts, screenBuffer, tileBitmap, pb);
+                PaintToScreenBuffer(ts, tileBitmap, pb);
             }
         }
 
@@ -90,7 +90,7 @@ namespace MiniKreuzwortraetsel
                 // Save old Hash code
                 oldHashCode = newHashCode;
                 // Call my paint function
-                Paint(ts, screenBuffer, pb);
+                Paint(ts, pb);
             }
 
             // Hash all visual properties in before state
@@ -102,11 +102,11 @@ namespace MiniKreuzwortraetsel
             // In case of change, add this tile to refreshList
         }
 
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts)
         {
         }
 
-        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts)
         {
 
         }        

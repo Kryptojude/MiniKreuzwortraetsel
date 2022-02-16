@@ -10,7 +10,7 @@ namespace MiniKreuzwortraetsel
 {
     class EmptyTile : Tile
     {
-        public static void RemoveAllHighlights(Tile[,] grid, int ts, Bitmap screenBuffer, PictureBox pb)
+        public static void RemoveAllHighlights(Tile[,] grid, int ts, PictureBox pb)
         {
             for (int y = 0; y < grid.GetLength(0); y++)
             {
@@ -22,7 +22,7 @@ namespace MiniKreuzwortraetsel
                         // Reset the Subtiles so highlights disappear
                         emptyTile.MakeSubTiles();
                         // Call paint method of this tile
-                        emptyTile.Paint(ts, screenBuffer, pb);
+                        emptyTile.Paint(ts, pb);
                     }
                 }
             }
@@ -41,9 +41,9 @@ namespace MiniKreuzwortraetsel
             SubTiles[0] = new SubTile(direction: 0, parentTile: this);
             SubTiles[1] = new SubTile(direction: 1, parentTile: this);
         }
-        public LetterTile ToLetterTile(Tile[,] grid, QuestionTile questionTile, string text, int ts, Bitmap screenBuffer, PictureBox pb)
+        public LetterTile ToLetterTile(Tile[,] grid, QuestionTile questionTile, string text, int ts, PictureBox pb)
         {
-            grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), questionTile, text, ts, screenBuffer, pb);
+            grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), questionTile, text, ts, pb);
             return grid[GetPosition().Y, GetPosition().X] as LetterTile;
         }
         public QuestionTile ToQuestionTile(Tile[,] grid, string question, int direction)
@@ -54,7 +54,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public override void Paint(int ts, Bitmap screenBuffer, PictureBox pb)
+        public override void Paint(int ts, PictureBox pb)
         {
             // Dispose Image and Graphics to prevent memory leak
             Bitmap tileBitmap = new Bitmap(ts, ts);
@@ -103,7 +103,7 @@ namespace MiniKreuzwortraetsel
                         break;
                 }
 
-                PaintToScreenBuffer(ts, screenBuffer, tileBitmap, pb);  
+                PaintToScreenBuffer(ts, tileBitmap, pb);  
             }
 
         }
@@ -122,7 +122,7 @@ namespace MiniKreuzwortraetsel
         {
             return reserved;
         }
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts)
         {
 
         }
@@ -130,7 +130,7 @@ namespace MiniKreuzwortraetsel
         {
 
         }
-        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts)
         {
             
         }

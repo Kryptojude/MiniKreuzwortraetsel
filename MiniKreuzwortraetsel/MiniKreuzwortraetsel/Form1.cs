@@ -20,8 +20,6 @@ namespace MiniKreuzwortraetsel
         UI_mode_enum UI_mode;
         Random random = new Random();
         Point oldMousePosition = new Point();
-        Rectangle nextPaintArea;
-        Bitmap nextPaintBitmap;
 
         // TODO: 
 
@@ -61,9 +59,6 @@ namespace MiniKreuzwortraetsel
                     grid[y, x] = tile;
                 }
             }
-
-            // Instantiate screenBuffer
-            screenBuffer = new Bitmap(TS * grid.GetLength(1), TS * grid.GetLength(0));
 
             // Instantiate Popup
             popup = new Popup();
@@ -170,7 +165,7 @@ namespace MiniKreuzwortraetsel
                 tuple.Question = ReplaceUmlaute(tuple.Question);
 
                 // Reset Highlights
-                EmptyTile.RemoveAllHighlights(grid, TS, screenBuffer, gridPB);
+                EmptyTile.RemoveAllHighlights(grid, TS, gridPB);
 
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed ("matched")
@@ -353,7 +348,7 @@ namespace MiniKreuzwortraetsel
                     EmptyTile emptyTile = tile as EmptyTile;
                     // Convert the EmptyTile to LetterTile
                     string text = tuple.Answer[c].ToString();
-                    emptyTile.ToLetterTile(grid, questionTile, text, TS, screenBuffer, gridPB);
+                    emptyTile.ToLetterTile(grid, questionTile, text, TS, gridPB);
                 }
                 else if (tile is LetterTile)
                 {
@@ -535,38 +530,25 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         private void GridPB_MouseMove(object sender, MouseEventArgs e)
         {
-            screenBuffer.Save("screenBuffer.jpg");
             // Get old mouse tile
             Tile oldMouseTile = grid[oldMousePosition.Y / TS, oldMousePosition.X / TS];
             // Get new mouse tile
             Tile newMouseTile = grid[e.Y / TS, e.X / TS];
             // This will always be called, whether mouse movement was intra-tile or inter-tile
-            newMouseTile.MouseMove(e, gridPB, TS, screenBuffer);
+            newMouseTile.MouseMove(e, gridPB, TS);
             // Check if new mouse tile is different from old mouse tile
             if (oldMouseTile != newMouseTile)
                 // If they are different, then the mouse has moved from one tile to another, 
                 // so also call MouseLeave for old tile
-                oldMouseTile.MouseLeave(e, gridPB, TS, screenBuffer);
+                oldMouseTile.MouseLeave(e, gridPB, TS);
 
             // Update old mouse position
             oldMousePosition = new Point(e.X, e.Y);
         }
-
-        // What I did last time: Tile should call this method and hand over its bounds and its generated visuals, 
-        // this method then puts both into fields and invalidates the area of the bounds of the tile, then calls update
-        public void PaintSingleTile(nextPaintArea, nextPaintBitmap)
-        {
-            nextPaintArea = 
-            nextPaintBitmap = 
-
-            Invalidate();
-            Update();
-        }
-
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
             // Paint single tile
-            e.Graphics.DrawImage(nextPaintBitmap, nextPaintArea);
+            e.Graphics.DrawImage(NextPaintInstruction.GetBitmap(), NextPaintInstruction.GetRectangle());
 
             // Draw Popup
             if (popup.IsVisible())

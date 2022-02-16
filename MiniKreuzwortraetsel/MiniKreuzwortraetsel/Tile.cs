@@ -47,11 +47,13 @@ namespace MiniKreuzwortraetsel
             this.position = position;
         }
 
-        /// <summary>
-        /// Draws all the visuals of this tile on an image and returns that image
-        /// </summary>
-        public abstract void Paint(int ts, Bitmap screenBuffer, PictureBox pb);
+        public abstract void Paint(int ts, PictureBox pb);
 
+        // What I did last time: I need to create a method in Tile.cs which returns the Bounds (Rectangle) of a tile, 
+        // or save the Bounds upon creation of the instance, so that the Paint() function in the tile subclass can
+        // hand over its Bounds to NextPaintInstruction.Set(), which will then save the Rectangle and Bitmap, and
+        // it will call Invalidate() which calls Form1.Paint(), which will only draw that single bitmap, and
+        // it should not erase the rest of the grid (Debug Invalidate to confirm)
         public Point GetPosition()
         {
             return position;
@@ -60,27 +62,16 @@ namespace MiniKreuzwortraetsel
         {
             return new Point(position.X * ts, position.Y * ts);
         }
-        protected void PaintToScreenBuffer(int ts, Bitmap screenBuffer, Bitmap tileBitmap, PictureBox pb)
-        {
-            // Draw the visuals into the screenBuffer
-            using (Graphics screenBufferGfx = Graphics.FromImage(screenBuffer))
-            {
-                screenBufferGfx.DrawImage(tileBitmap, GetWorldPosition(ts));
-                //screenBuffer.Save("screenBuffer.jpg");
-                pb.Invalidate(new Rectangle(GetWorldPosition(ts), new Size(ts, ts)));
-                pb.Update();
-            }
-        }
         /// <summary>
         /// This will be called when the mouse has moved, 
         /// the called method belongs to the tile instance that the mouse is on
         /// </summary>
-        public abstract void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer);
+        public abstract void MouseMove(MouseEventArgs e, PictureBox pb, int ts);
         /// <summary>
         /// This will be called when the mouse has moved from one tile to another,
         /// the called method belongs to the tile instance that the mouse was on before the movement
         /// </summary>
-        public abstract void MouseLeave(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer);
+        public abstract void MouseLeave(MouseEventArgs e, PictureBox pb, int ts);
         public abstract void MouseClick(MouseEventArgs e, Tile[,] grid, int ts);
     }
 }

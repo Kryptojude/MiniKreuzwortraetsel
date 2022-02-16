@@ -123,6 +123,7 @@
     </Compile>
     <Compile Include="LetterTile.cs" />
     <Compile Include="MySqlQueries.cs" />
+    <Compile Include="NextPaintInstruction.cs" />
     <Compile Include="Popup.cs" />
     <Compile Include="QuestionTile.cs" />
     <Compile Include="SubTile.cs" />

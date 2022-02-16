@@ -77,7 +77,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Draws all the visuals of this tile on an image and returns that image
         /// </summary>
-        public override void Paint(int ts, Bitmap screenBuffer, PictureBox pb)
+        public override void Paint(int ts, PictureBox pb)
         {
             // Dispose Image and Graphics to prevent memory leak
             Bitmap tileBitmap = new Bitmap(ts, ts);
@@ -96,7 +96,8 @@ namespace MiniKreuzwortraetsel
                 using (Image deleteButtonImage = deleteButton.GetImage())
                     graphics.DrawImage(deleteButtonImage, DeleteButton.bounds_tile_space);
 
-                PaintToScreenBuffer(ts, screenBuffer, tileBitmap, pb);
+                
+                NextPaintInstruction.Set(tileBitmap, pb);
             }
         }
 
@@ -106,7 +107,7 @@ namespace MiniKreuzwortraetsel
             letterTile.AddQuestionTile(this);
         }
 
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts)
         {
             /* What can happen when you move the mouse onto a questionTile, or within a questionTile?
              * deleteButton could appear, it can't disappear
@@ -135,10 +136,10 @@ namespace MiniKreuzwortraetsel
 
             // Compare before and after-state, If change occured, call this.Paint();
             if (beforeHashCode != afterHashCode)
-                Paint(ts, screenBuffer, pb);
+                Paint(ts, pb);
         }
 
-        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts, Bitmap screenBuffer)
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts)
         {
             // deleteButton is not visible
             deleteButton.SetVisible(false);
