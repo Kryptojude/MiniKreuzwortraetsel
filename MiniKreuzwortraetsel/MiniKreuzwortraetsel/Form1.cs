@@ -20,16 +20,9 @@ namespace MiniKreuzwortraetsel
         UI_mode_enum UI_mode;
         Random random = new Random();
         Point oldMousePosition = new Point();
+        int refreshCounter = 0;
 
         // TODO: 
-
-        // Implement MouseLeave method in tile class, so that when a tile is left, different logic can run from current MouseMove logic
-
-        // Right now this should hand down the MouseMove Event to the affected tiles
-        // they will then update their properties based on the mouse position
-        // Then they should call CheckVisualChange() which hashes their properties and determines a potential visual change
-        // If a change occured, then it will call Paint() method which calculates new bitmap for tile and writes that into the screenBuffer
-        // Then the screenBuffer setter will call a refresh which will simply display the new screenbuffer
         /*
          * Lokale Kopie der Datenbank machen und diese benutzen falls Verbindung fehlschlägt
          * Üvbereinstimmngen anzeigen knöpfe enabled/disabled
@@ -50,12 +43,15 @@ namespace MiniKreuzwortraetsel
         {
             InitializeComponent();
 
+            // Initialize screenBuffer
+            ScreenBuffer.Initialize(TS, grid.GetLength(0));
+
             // Create tile instances in grid
             for (int y = 0; y < grid.GetLength(0); y++)
             {
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    Tile tile = new EmptyTile(new Point(x, y));
+                    Tile tile = new EmptyTile(new Point(x, y), TS);
                     grid[y, x] = tile;
                 }
             }
@@ -279,7 +275,7 @@ namespace MiniKreuzwortraetsel
                 else if (candidates.Count == 1)
                 {
                     // Fill answer into that position, convert the EmptyTile to QuestionTile
-                    FillAnswer(candidates[0].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[0].direction), tuple);
+                    FillAnswer(candidates[0].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[0].direction, TS), tuple);
                 }
                 else if (candidates.Count > 1)
                 {
@@ -309,7 +305,7 @@ namespace MiniKreuzwortraetsel
 
                         // Pick a random index
                         int randomIndex = maxMatchesIndeces[random.Next(maxMatchesIndeces.Count)];
-                        FillAnswer(candidates[randomIndex].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[randomIndex].direction), tuple);
+                        FillAnswer(candidates[randomIndex].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[randomIndex].direction, TS), tuple);
                     }
                 }
             }
@@ -547,12 +543,24 @@ namespace MiniKreuzwortraetsel
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
-            // Paint single tile
-            e.Graphics.DrawImage(NextPaintInstruction.GetBitmap(), NextPaintInstruction.GetRectangle());
+            if (NextPaintInstruction.Get(out Bitmap bitmap, out Rectangle rectangle))
+            {
+                // Paint single tile (all tiles will still be visible, because this branch will be reached only when
+                // tile.Paint() has called Invalidate(rec))
+                e.Graphics.DrawImage(bitmap, rectangle);
+                Debug.WriteLine("PaintMethod single tile branch count: " + refreshCounter++);
+            }
+            else
+            {
+                // There is nothing buffered in NextPaintInstruction (Paint event was raised from somewhere else),
+                // so just draw the backup screenBuffer
+                e.Graphics.DrawImage(ScreenBuffer.GetScreenBuffer(), 0, 0);
+            }
 
             // Draw Popup
             if (popup.IsVisible())
                 e.Graphics.DrawString(popup.GetText(), Font, Brushes.Black, popup.GetPosition());
+
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and on hover tile

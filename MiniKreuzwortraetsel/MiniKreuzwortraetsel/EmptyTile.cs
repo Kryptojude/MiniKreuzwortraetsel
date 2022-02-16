@@ -31,7 +31,7 @@ namespace MiniKreuzwortraetsel
         bool reserved = false;
         public SubTile[] SubTiles { get; } = new SubTile[2];
 
-        public EmptyTile(Point position) : base(position)
+        public EmptyTile(Point position, int ts) : base(position, ts)
         {
             MakeSubTiles();
         }
@@ -46,14 +46,11 @@ namespace MiniKreuzwortraetsel
             grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), questionTile, text, ts, pb);
             return grid[GetPosition().Y, GetPosition().X] as LetterTile;
         }
-        public QuestionTile ToQuestionTile(Tile[,] grid, string question, int direction)
+        public QuestionTile ToQuestionTile(Tile[,] grid, string question, int direction, int ts)
         {
-            grid[GetPosition().Y, GetPosition().X] = new QuestionTile(GetPosition(), question, direction);
+            grid[GetPosition().Y, GetPosition().X] = new QuestionTile(GetPosition(), question, direction, ts);
             return grid[GetPosition().Y, GetPosition().X] as QuestionTile;
         }
-        /// <summary>
-        /// Draws all the visuals of this tile on an image and returns that image
-        /// </summary>
         public override void Paint(int ts, PictureBox pb)
         {
             // Dispose Image and Graphics to prevent memory leak
@@ -103,7 +100,7 @@ namespace MiniKreuzwortraetsel
                         break;
                 }
 
-                PaintToScreenBuffer(ts, tileBitmap, pb);  
+                NextPaintInstruction.Set(GetBounds(), tileBitmap, pb);
             }
 
         }

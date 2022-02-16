@@ -10,25 +10,57 @@ namespace MiniKreuzwortraetsel
 {
     static class NextPaintInstruction
     {
-        static Rectangle Rectangle;
+        static Rectangle Bounds;
         static Bitmap Bitmap;
 
-        static public Rectangle GetRectangle()
+        //static public Rectangle GetRectangle()
+        //{
+        //    return Bounds;
+        //}
+        static public bool Get(out Bitmap bitmap, out Rectangle rectangle)
         {
-            return Rectangle;
+            // Returns
+            bitmap = Bitmap;
+            rectangle = Bounds;
+            // Ready check
+            if (!Bounds.IsEmpty && Bitmap != null)
+            {
+                // Reset
+                Bounds = new Rectangle();
+                Bitmap = null;
+                return true;
+            }
+            else
+                return false;
         }
-        static public Bitmap GetBitmap()
+        //static public Bitmap GetBitmap()
+        //{
+        //    return Bitmap;
+        //}
+        static public void Set(Rectangle bounds, Bitmap tileBitmap, PictureBox pb)
         {
-            return Bitmap;
-        }
-        static public void Set(Rectangle rectangle, Bitmap bitmap, PictureBox pb)
-        {
-            Rectangle = rectangle;
-            Bitmap = bitmap;
+            // Save these fields, they will be accessed by gridPB.Paint() to paint a single tile
+            Bounds = bounds;
+            Bitmap = tileBitmap;
+
+            // Also write this tile bitmap into the screenBuffer in case system forces complete refresh
+            ScreenBuffer.DrawToScreenBuffer(Bitmap, Bounds);
 
             // This should cause a repaint of only the invalidated area (Debug to verify)
-            pb.Invalidate(Rectangle);
-            //pb.Update();
+            pb.Invalidate(Bounds);
+            pb.Update();
         }
+        //static public bool Ready()
+        //{
+        //    if (!Bounds.IsEmpty && Bitmap != null)
+        //        return true;
+        //    else
+        //        return false;
+        //}
+        //static public void Reset()
+        //{
+        //    Bounds = new Rectangle();
+        //    Bitmap = null;
+        //}
     }
 }

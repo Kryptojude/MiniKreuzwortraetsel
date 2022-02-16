@@ -16,25 +16,22 @@ namespace MiniKreuzwortraetsel
         readonly List<QuestionTile> questionTiles = new List<QuestionTile>();
         public string Text = "";
 
-        public LetterTile(Point position, QuestionTile questionTile, string text, int ts, PictureBox pb) : base(position)
+        public LetterTile(Point position, QuestionTile questionTile, string text, int ts, PictureBox pb) : base(position, ts)
         {
             questionTile.AddLinkedLetterTile(this);
             Text = text;
             Paint(ts, pb);
         }
 
-        public void ToEmptyTile(Tile[,] grid, QuestionTile questionTile)
+        public void ToEmptyTile(Tile[,] grid, QuestionTile questionTile, int ts)
         {
             // If the letterTile only belongs to this questionTile, then make into EmptyTile
             if (questionTiles.Count == 1)
-                grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
+                grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition(), ts);
             // If the letterTile belongs to multiple QuestionTiles, just remove this QuestionTile from its question tile list
             else
                 questionTiles.Remove(questionTile);
         }
-        /// <summary>
-        /// Draws all the visuals of this tile on an image and returns that image
-        /// </summary>
         public override void Paint(int ts, PictureBox pb)
         {
             // Dispose Image and Graphics to prevent memory leak
@@ -72,8 +69,8 @@ namespace MiniKreuzwortraetsel
                         graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
                         break;
                 }
-                //tileBitmap.Save("tileBitmap.jpg");
-                PaintToScreenBuffer(ts, tileBitmap, pb);
+
+                NextPaintInstruction.Set(GetBounds(), tileBitmap, pb);
             }
         }
 

@@ -31,7 +31,8 @@ namespace MiniKreuzwortraetsel
             }
         }
 
-        Point position;
+        Point Position;
+        Rectangle Bounds;
         protected Font font = new Font("Verdana", 9.75f, FontStyle.Bold);
         protected Brush foregroundColor = Brushes.Blue;
         protected int oldHashCode = 0;
@@ -42,25 +43,23 @@ namespace MiniKreuzwortraetsel
         public ExtendedHover extendedHover = ExtendedHover.Off;
         protected Pen extendedHoverPen = new Pen(Brushes.Red, 5);
 
-        public Tile(Point position)
+        public Tile(Point position, int ts)
         {
-            this.position = position;
+            Position = position;
+            Bounds = new Rectangle(Position.X * ts, Position.Y * ts, ts, ts);
         }
-
-        public abstract void Paint(int ts, PictureBox pb);
-
-        // What I did last time: I need to create a method in Tile.cs which returns the Bounds (Rectangle) of a tile, 
-        // or save the Bounds upon creation of the instance, so that the Paint() function in the tile subclass can
-        // hand over its Bounds to NextPaintInstruction.Set(), which will then save the Rectangle and Bitmap, and
-        // it will call Invalidate() which calls Form1.Paint(), which will only draw that single bitmap, and
-        // it should not erase the rest of the grid (Debug Invalidate to confirm)
+        protected Rectangle GetBounds()
+        {
+            return Bounds;
+        }
         public Point GetPosition()
         {
-            return position;
+            return Position;
         }
+        // Reduntant with Bounds field added
         public Point GetWorldPosition(int ts)
         {
-            return new Point(position.X * ts, position.Y * ts);
+            return new Point(Position.X * ts, Position.Y * ts);
         }
         /// <summary>
         /// This will be called when the mouse has moved, 
@@ -73,5 +72,6 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         public abstract void MouseLeave(MouseEventArgs e, PictureBox pb, int ts);
         public abstract void MouseClick(MouseEventArgs e, Tile[,] grid, int ts);
+        public abstract void Paint(int ts, PictureBox pb);
     }
 }

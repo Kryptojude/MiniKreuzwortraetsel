@@ -126,6 +126,7 @@
     <Compile Include="NextPaintInstruction.cs" />
     <Compile Include="Popup.cs" />
     <Compile Include="QuestionTile.cs" />
+    <Compile Include="ScreenBuffer.cs" />
     <Compile Include="SubTile.cs" />
     <Compile Include="TextDialogForm.cs">
       <SubType>Form</SubType>

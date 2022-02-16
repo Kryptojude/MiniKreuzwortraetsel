@@ -19,7 +19,7 @@ namespace MiniKreuzwortraetsel
         public EmptyTile LinkedReservedTile;
         DeleteButton deleteButton = new DeleteButton();
 
-        public QuestionTile(Point position, string question, int direction) : base(position)
+        public QuestionTile(Point position, string question, int direction, int ts) : base(position, ts)
         {
             foregroundColor = Brushes.Red;
             font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
@@ -51,18 +51,18 @@ namespace MiniKreuzwortraetsel
             return string.IsNullOrEmpty(Question);
         }
 
-        public void ToEmptyTile(Tile[,] grid)
+        public void ToEmptyTile(Tile[,] grid, int ts)
         {
             // Turn the letter tiles associated with this questionTile into emptyTiles
             foreach (LetterTile letterTile in LinkedLetterTiles)
-                letterTile.ToEmptyTile(grid, this);
+                letterTile.ToEmptyTile(grid, this, ts);
 
             // Unreserve the reserved tile of the questionTile
             LinkedReservedTile?.Unreserve();
 
             // Insert a new EmptyTile instance into the grid at this tile's position, 
             Point position = GetPosition();
-            grid[position.Y, position.X] = new EmptyTile(position);
+            grid[position.Y, position.X] = new EmptyTile(position, ts);
 
             // Save this index
             int indexOfThisQuestionTile = questionTileList.IndexOf(this);
@@ -97,7 +97,7 @@ namespace MiniKreuzwortraetsel
                     graphics.DrawImage(deleteButtonImage, DeleteButton.bounds_tile_space);
 
                 
-                NextPaintInstruction.Set(tileBitmap, pb);
+                NextPaintInstruction.Set(GetBounds(), tileBitmap, pb);
             }
         }
 
@@ -106,7 +106,9 @@ namespace MiniKreuzwortraetsel
             LinkedLetterTiles.Add(letterTile);
             letterTile.AddQuestionTile(this);
         }
-
+        // What I did last time: Painting logic is pretty much done now, now fix why tiles aren't showing up properly after adding them
+        // CheckVisualChange() method probably instead override GetHashCode() and in that go through all the fields that are relevant for visuals (even child elements)
+        // and hash it before and after
         public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts)
         {
             /* What can happen when you move the mouse onto a questionTile, or within a questionTile?
@@ -151,7 +153,7 @@ namespace MiniKreuzwortraetsel
             if (deleteButton.IsMouseOverMe(e, this, ts))
             {
                 // Then delete this question
-                ToEmptyTile(grid);
+                ToEmptyTile(grid, ts);
             }
         }
 
