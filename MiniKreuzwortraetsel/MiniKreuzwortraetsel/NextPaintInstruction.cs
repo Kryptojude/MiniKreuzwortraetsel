@@ -37,9 +37,15 @@ namespace MiniKreuzwortraetsel
         //{
         //    return Bitmap;
         //}
+        // Next time: Too many Paint event calls are slowing down the program, so we need to implement a refresh list in this class,
+        // where the Get() method always returns the next Paint instruction from that list and deletes it
+        // Get() will be called like now by gridPB_Paint() and loops through the refresh list until its empty.
+        // The invalidate/update is necessary cause only certain tiles will be drawn, so we dont lose the rest which would be the case with refresh().
+        // The invalidate/update call cant be in here, we dont want every tile paint to cause gridPB_Paint() to be called, instead the pair will be called
+        // in the places it was when refresh() was still used, so whenever a big operation is complete, like autofilling a word into the grid, at the very end there should be one call
         static public void Set(Rectangle bounds, Bitmap tileBitmap, PictureBox pb)
         {
-            // Save these fields, they will be accessed by gridPB.Paint() to paint a single tile
+            // Save these fields, they will be accessed by gridPB_Paint() to paint a single tile
             Bounds = bounds;
             Bitmap = tileBitmap;
 
