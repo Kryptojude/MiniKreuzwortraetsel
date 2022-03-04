@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Media;
 
-namespace WindowsFormsPaintTest1
+namespace TimeLogger
 {
     public static class TimeLogger
     {
