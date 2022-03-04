@@ -17,10 +17,11 @@ namespace MiniKreuzwortraetsel
         public int Direction;
         readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
         public EmptyTile LinkedReservedTile;
-        DeleteButton deleteButton = new DeleteButton();
+        DeleteButton deleteButton;
 
         public QuestionTile(Point position, string question, int direction, int ts) : base(position, ts)
         {
+            deleteButton = new DeleteButton(GetBounds().Location);
             foregroundColor = Brushes.Red;
             font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
             Question = question;
@@ -74,37 +75,27 @@ namespace MiniKreuzwortraetsel
                 questionTileList[i].GenerateText();
         }
 
-        /// <summary>
-        /// Draws all the visuals of this tile on an image and returns that image
-        /// </summary>
-        public override void Paint(int ts, PictureBox pb)
+        public override void Paint(Graphics g)
         {
-            // Dispose Image and Graphics to prevent memory leak
-            Bitmap tileBitmap = new Bitmap(ts, ts);
-            using (Graphics graphics = Graphics.FromImage(tileBitmap))
-            {
-                graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
+            int ts = Form1.TS;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
-                // Draw text
-                Size textSize = TextRenderer.MeasureText(Text, font);
-                graphics.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
+            // Draw text
+            Size textSize = TextRenderer.MeasureText(Text, font);
+            //g.DrawString(Text, font, foregroundColor, GetBounds().Location.X + (ts / 2 - textSize.Width / 2), GetBounds().Location.Y + (ts / 2 - textSize.Height / 2));
+            g.DrawString(Text, font, foregroundColor,ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
 
-                // Draw Rectangle
-                graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
+            // Draw Rectangle
+            g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
 
-                // Draw X
-                using (Image deleteButtonImage = deleteButton.GetImage())
-                    graphics.DrawImage(deleteButtonImage, DeleteButton.bounds_tile_space);
-
-                
-                NextPaintInstruction.Set(GetBounds(), tileBitmap, pb);
-            }
+            // Draw X
+            deleteButton.Paint(g);
         }
 
         public void AddLinkedLetterTile(LetterTile letterTile)
         {
             LinkedLetterTiles.Add(letterTile);
-            letterTile.AddQuestionTile(this);
+            letterTile.AddParentQuestionTile(this);
         }
         // What I did last time: Painting logic is pretty much done now, now fix why tiles aren't showing up properly after adding them
         // CheckVisualChange() method probably instead override GetHashCode() and in that go through all the fields that are relevant for visuals (even child elements)
@@ -138,7 +129,7 @@ namespace MiniKreuzwortraetsel
 
             // Compare before and after-state, If change occured, call this.Paint();
             if (beforeHashCode != afterHashCode)
-                Paint(ts, pb);
+                AddToRefreshList(this);
         }
 
         public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts)

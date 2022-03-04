@@ -17,6 +17,7 @@ namespace MiniKreuzwortraetsel
 
         bool visible = false;
         bool hover = false;
+        Rectangle bounds_global;
 
         static DeleteButton()
         {
@@ -24,6 +25,11 @@ namespace MiniKreuzwortraetsel
 
             absoluteSize = (int)(sizeFactor * Form1.TS);
             bounds_tile_space = new Rectangle(Form1.TS - absoluteSize, 0, absoluteSize, absoluteSize);
+        }
+
+        public DeleteButton(Point parentTileLocation)
+        {
+            bounds_global = new Rectangle(bounds_tile_space.X + parentTileLocation.X, bounds_tile_space.Y + parentTileLocation.Y, absoluteSize, absoluteSize);
         }
 
         public bool IsVisible()
@@ -48,7 +54,7 @@ namespace MiniKreuzwortraetsel
         public bool IsMouseOverMe(MouseEventArgs e, QuestionTile parentTile, int ts)
         {
             // Calculate mouse position in tile space
-            Point mousePosition_tile_space = new Point(e.X - parentTile.GetWorldPosition(ts).X, e.Y - parentTile.GetWorldPosition(ts).Y);
+            Point mousePosition_tile_space = new Point(e.X - parentTile.GetBounds().X, e.Y - parentTile.GetBounds().Y);
             // Check if mouse is over deleteButton
             if (bounds_tile_space.X <= mousePosition_tile_space.X && bounds_tile_space.Height >= mousePosition_tile_space.Y)
                 return true;
@@ -56,23 +62,16 @@ namespace MiniKreuzwortraetsel
                 return false;
         }
 
-        public Image GetImage()
+        public void Paint(Graphics g)
         {
-            // Dispose Image and Graphics to prevent memory leak
-            Image canvas = new Bitmap(absoluteSize, absoluteSize);
-            using (Graphics graphics = Graphics.FromImage(canvas))
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
+            if (IsVisible())
             {
-                graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
-                if (IsVisible())
-                {
-                    graphics.DrawRectangle(pen, 0, 0, absoluteSize, absoluteSize - 1);
-                    graphics.DrawLine(pen, 0, 0, absoluteSize, absoluteSize - 1);
-                    graphics.DrawLine(pen, 0, absoluteSize - 1, absoluteSize, 0);
+                g.DrawRectangle(pen, bounds_global.X, bounds_global.Y, absoluteSize, absoluteSize - 1);
+                g.DrawLine(pen, 0, 0, absoluteSize, absoluteSize - 1);
+                g.DrawLine(pen, 0, absoluteSize - 1, absoluteSize, 0);
 
-                    //graphics.FillRectangle(Brushes.Black, 0, 0, absoluteSize, absoluteSize);
-                }
-
-                return canvas;
+                //graphics.FillRectangle(Brushes.Black, 0, 0, absoluteSize, absoluteSize);
             }
         }
     }

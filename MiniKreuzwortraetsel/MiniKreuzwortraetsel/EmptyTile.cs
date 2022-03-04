@@ -22,7 +22,7 @@ namespace MiniKreuzwortraetsel
                         // Reset the Subtiles so highlights disappear
                         emptyTile.MakeSubTiles();
                         // Call paint method of this tile
-                        emptyTile.Paint(ts, pb);
+                        AddToRefreshList(emptyTile);
                     }
                 }
             }
@@ -43,7 +43,7 @@ namespace MiniKreuzwortraetsel
         }
         public LetterTile ToLetterTile(Tile[,] grid, QuestionTile questionTile, string text, int ts, PictureBox pb)
         {
-            grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), questionTile, text, ts, pb);
+            grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), questionTile, text, ts);
             return grid[GetPosition().Y, GetPosition().X] as LetterTile;
         }
         public QuestionTile ToQuestionTile(Tile[,] grid, string question, int direction, int ts)
@@ -51,58 +51,52 @@ namespace MiniKreuzwortraetsel
             grid[GetPosition().Y, GetPosition().X] = new QuestionTile(GetPosition(), question, direction, ts);
             return grid[GetPosition().Y, GetPosition().X] as QuestionTile;
         }
-        public override void Paint(int ts, PictureBox pb)
+        public override void Paint(Graphics g)
         {
-            // Dispose Image and Graphics to prevent memory leak
-            Bitmap tileBitmap = new Bitmap(ts, ts);
-            using (Graphics graphics = Graphics.FromImage(tileBitmap))
+            int ts = Form1.TS;
+
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
+            // Draw highlights
+            for (int i = 0; i < SubTiles.Length; i++)
             {
-                graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
-                // Draw highlights
-                for (int i = 0; i < SubTiles.Length; i++)
-                {
-                    graphics.FillPolygon(SubTiles[i].GetColor(), SubTiles[i].GetSubTilePolygon());
-                }
-
-                SubTile hoverSubTile = SubTile.BlueHoverSubTile;
-                // Draw hover effect
-                if (SubTile.BlueHoverSubTile?.ParentTile == this)
-                {
-                    graphics.FillPolygon(Brushes.Blue, hoverSubTile.GetSubTilePolygon());
-                    graphics.DrawString(hoverSubTile.GetArrow(), SubTile.HOVER_ARROW_FONT, Brushes.Red, hoverSubTile.GetArrowPosition());
-                }
-
-                // Draw Rectangle
-                // Condition: At least one subtile is highlighted
-                if (SubTiles[0].IsHighlighted() || SubTiles[1].IsHighlighted())
-                    graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
-
-                // Draw extendedHover
-                switch (extendedHover)
-                {
-                    case ExtendedHover.Two_Outlines_Horizontal:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                        break;
-                    case ExtendedHover.Three_Outlines_Horizontal:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                        break;
-                    case ExtendedHover.Two_Outlines_Vertical:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                        break;
-                    case ExtendedHover.Three_Outlines_Vertical:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                        break;
-                }
-
-                NextPaintInstruction.Set(GetBounds(), tileBitmap, pb);
+                g.FillPolygon(SubTiles[i].GetColor(), SubTiles[i].GetSubTilePolygon());
             }
 
+            SubTile hoverSubTile = SubTile.BlueHoverSubTile;
+            // Draw hover effect
+            if (SubTile.BlueHoverSubTile?.ParentTile == this)
+            {
+                g.FillPolygon(Brushes.Blue, hoverSubTile.GetSubTilePolygon());
+                g.DrawString(hoverSubTile.GetArrow(), SubTile.HOVER_ARROW_FONT, Brushes.Red, hoverSubTile.GetArrowPosition());
+            }
+
+            // Draw Rectangle
+            // Condition: At least one subtile is highlighted
+            if (SubTiles[0].IsHighlighted() || SubTiles[1].IsHighlighted())
+                g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
+
+            // Draw extendedHover
+            switch (extendedHover)
+            {
+                case ExtendedHover.Two_Outlines_Horizontal:
+                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
+                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    break;
+                case ExtendedHover.Three_Outlines_Horizontal:
+                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
+                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    break;
+                case ExtendedHover.Two_Outlines_Vertical:
+                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
+                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                    break;
+                case ExtendedHover.Three_Outlines_Vertical:
+                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
+                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    break;
+            }
         }
 
         public void Reserve()
@@ -131,20 +125,5 @@ namespace MiniKreuzwortraetsel
         {
             
         }
-        private bool CheckVisualChange()
-        {
-            if (oldHashCode != GetHashCode())
-                return true;
-            else
-                return false;
-            // Hash all visual properties in before state
-
-            // Hash all visual properties in after state
-
-            // Compare before to after state
-
-            // In case of change, add this tile to refreshList
-        }
-
     }
 }

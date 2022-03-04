@@ -20,7 +20,6 @@ namespace MiniKreuzwortraetsel
         UI_mode_enum UI_mode;
         Random random = new Random();
         Point oldMousePosition = new Point();
-        int refreshCounter = 0;
 
         // TODO: 
         /*
@@ -309,6 +308,8 @@ namespace MiniKreuzwortraetsel
                     }
                 }
             }
+
+            Refresh();
         }
 
         private void FillAnswer(QuestionTile questionTile, (string Question, string Answer) tuple)
@@ -543,18 +544,22 @@ namespace MiniKreuzwortraetsel
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
-            if (NextPaintInstruction.Get(out Bitmap bitmap, out Rectangle rectangle))
+            //List<Tile> refreshList = Tile.GetRefreshList();
+
+            //for (int t = 0; t < refreshList.Count; t++)
+            //    refreshList[t].Paint(e.Graphics);
+
+            //refreshList.Clear();
+
+            for (int x = 0; x < grid.GetLength(1); x++)
             {
-                // Paint single tile (all tiles will still be visible, because this branch will be reached only when
-                // tile.Paint() has called Invalidate(rec))
-                e.Graphics.DrawImage(bitmap, rectangle);
-                Debug.WriteLine("PaintMethod single tile branch count: " + refreshCounter++);
-            }
-            else
-            {
-                // There is nothing buffered in NextPaintInstruction (Paint event was raised from somewhere else),
-                // so just draw the backup screenBuffer
-                e.Graphics.DrawImage(ScreenBuffer.GetScreenBuffer(), 0, 0);
+                for (int y = 0; y < grid.GetLength(0); y++)
+                {
+                    Tile tile = grid[x, y];
+                    e.Graphics.TranslateTransform(tile.GetBounds().Location.X, tile.GetBounds().Location.Y);
+                    tile.Paint(e.Graphics);
+                    e.Graphics.TranslateTransform(-tile.GetBounds().Location.X, -tile.GetBounds().Location.Y);
+                }
             }
 
             // Draw Popup

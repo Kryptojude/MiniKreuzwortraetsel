@@ -11,6 +11,7 @@ namespace MiniKreuzwortraetsel
 {
     abstract class Tile
     {
+        static List<Tile> refreshList = new List<Tile>();
         static public (string Question, string Answer) TupleToBeFilled;
         public enum ExtendedHover
         {
@@ -30,6 +31,14 @@ namespace MiniKreuzwortraetsel
                 }
             }
         }
+        static public List<Tile> GetRefreshList()
+        {
+            return refreshList;
+        }
+        static public void AddToRefreshList(Tile tile)
+        {
+            refreshList.Add(tile);
+        }
 
         Point Position;
         Rectangle Bounds;
@@ -48,7 +57,7 @@ namespace MiniKreuzwortraetsel
             Position = position;
             Bounds = new Rectangle(Position.X * ts, Position.Y * ts, ts, ts);
         }
-        protected Rectangle GetBounds()
+        public Rectangle GetBounds()
         {
             return Bounds;
         }
@@ -56,10 +65,24 @@ namespace MiniKreuzwortraetsel
         {
             return Position;
         }
-        // Reduntant with Bounds field added
-        public Point GetWorldPosition(int ts)
+        protected void CheckVisualChange()
         {
-            return new Point(Position.X * ts, Position.Y * ts);
+            int newHashCode = GetHashCode();
+            if (oldHashCode != newHashCode)
+            {
+                // Save old Hash code
+                oldHashCode = newHashCode;
+
+                AddToRefreshList(this);
+            }
+
+            // Hash all visual properties in before state
+
+            // Hash all visual properties in after state
+
+            // Compare before to after state
+
+            // In case of change, add this tile to refreshList
         }
         /// <summary>
         /// This will be called when the mouse has moved, 
@@ -72,6 +95,7 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         public abstract void MouseLeave(MouseEventArgs e, PictureBox pb, int ts);
         public abstract void MouseClick(MouseEventArgs e, Tile[,] grid, int ts);
-        public abstract void Paint(int ts, PictureBox pb);
+        public abstract void Paint(Graphics g);
+
     }
 }

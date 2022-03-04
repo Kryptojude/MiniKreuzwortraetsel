@@ -13,90 +13,65 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// The question tile(s) that this letter belongs to
         /// </summary>
-        readonly List<QuestionTile> questionTiles = new List<QuestionTile>();
+        readonly List<QuestionTile> parent_question_tiles = new List<QuestionTile>();
         public string Text = "";
 
-        public LetterTile(Point position, QuestionTile questionTile, string text, int ts, PictureBox pb) : base(position, ts)
+        public LetterTile(Point position, QuestionTile questionTile, string text, int ts) : base(position, ts)
         {
             questionTile.AddLinkedLetterTile(this);
             Text = text;
-            Paint(ts, pb);
+            AddToRefreshList(this);
         }
 
         public void ToEmptyTile(Tile[,] grid, QuestionTile questionTile, int ts)
         {
             // If the letterTile only belongs to this questionTile, then make into EmptyTile
-            if (questionTiles.Count == 1)
+            if (parent_question_tiles.Count == 1)
                 grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition(), ts);
             // If the letterTile belongs to multiple QuestionTiles, just remove this QuestionTile from its question tile list
             else
-                questionTiles.Remove(questionTile);
+                parent_question_tiles.Remove(questionTile);
         }
-        public override void Paint(int ts, PictureBox pb)
+        public override void Paint(Graphics g)
         {
-            // Dispose Image and Graphics to prevent memory leak
-            Bitmap tileBitmap = new Bitmap(ts, ts);
-            using (Graphics graphics = Graphics.FromImage(tileBitmap))
+            int ts = Form1.TS;
+
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
+
+            // Draw text
+            Size textSize = TextRenderer.MeasureText(Text, font);
+            g.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
+
+            // Draw Rectangle
+            g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
+
+            // Draw extendedHover
+            switch (extendedHover)
             {
-                graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
-
-                // Draw text
-                Size textSize = TextRenderer.MeasureText(Text, font);
-                graphics.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
-
-                // Draw Rectangle
-                graphics.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
-
-                // Draw extendedHover
-                switch (extendedHover)
-                {
-                    case ExtendedHover.Two_Outlines_Horizontal:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                        break;
-                    case ExtendedHover.Three_Outlines_Horizontal:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                        break;
-                    case ExtendedHover.Two_Outlines_Vertical:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                        break;
-                    case ExtendedHover.Three_Outlines_Vertical:
-                        graphics.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                        graphics.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                        graphics.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                        break;
-                }
-
-                NextPaintInstruction.Set(GetBounds(), tileBitmap, pb);
+                case ExtendedHover.Two_Outlines_Horizontal:
+                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
+                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    break;
+                case ExtendedHover.Three_Outlines_Horizontal:
+                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
+                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    break;
+                case ExtendedHover.Two_Outlines_Vertical:
+                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
+                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                    break;
+                case ExtendedHover.Three_Outlines_Vertical:
+                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
+                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    break;
             }
         }
 
-        public void AddQuestionTile(QuestionTile questionTile)
+        public void AddParentQuestionTile(QuestionTile questionTile)
         {
-            questionTiles.Add(questionTile);
-        }
-
-        private void CheckVisualChange(int ts, Bitmap screenBuffer, PictureBox pb)
-        {
-            int newHashCode = GetHashCode();
-            if (oldHashCode != newHashCode)
-            {
-                // Save old Hash code
-                oldHashCode = newHashCode;
-                // Call my paint function
-                Paint(ts, pb);
-            }
-
-            // Hash all visual properties in before state
-
-            // Hash all visual properties in after state
-
-            // Compare before to after state
-
-            // In case of change, add this tile to refreshList
+            parent_question_tiles.Add(questionTile);
         }
 
         public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts)
