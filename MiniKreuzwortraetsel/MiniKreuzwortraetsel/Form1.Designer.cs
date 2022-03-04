@@ -73,7 +73,7 @@ namespace MiniKreuzwortraetsel
             this.baseWordTBox.Name = "baseWordTBox";
             this.baseWordTBox.Size = new System.Drawing.Size(148, 23);
             this.baseWordTBox.TabIndex = 1;
-            this.baseWordTBox.TextChanged += new System.EventHandler(this.baseWordTBox_TextChanged);
+            this.baseWordTBox.TextChanged += new System.EventHandler(this.BaseWordTBox_TextChanged);
             // 
             // label1
             // 
@@ -170,7 +170,7 @@ namespace MiniKreuzwortraetsel
             this.tableMenu.Name = "tableMenu";
             this.tableMenu.Size = new System.Drawing.Size(131, 24);
             this.tableMenu.TabIndex = 5;
-            this.tableMenu.SelectedIndexChanged += new System.EventHandler(this.tableMenu_SelectedIndexChanged);
+            this.tableMenu.SelectedIndexChanged += new System.EventHandler(this.TableMenu_SelectedIndexChanged);
             // 
             // deleteTupleBTN
             // 
@@ -252,7 +252,7 @@ namespace MiniKreuzwortraetsel
             this.showMatchesBaseWordBTN.TabIndex = 17;
             this.showMatchesBaseWordBTN.Text = "Übereinstimmungen anzeigen";
             this.showMatchesBaseWordBTN.UseVisualStyleBackColor = true;
-            this.showMatchesBaseWordBTN.Click += new System.EventHandler(this.showMatchesBaseWordBTN_Click);
+            this.showMatchesBaseWordBTN.Click += new System.EventHandler(this.ShowMatchesBaseWordBTN_Click);
             // 
             // InsertBaseWordBTN
             // 

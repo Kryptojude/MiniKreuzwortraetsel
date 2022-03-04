@@ -10,7 +10,7 @@ namespace MiniKreuzwortraetsel
 {
     class EmptyTile : Tile
     {
-        public static void RemoveAllHighlights(Tile[,] grid, int ts, PictureBox pb)
+        public static void RemoveAllHighlights(Tile[,] grid, Graphics g)
         {
             for (int y = 0; y < grid.GetLength(0); y++)
             {
@@ -21,8 +21,6 @@ namespace MiniKreuzwortraetsel
                         EmptyTile emptyTile = grid[y, x] as EmptyTile;
                         // Reset the Subtiles so highlights disappear
                         emptyTile.MakeSubTiles();
-                        // Call paint method of this tile
-                        emptyTile.Paint(Form1.myBuffer.Graphics);
                     }
                 }
             }

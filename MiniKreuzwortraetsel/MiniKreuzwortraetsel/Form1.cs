@@ -21,7 +21,7 @@ namespace MiniKreuzwortraetsel
         Random random = new Random();
         Point oldMousePosition = new Point();
         BufferedGraphicsContext currentContext;
-        public static BufferedGraphics myBuffer;
+        BufferedGraphics myBuffer;
 
         // TODO: 
         /*
@@ -162,7 +162,7 @@ namespace MiniKreuzwortraetsel
                 tuple.Question = ReplaceUmlaute(tuple.Question);
 
                 // Reset Highlights
-                EmptyTile.RemoveAllHighlights(grid, TS, gridPB);
+                EmptyTile.RemoveAllHighlights(grid, myBuffer.Graphics);
 
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed ("matched")
@@ -559,21 +559,26 @@ namespace MiniKreuzwortraetsel
         }
         private void RepaintAllTiles()
         {
-            // Draw white background
-            //myBuffer.Graphics.FillRectangle(Brushes.White, myBuffer.Graphics.Clip.GetBounds(myBuffer.Graphics));
-            myBuffer.Graphics.FillRegion(Brushes.White, myBuffer.Graphics.Clip);
-            for (int x = 0; x < grid.GetLength(1); x++)
+            // 7,892
+            Action action = () =>
             {
-                for (int y = 0; y < grid.GetLength(0); y++)
+                // Draw white background
+                myBuffer.Graphics.FillRectangle(Brushes.White, gridPB.Bounds);
+                for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    Tile tile = grid[x, y];
-                    myBuffer.Graphics.TranslateTransform(tile.GetBounds().Location.X, tile.GetBounds().Location.Y);
-                    tile.Paint(myBuffer.Graphics);
-                    myBuffer.Graphics.TranslateTransform(-tile.GetBounds().Location.X, -tile.GetBounds().Location.Y);
+                    for (int y = 0; y < grid.GetLength(0); y++)
+                    {
+                        Tile tile = grid[x, y];
+                        myBuffer.Graphics.TranslateTransform(tile.GetBounds().Location.X, tile.GetBounds().Location.Y);
+                        tile.Paint(myBuffer.Graphics);
+                        myBuffer.Graphics.TranslateTransform(-tile.GetBounds().Location.X, -tile.GetBounds().Location.Y);
+                    }
                 }
-            }
 
-            myBuffer.Render();
+                myBuffer.Render();
+            };
+            action.Invoke();
+            //TimeLogger.TimeLogger.Benchmark(action, TimeLogger.TimeLogger.TimeUnit.Millisecond);
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and on hover tile
@@ -583,12 +588,6 @@ namespace MiniKreuzwortraetsel
             Tile clickedTile = grid[e.Y / TS, e.X / TS];
             // Hand down event
             clickedTile.MouseClick(e, grid, TS);
-        }
-        private void NoDBBaseWordCHBox_CheckedChanged(object sender, EventArgs e)
-        {
-            QuestionTBox.Enabled = !(sender as CheckBox).Checked;
-            QuestionTBox.Text = "";
-            NoDBQuestionLBL.Enabled = !(sender as CheckBox).Checked;
         }
 
         // Methods that call DetermineCandidateSubtiles()
@@ -638,7 +637,7 @@ namespace MiniKreuzwortraetsel
                 DetermineCandidateSubtiles(tuple, highlightCandidates: true, baseWord: false);
             }
         }
-        private void showMatchesBaseWordBTN_Click(object sender, EventArgs e)
+        private void ShowMatchesBaseWordBTN_Click(object sender, EventArgs e)
         {
             string baseWord = baseWordTBox.Text;
             if (baseWord != "")
@@ -650,7 +649,8 @@ namespace MiniKreuzwortraetsel
                 MessageBox.Show("Hilfswort darf nicht leer sein");
         }
 
-        private void baseWordTBox_TextChanged(object sender, EventArgs e)
+        // Handle UI changes
+        private void BaseWordTBox_TextChanged(object sender, EventArgs e)
         {
             TextBox senderTBox = sender as TextBox;
             if (senderTBox.Text != "")
@@ -679,7 +679,7 @@ namespace MiniKreuzwortraetsel
             }
         }
 
-        private void tableMenu_SelectedIndexChanged(object sender, EventArgs e)
+        private void TableMenu_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateTuplesListBox();
         }
