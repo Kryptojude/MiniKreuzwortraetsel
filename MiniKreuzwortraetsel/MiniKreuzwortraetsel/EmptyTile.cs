@@ -22,7 +22,7 @@ namespace MiniKreuzwortraetsel
                         // Reset the Subtiles so highlights disappear
                         emptyTile.MakeSubTiles();
                         // Call paint method of this tile
-                        AddToRefreshList(emptyTile);
+                        emptyTile.Paint(Form1.myBuffer.Graphics);
                     }
                 }
             }
@@ -113,17 +113,8 @@ namespace MiniKreuzwortraetsel
         {
             return reserved;
         }
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts)
-        {
-
-        }
-        public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts)
-        {
-
-        }
-        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts)
-        {
-            
-        }
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts) { }
+        public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts) { }
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts) { }
     }
 }

@@ -11,7 +11,6 @@ namespace MiniKreuzwortraetsel
 {
     abstract class Tile
     {
-        static List<Tile> refreshList = new List<Tile>();
         static public (string Question, string Answer) TupleToBeFilled;
         public enum ExtendedHover
         {
@@ -31,20 +30,11 @@ namespace MiniKreuzwortraetsel
                 }
             }
         }
-        static public List<Tile> GetRefreshList()
-        {
-            return refreshList;
-        }
-        static public void AddToRefreshList(Tile tile)
-        {
-            refreshList.Add(tile);
-        }
 
         Point Position;
         Rectangle Bounds;
         protected Font font = new Font("Verdana", 9.75f, FontStyle.Bold);
         protected Brush foregroundColor = Brushes.Blue;
-        protected int oldHashCode = 0;
         /// <summary>
         /// Determines if this tile should have red outline based on question tile hover pointing to it, 
         /// -1 = off, 0 = 2 outlines horizontal, 1 = 3 outlines horizontal, 2 = 2 outlines vertical, 3 = 3 outlines vertical
@@ -64,25 +54,6 @@ namespace MiniKreuzwortraetsel
         public Point GetPosition()
         {
             return Position;
-        }
-        protected void CheckVisualChange()
-        {
-            int newHashCode = GetHashCode();
-            if (oldHashCode != newHashCode)
-            {
-                // Save old Hash code
-                oldHashCode = newHashCode;
-
-                AddToRefreshList(this);
-            }
-
-            // Hash all visual properties in before state
-
-            // Hash all visual properties in after state
-
-            // Compare before to after state
-
-            // In case of change, add this tile to refreshList
         }
         /// <summary>
         /// This will be called when the mouse has moved, 

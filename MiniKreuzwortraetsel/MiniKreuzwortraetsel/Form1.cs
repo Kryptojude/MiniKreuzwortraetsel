@@ -20,6 +20,8 @@ namespace MiniKreuzwortraetsel
         UI_mode_enum UI_mode;
         Random random = new Random();
         Point oldMousePosition = new Point();
+        BufferedGraphicsContext currentContext;
+        public static BufferedGraphics myBuffer;
 
         // TODO: 
         /*
@@ -42,8 +44,8 @@ namespace MiniKreuzwortraetsel
         {
             InitializeComponent();
 
-            // Initialize screenBuffer
-            ScreenBuffer.Initialize(TS, grid.GetLength(0));
+            currentContext = BufferedGraphicsManager.Current;
+            myBuffer = currentContext.Allocate(gridPB.CreateGraphics(), DisplayRectangle);
 
             // Create tile instances in grid
             for (int y = 0; y < grid.GetLength(0); y++)
@@ -309,7 +311,7 @@ namespace MiniKreuzwortraetsel
                 }
             }
 
-            Refresh();
+            RepaintAllTiles();
         }
 
         private void FillAnswer(QuestionTile questionTile, (string Question, string Answer) tuple)
@@ -533,39 +535,45 @@ namespace MiniKreuzwortraetsel
             Tile newMouseTile = grid[e.Y / TS, e.X / TS];
             // This will always be called, whether mouse movement was intra-tile or inter-tile
             newMouseTile.MouseMove(e, gridPB, TS);
+            newMouseTile.Paint(myBuffer.Graphics);
             // Check if new mouse tile is different from old mouse tile
             if (oldMouseTile != newMouseTile)
+            {
                 // If they are different, then the mouse has moved from one tile to another, 
                 // so also call MouseLeave for old tile
                 oldMouseTile.MouseLeave(e, gridPB, TS);
+                oldMouseTile.Paint(myBuffer.Graphics);
+            }
 
             // Update old mouse position
             oldMousePosition = new Point(e.X, e.Y);
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
-            //List<Tile> refreshList = Tile.GetRefreshList();
+            myBuffer.Render();
 
-            //for (int t = 0; t < refreshList.Count; t++)
-            //    refreshList[t].Paint(e.Graphics);
+            // Draw Popup
+            //if (popup.IsVisible())
+            //    e.Graphics.DrawString(popup.GetText(), Font, Brushes.Black, popup.GetPosition());
 
-            //refreshList.Clear();
-
+        }
+        private void RepaintAllTiles()
+        {
+            // Draw white background
+            //myBuffer.Graphics.FillRectangle(Brushes.White, myBuffer.Graphics.Clip.GetBounds(myBuffer.Graphics));
+            myBuffer.Graphics.FillRegion(Brushes.White, myBuffer.Graphics.Clip);
             for (int x = 0; x < grid.GetLength(1); x++)
             {
                 for (int y = 0; y < grid.GetLength(0); y++)
                 {
                     Tile tile = grid[x, y];
-                    e.Graphics.TranslateTransform(tile.GetBounds().Location.X, tile.GetBounds().Location.Y);
-                    tile.Paint(e.Graphics);
-                    e.Graphics.TranslateTransform(-tile.GetBounds().Location.X, -tile.GetBounds().Location.Y);
+                    myBuffer.Graphics.TranslateTransform(tile.GetBounds().Location.X, tile.GetBounds().Location.Y);
+                    tile.Paint(myBuffer.Graphics);
+                    myBuffer.Graphics.TranslateTransform(-tile.GetBounds().Location.X, -tile.GetBounds().Location.Y);
                 }
             }
 
-            // Draw Popup
-            if (popup.IsVisible())
-                e.Graphics.DrawString(popup.GetText(), Font, Brushes.Black, popup.GetPosition());
-
+            myBuffer.Render();
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and on hover tile

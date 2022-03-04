@@ -108,9 +108,6 @@ namespace MiniKreuzwortraetsel
              * 
              * */
 
-            // GetHashCode for before-state
-            int beforeHashCode = GetHashCode();
-
             // Calculate the fields of this instance based on mouse position (this may or may not result in any changes to this object)
             // Is mouse hovering over this tile? (This check will become redundant when MouseLeave is implemented
             // Set deleteButton to visible
@@ -123,13 +120,6 @@ namespace MiniKreuzwortraetsel
                 // Mouse is not over deleteButton, 
                 // so undo deleteButton hover
                 deleteButton.SetHover(false, pb);
-
-            // GetHashCode for after-state (this may take into account fields that are not relevant to the visual appearance of this tile, may also not take into account changes to objects that are referenced in fields)
-            int afterHashCode = GetHashCode();
-
-            // Compare before and after-state, If change occured, call this.Paint();
-            if (beforeHashCode != afterHashCode)
-                AddToRefreshList(this);
         }
 
         public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts)
