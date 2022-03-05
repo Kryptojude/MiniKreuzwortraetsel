@@ -51,6 +51,7 @@ namespace MiniKreuzwortraetsel
         }
         public override void Paint(Graphics g)
         {
+            TranslateTransformGraphics(g, GetBounds().Location);
             int ts = Form1.TS;
 
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
@@ -95,6 +96,8 @@ namespace MiniKreuzwortraetsel
                     g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
                     break;
             }
+
+            TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
         }
 
         public void Reserve()
@@ -111,7 +114,10 @@ namespace MiniKreuzwortraetsel
         {
             return reserved;
         }
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts) { }
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts) 
+        {
+            // Which subtile is mouse over?
+        }
         public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts) { }
         public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts) { }
     }

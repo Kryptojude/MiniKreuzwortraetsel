@@ -545,6 +545,9 @@ namespace MiniKreuzwortraetsel
                 oldMouseTile.Paint(myBuffer.Graphics);
             }
 
+            // Render the potential visual changes that were drawn into buffered graphics
+            myBuffer.Render();
+
             // Update old mouse position
             oldMousePosition = new Point(e.X, e.Y);
         }
@@ -559,7 +562,7 @@ namespace MiniKreuzwortraetsel
         }
         private void RepaintAllTiles()
         {
-            // 7,892
+            // 7,892 ms
             Action action = () =>
             {
                 // Draw white background
@@ -569,9 +572,7 @@ namespace MiniKreuzwortraetsel
                     for (int y = 0; y < grid.GetLength(0); y++)
                     {
                         Tile tile = grid[x, y];
-                        myBuffer.Graphics.TranslateTransform(tile.GetBounds().Location.X, tile.GetBounds().Location.Y);
                         tile.Paint(myBuffer.Graphics);
-                        myBuffer.Graphics.TranslateTransform(-tile.GetBounds().Location.X, -tile.GetBounds().Location.Y);
                     }
                 }
 

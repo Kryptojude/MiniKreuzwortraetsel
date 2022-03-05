@@ -32,6 +32,8 @@ namespace MiniKreuzwortraetsel
         }
         public override void Paint(Graphics g)
         {
+            TranslateTransformGraphics(g, GetBounds().Location);
+
             int ts = Form1.TS;
 
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
@@ -65,6 +67,8 @@ namespace MiniKreuzwortraetsel
                     g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
                     break;
             }
+
+            TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
         }
 
         public void AddParentQuestionTile(QuestionTile questionTile)

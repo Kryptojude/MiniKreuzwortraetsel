@@ -77,6 +77,8 @@ namespace MiniKreuzwortraetsel
 
         public override void Paint(Graphics g)
         {
+            TranslateTransformGraphics(g, GetBounds().Location);
+
             int ts = Form1.TS;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
@@ -90,6 +92,8 @@ namespace MiniKreuzwortraetsel
 
             // Draw X
             deleteButton.Paint(g);
+
+            TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
         }
 
         public void AddLinkedLetterTile(LetterTile letterTile)

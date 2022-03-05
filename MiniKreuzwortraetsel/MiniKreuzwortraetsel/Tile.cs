@@ -57,7 +57,7 @@ namespace MiniKreuzwortraetsel
         }
         /// <summary>
         /// This will be called when the mouse has moved, 
-        /// the called method belongs to the tile instance that the mouse is on
+        /// the called method belongs to the tile instance that the mouse is on after the movement
         /// </summary>
         public abstract void MouseMove(MouseEventArgs e, PictureBox pb, int ts);
         /// <summary>
@@ -67,6 +67,12 @@ namespace MiniKreuzwortraetsel
         public abstract void MouseLeave(MouseEventArgs e, PictureBox pb, int ts);
         public abstract void MouseClick(MouseEventArgs e, Tile[,] grid, int ts);
         public abstract void Paint(Graphics g);
-
+        /// <summary>
+        /// Moves the origin of the grid
+        /// </summary>
+        protected void TranslateTransformGraphics(Graphics g, Point location)
+        {
+            g.TranslateTransform(location.X, location.Y);
+        }
     }
 }
