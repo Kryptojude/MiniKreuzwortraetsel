@@ -78,9 +78,8 @@ namespace MiniKreuzwortraetsel
         public override void Paint(Graphics g)
         {
             TranslateTransformGraphics(g, GetBounds().Location);
-
-            int ts = Form1.TS;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
+            int ts = Form1.TS;
 
             // Draw text
             Size textSize = TextRenderer.MeasureText(Text, font);
@@ -104,7 +103,7 @@ namespace MiniKreuzwortraetsel
         // What I did last time: Painting logic is pretty much done now, now fix why tiles aren't showing up properly after adding them
         // CheckVisualChange() method probably instead override GetHashCode() and in that go through all the fields that are relevant for visuals (even child elements)
         // and hash it before and after
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts)
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Point[] directions, Tile[,] grid)
         {
             /* What can happen when you move the mouse onto a questionTile, or within a questionTile?
              * deleteButton could appear, it can't disappear

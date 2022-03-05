@@ -51,6 +51,9 @@ namespace MiniKreuzwortraetsel
         {
             return Bounds;
         }
+        /// <summary>
+        /// Refers to the position in grid[,] array
+        /// </summary>
         public Point GetPosition()
         {
             return Position;
@@ -59,7 +62,7 @@ namespace MiniKreuzwortraetsel
         /// This will be called when the mouse has moved, 
         /// the called method belongs to the tile instance that the mouse is on after the movement
         /// </summary>
-        public abstract void MouseMove(MouseEventArgs e, PictureBox pb, int ts);
+        public abstract void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Point[] directions, Tile[,] grid);
         /// <summary>
         /// This will be called when the mouse has moved from one tile to another,
         /// the called method belongs to the tile instance that the mouse was on before the movement

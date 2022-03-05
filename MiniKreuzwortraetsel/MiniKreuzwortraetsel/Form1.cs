@@ -46,6 +46,7 @@ namespace MiniKreuzwortraetsel
 
             currentContext = BufferedGraphicsManager.Current;
             myBuffer = currentContext.Allocate(gridPB.CreateGraphics(), DisplayRectangle);
+            // 7,568 ms
 
             // Create tile instances in grid
             for (int y = 0; y < grid.GetLength(0); y++)
@@ -534,7 +535,7 @@ namespace MiniKreuzwortraetsel
             // Get new mouse tile
             Tile newMouseTile = grid[e.Y / TS, e.X / TS];
             // This will always be called, whether mouse movement was intra-tile or inter-tile
-            newMouseTile.MouseMove(e, gridPB, TS);
+            newMouseTile.MouseMove(e, gridPB, TS, directions, grid);
             newMouseTile.Paint(myBuffer.Graphics);
             // Check if new mouse tile is different from old mouse tile
             if (oldMouseTile != newMouseTile)
@@ -546,14 +547,14 @@ namespace MiniKreuzwortraetsel
             }
 
             // Render the potential visual changes that were drawn into buffered graphics
-            myBuffer.Render();
+            GraphicsBufferRenderDelegate();
 
             // Update old mouse position
             oldMousePosition = new Point(e.X, e.Y);
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
-            myBuffer.Render();
+            GraphicsBufferRenderDelegate();
 
             // Draw Popup
             //if (popup.IsVisible())
@@ -566,7 +567,6 @@ namespace MiniKreuzwortraetsel
             Action action = () =>
             {
                 // Draw white background
-                myBuffer.Graphics.FillRectangle(Brushes.White, gridPB.Bounds);
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
                     for (int y = 0; y < grid.GetLength(0); y++)
@@ -575,11 +575,15 @@ namespace MiniKreuzwortraetsel
                         tile.Paint(myBuffer.Graphics);
                     }
                 }
-
-                myBuffer.Render();
+                GraphicsBufferRenderDelegate();
             };
             action.Invoke();
-            //TimeLogger.TimeLogger.Benchmark(action, TimeLogger.TimeLogger.TimeUnit.Millisecond);
+            TimeLogger.TimeLogger.Benchmark(action, TimeLogger.TimeLogger.TimeUnit.Millisecond);
+        }
+        private void GraphicsBufferRenderDelegate()
+        {
+            myBuffer.Graphics.FillRectangle(Brushes.White, gridPB.Bounds);
+            myBuffer.Render();
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and on hover tile

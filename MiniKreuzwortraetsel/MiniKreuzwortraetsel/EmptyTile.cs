@@ -52,22 +52,12 @@ namespace MiniKreuzwortraetsel
         public override void Paint(Graphics g)
         {
             TranslateTransformGraphics(g, GetBounds().Location);
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
             int ts = Form1.TS;
 
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
-            // Draw highlights
-            for (int i = 0; i < SubTiles.Length; i++)
-            {
-                g.FillPolygon(SubTiles[i].GetColor(), SubTiles[i].GetSubTilePolygon());
-            }
-
-            SubTile hoverSubTile = SubTile.BlueHoverSubTile;
-            // Draw hover effect
-            if (SubTile.BlueHoverSubTile?.ParentTile == this)
-            {
-                g.FillPolygon(Brushes.Blue, hoverSubTile.GetSubTilePolygon());
-                g.DrawString(hoverSubTile.GetArrow(), SubTile.HOVER_ARROW_FONT, Brushes.Red, hoverSubTile.GetArrowPosition());
-            }
+            // Call subtile painting routines
+            SubTiles[0].Paint(g);
+            SubTiles[0].Paint(g);
 
             // Draw Rectangle
             // Condition: At least one subtile is highlighted
@@ -114,11 +104,52 @@ namespace MiniKreuzwortraetsel
         {
             return reserved;
         }
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts) 
+        private void RemoveHoverFlagFromBothSubtiles()
         {
+            SubTiles[0].SetHoverFlag(false);
+            SubTiles[1].SetHoverFlag(false);
+        }
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Point[] directions, Tile[,] grid)
+        {
+            RemoveHoverFlagFromBothSubtiles();
             // Which subtile is mouse over?
+            int mouseSubtile = (e.X - GetBounds().X < e.Y - GetBounds().Y) ? 1 : 0;
+            SubTile hoverSubTile = SubTiles[mouseSubtile];
+            // Check if that subtile has a highlight
+            if (hoverSubTile.IsHighlighted())
+            {
+                // If so, then set hover_flag to true
+                hoverSubTile.SetHoverFlag(true);
+
+                // And Activate extendedHover outline for adjacent tiles
+                Point directionPoint = directions[hoverSubTile.Direction];
+                for (int i = 0; i < TupleToBeFilled.Answer.Length; i++)
+                {
+                    int letterX = GetPosition().X + directionPoint.X * (1 + i);
+                    int letterY = GetPosition().Y + directionPoint.Y * (1 + i);
+                    // Out of bounds check
+                    if (letterX <= grid.GetUpperBound(1) && letterY <= grid.GetUpperBound(0))
+                    {
+                        // End or middle outline
+                        if (i < TupleToBeFilled.Answer.Length - 1)
+                            grid[letterY, letterX].extendedHover = ExtendedHover.Two_Outlines_Horizontal;
+                        else
+                            grid[letterY, letterX].extendedHover = ExtendedHover.Three_Outlines_Horizontal;
+
+                        // Vertical mode
+                        if (directionPoint.Y == 1)
+                            grid[letterY, letterX].extendedHover += 2;
+                    }
+                }
+
+            }
+
+
         }
         public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts) { }
-        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts) { }
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts) 
+        {
+            RemoveHoverFlagFromBothSubtiles();
+        }
     }
 }

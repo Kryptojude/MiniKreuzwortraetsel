@@ -9,8 +9,6 @@ namespace MiniKreuzwortraetsel
 {
     class SubTile
     {
-        static public SubTile BlueHoverSubTile;
-
         static public readonly Font HOVER_ARROW_FONT = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
         static readonly Dictionary<string, Point[]> subTilePolygons = new Dictionary<string, Point[]>() {
                                                                  { "horizontal", new Point[3] { new Point(0, 0), new Point(Form1.TS, 0),  new Point(Form1.TS, Form1.TS) } },
@@ -36,6 +34,7 @@ namespace MiniKreuzwortraetsel
         static public readonly Color MinColor = Color.FromArgb(0x9be8a1);
         static public readonly Color MaxColor = Color.FromArgb(0x00ff14);
 
+        private bool hover_flag;
         Brush color = Brushes.White;
         public int Direction { get; }
         public EmptyTile ParentTile { get; }
@@ -48,15 +47,20 @@ namespace MiniKreuzwortraetsel
 
         public void SetHighlight(float colorLevel)
         {
-
             color = new SolidBrush(Color.FromArgb((int)(MinColor.R + (MaxColor.R - MinColor.R) * colorLevel), (int)(MinColor.G + (MaxColor.G - MinColor.G) * colorLevel), (int)(MinColor.B + (MaxColor.B - MinColor.B) * colorLevel)));
         }
-
         public bool IsHighlighted()
         {
             return color != Brushes.White;
         }
-
+        public void SetHoverFlag(bool flag)
+        {
+            hover_flag = flag;
+        }
+        public bool GetHoverFlag()
+        {
+            return hover_flag;
+        }
         public Brush GetColor()
         {
             return color;
@@ -85,5 +89,21 @@ namespace MiniKreuzwortraetsel
             else
                 return arrowPositions["vertical"];
         }  
+
+        public void Paint (Graphics g)
+        {
+            // Hover flag set to true?
+            if (GetHoverFlag())
+            {
+                // Draw hover effect
+                g.FillPolygon(Brushes.Blue, GetSubTilePolygon());
+                g.DrawString(GetArrow(), HOVER_ARROW_FONT, Brushes.Red, GetArrowPosition());
+            }
+            // No hover flag, so draw highlight
+            else
+                // Draw highlight
+                g.FillPolygon(GetColor(), GetSubTilePolygon());
+
+        }
     }
 }
