@@ -64,14 +64,11 @@ namespace MiniKreuzwortraetsel
 
         public void Paint(Graphics g)
         {
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
             if (IsVisible())
             {
                 g.DrawRectangle(pen, bounds_global.X, bounds_global.Y, absoluteSize, absoluteSize - 1);
                 g.DrawLine(pen, 0, 0, absoluteSize, absoluteSize - 1);
                 g.DrawLine(pen, 0, absoluteSize - 1, absoluteSize, 0);
-
-                //graphics.FillRectangle(Brushes.Black, 0, 0, absoluteSize, absoluteSize);
             }
         }
     }

@@ -46,7 +46,8 @@ namespace MiniKreuzwortraetsel
 
             currentContext = BufferedGraphicsManager.Current;
             myBuffer = currentContext.Allocate(gridPB.CreateGraphics(), DisplayRectangle);
-            // 7,568 ms
+            myBuffer.Graphics.FillRectangle(Brushes.White, gridPB.Bounds);
+            myBuffer.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
             // Create tile instances in grid
             for (int y = 0; y < grid.GetLength(0); y++)
@@ -547,14 +548,14 @@ namespace MiniKreuzwortraetsel
             }
 
             // Render the potential visual changes that were drawn into buffered graphics
-            GraphicsBufferRenderDelegate();
+            myBuffer.Render();
 
             // Update old mouse position
             oldMousePosition = new Point(e.X, e.Y);
         }
         private void GridPB_Paint(object sender, PaintEventArgs e)
         {
-            GraphicsBufferRenderDelegate();
+            myBuffer.Render();
 
             // Draw Popup
             //if (popup.IsVisible())
@@ -575,15 +576,10 @@ namespace MiniKreuzwortraetsel
                         tile.Paint(myBuffer.Graphics);
                     }
                 }
-                GraphicsBufferRenderDelegate();
+                myBuffer.Render();
             };
             action.Invoke();
-            TimeLogger.TimeLogger.Benchmark(action, TimeLogger.TimeLogger.TimeUnit.Millisecond);
-        }
-        private void GraphicsBufferRenderDelegate()
-        {
-            myBuffer.Graphics.FillRectangle(Brushes.White, gridPB.Bounds);
-            myBuffer.Render();
+            //TimeLogger.TimeLogger.Benchmark(action, TimeLogger.TimeLogger.TimeUnit.Millisecond);
         }
         /// <summary>
         /// Calls FillAnswer if in bounds and on hover tile

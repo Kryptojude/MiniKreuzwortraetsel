@@ -52,7 +52,6 @@ namespace MiniKreuzwortraetsel
         public override void Paint(Graphics g)
         {
             TranslateTransformGraphics(g, GetBounds().Location);
-            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
             int ts = Form1.TS;
 
             // Call subtile painting routines
