@@ -73,7 +73,7 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// Moves the origin of the grid
         /// </summary>
-        protected void TranslateTransformGraphics(Graphics g, Point location)
+        static public void TranslateTransformGraphics(Graphics g, Point location)
         {
             g.TranslateTransform(location.X, location.Y);
         }

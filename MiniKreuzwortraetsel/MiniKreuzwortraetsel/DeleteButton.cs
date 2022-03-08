@@ -66,9 +66,13 @@ namespace MiniKreuzwortraetsel
         {
             if (IsVisible())
             {
-                g.DrawRectangle(pen, bounds_global.X, bounds_global.Y, absoluteSize, absoluteSize - 1);
+                Tile.TranslateTransformGraphics(g, bounds_global.Location);
+
+                g.DrawRectangle(pen, 0, 0, absoluteSize, absoluteSize - 1);
                 g.DrawLine(pen, 0, 0, absoluteSize, absoluteSize - 1);
                 g.DrawLine(pen, 0, absoluteSize - 1, absoluteSize, 0);
+
+                Tile.TranslateTransformGraphics(g, new Point(-bounds_global.Location.X, -bounds_global.Location.Y));
             }
         }
     }

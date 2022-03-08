@@ -82,6 +82,7 @@ namespace MiniKreuzwortraetsel
 
             // Draw background
             g.FillRectangle(Brushes.White, GetBounds());
+            g.FillRectangle(Brushes.Black, GetBounds());
             // Draw text
             Size textSize = TextRenderer.MeasureText(Text, font);
             //g.DrawString(Text, font, foregroundColor, GetBounds().Location.X + (ts / 2 - textSize.Width / 2), GetBounds().Location.Y + (ts / 2 - textSize.Height / 2));
@@ -90,10 +91,10 @@ namespace MiniKreuzwortraetsel
             // Draw Rectangle
             g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
 
+            TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
+
             // Draw X
             deleteButton.Paint(g);
-
-            TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
         }
 
         public void AddLinkedLetterTile(LetterTile letterTile)
