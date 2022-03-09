@@ -414,7 +414,7 @@ namespace MiniKreuzwortraetsel
 
                 html += "</table><p>";
                 // Legende
-                List<QuestionTile> questionTileList = QuestionTile.questionTileList;
+                List<QuestionTile> questionTileList = QuestionTile.QuestionTileList;
                 for (int i = 0; i < questionTileList.Count; i++)
                 {
                     html += i + 1 + ". " + questionTileList[i].Question + "<br/>";

@@ -113,6 +113,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseWordTile.cs" />
     <Compile Include="DeleteButton.cs" />
     <Compile Include="EmptyTile.cs" />
     <Compile Include="Form1.cs">

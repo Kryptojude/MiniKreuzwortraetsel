@@ -10,7 +10,7 @@ namespace MiniKreuzwortraetsel
 {
     class QuestionTile : Tile
     {
-        static public readonly List<QuestionTile> questionTileList = new List<QuestionTile>();
+        static public readonly List<QuestionTile> QuestionTileList = new List<QuestionTile>();
 
         public string Question;
         public string Text = "";
@@ -29,7 +29,7 @@ namespace MiniKreuzwortraetsel
             // normal question tile
             string arrow = SubTile.GetArrow(direction);
             if (!string.IsNullOrEmpty(Question))
-                questionTileList.Add(this);
+                QuestionTileList.Add(this);
 
             GenerateText();
         }
@@ -40,7 +40,7 @@ namespace MiniKreuzwortraetsel
             string arrow = SubTile.GetArrow(Direction);
             if (!string.IsNullOrEmpty(Question))
             {
-                Text = questionTileList.IndexOf(this) + 1 + arrow;
+                Text = QuestionTileList.IndexOf(this) + 1 + arrow;
             }
             // base word
             else
@@ -66,13 +66,13 @@ namespace MiniKreuzwortraetsel
             grid[position.Y, position.X] = new EmptyTile(position, ts);
 
             // Save this index
-            int indexOfThisQuestionTile = questionTileList.IndexOf(this);
+            int indexOfThisQuestionTile = QuestionTileList.IndexOf(this);
             // Remove this instance from the questionTileList,
-            questionTileList.Remove(this);
+            QuestionTileList.Remove(this);
             // Now indexOfThisQuestionTile points to the next questionTile
             // Lower the number of every questionTile that comes after this one
-            for (int i = indexOfThisQuestionTile; i < questionTileList.Count; i++)
-                questionTileList[i].GenerateText();
+            for (int i = indexOfThisQuestionTile; i < QuestionTileList.Count; i++)
+                QuestionTileList[i].GenerateText();
         }
 
         public override void Paint(Graphics g)
@@ -81,12 +81,11 @@ namespace MiniKreuzwortraetsel
             int ts = Form1.TS;
 
             // Draw background
-            g.FillRectangle(Brushes.White, GetBounds());
-            g.FillRectangle(Brushes.Black, GetBounds());
+            g.FillRectangle(Brushes.White, 0, 0, ts, ts);
             // Draw text
             Size textSize = TextRenderer.MeasureText(Text, font);
             //g.DrawString(Text, font, foregroundColor, GetBounds().Location.X + (ts / 2 - textSize.Width / 2), GetBounds().Location.Y + (ts / 2 - textSize.Height / 2));
-            g.DrawString(Text, font, foregroundColor,ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
+            g.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
 
             // Draw Rectangle
             g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
