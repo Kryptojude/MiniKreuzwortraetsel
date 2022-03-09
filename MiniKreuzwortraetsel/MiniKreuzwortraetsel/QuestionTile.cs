@@ -13,17 +13,18 @@ namespace MiniKreuzwortraetsel
         static public readonly List<QuestionTile> QuestionTileList = new List<QuestionTile>();
 
         public string Question;
-        public string Text = "";
+        string Text;
         public int Direction;
         readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
         public EmptyTile LinkedReservedTile;
         DeleteButton deleteButton;
 
-        public QuestionTile(Point position, string question, int direction, int ts) : base(position, ts)
+        public QuestionTile(Point position, string question, int direction) : base(position)
         {
             deleteButton = new DeleteButton(GetBounds().Location);
             foregroundColor = Brushes.Red;
             font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
+            Text = "";
             Question = question;
             Direction = direction;
             // normal question tile
@@ -47,23 +48,18 @@ namespace MiniKreuzwortraetsel
                 Text = arrow;
         }
 
-        public bool IsBaseWord()
-        {
-            return string.IsNullOrEmpty(Question);
-        }
-
-        public void ToEmptyTile(Tile[,] grid, int ts)
+        public void ToEmptyTile(Tile[,] grid)
         {
             // Turn the letter tiles associated with this questionTile into emptyTiles
             foreach (LetterTile letterTile in LinkedLetterTiles)
-                letterTile.ToEmptyTile(grid, this, ts);
+                letterTile.ToEmptyTile(grid, this);
 
             // Unreserve the reserved tile of the questionTile
             LinkedReservedTile?.Unreserve();
 
             // Insert a new EmptyTile instance into the grid at this tile's position, 
             Point position = GetPosition();
-            grid[position.Y, position.X] = new EmptyTile(position, ts);
+            grid[position.Y, position.X] = new EmptyTile(position);
 
             // Save this index
             int indexOfThisQuestionTile = QuestionTileList.IndexOf(this);
@@ -80,7 +76,7 @@ namespace MiniKreuzwortraetsel
             TranslateTransformGraphics(g, GetBounds().Location);
             int ts = Form1.TS;
 
-            // Draw background
+            // Clear
             g.FillRectangle(Brushes.White, 0, 0, ts, ts);
             // Draw text
             Size textSize = TextRenderer.MeasureText(Text, font);
@@ -104,7 +100,7 @@ namespace MiniKreuzwortraetsel
         // What I did last time: Painting logic is pretty much done now, now fix why tiles aren't showing up properly after adding them
         // CheckVisualChange() method probably instead override GetHashCode() and in that go through all the fields that are relevant for visuals (even child elements)
         // and hash it before and after
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Point[] directions, Tile[,] grid)
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, Point[] directions, Tile[,] grid)
         {
             /* What can happen when you move the mouse onto a questionTile, or within a questionTile?
              * deleteButton could appear, it can't disappear
@@ -117,7 +113,7 @@ namespace MiniKreuzwortraetsel
             // Set deleteButton to visible
             deleteButton.SetVisible(true);
             // Is mouse hovering over deleteButton?
-            if (deleteButton.IsMouseOverMe(e, this, ts))
+            if (deleteButton.IsMouseOverMe(e, this))
                 // Call delete button hover logic
                 deleteButton.SetHover(true, pb);
             else
@@ -126,21 +122,25 @@ namespace MiniKreuzwortraetsel
                 deleteButton.SetHover(false, pb);
         }
 
-        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts)
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb)
         {
             // deleteButton is not visible
             deleteButton.SetVisible(false);
             deleteButton.SetHover(false, pb);
         }
-        public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts)
+        public override void MouseClick(MouseEventArgs e, Tile[,] grid)
         {
             // If the click was on the deleteButton
-            if (deleteButton.IsMouseOverMe(e, this, ts))
+            if (deleteButton.IsMouseOverMe(e, this))
             {
                 // Then delete this question
-                ToEmptyTile(grid, ts);
+                ToEmptyTile(grid);
             }
         }
 
+        public string GetText()
+        {
+            return Text;
+        }
     }
 }

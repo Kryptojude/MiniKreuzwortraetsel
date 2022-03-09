@@ -42,8 +42,9 @@ namespace MiniKreuzwortraetsel
         public ExtendedHover extendedHover = ExtendedHover.Off;
         protected Pen extendedHoverPen = new Pen(Brushes.Red, 5);
 
-        public Tile(Point position, int ts)
+        public Tile(Point position)
         {
+            int ts = Form1.TS;
             Position = position;
             Bounds = new Rectangle(Position.X * ts, Position.Y * ts, ts, ts);
         }
@@ -62,13 +63,13 @@ namespace MiniKreuzwortraetsel
         /// This will be called when the mouse has moved, 
         /// the called method belongs to the tile instance that the mouse is on after the movement
         /// </summary>
-        public abstract void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Point[] directions, Tile[,] grid);
+        public abstract void MouseMove(MouseEventArgs e, PictureBox pb, Point[] directions, Tile[,] grid);
         /// <summary>
         /// This will be called when the mouse has moved from one tile to another,
         /// the called method belongs to the tile instance that the mouse was on before the movement
         /// </summary>
-        public abstract void MouseLeave(MouseEventArgs e, PictureBox pb, int ts);
-        public abstract void MouseClick(MouseEventArgs e, Tile[,] grid, int ts);
+        public abstract void MouseLeave(MouseEventArgs e, PictureBox pb);
+        public abstract void MouseClick(MouseEventArgs e, Tile[,] grid);
         public abstract void Paint(Graphics g);
         /// <summary>
         /// Moves the origin of the grid

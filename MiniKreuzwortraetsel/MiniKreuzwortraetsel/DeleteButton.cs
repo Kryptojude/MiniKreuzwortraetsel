@@ -51,7 +51,7 @@ namespace MiniKreuzwortraetsel
                 pb.Cursor = Cursors.Default;
         }
 
-        public bool IsMouseOverMe(MouseEventArgs e, QuestionTile parentTile, int ts)
+        public bool IsMouseOverMe(MouseEventArgs e, QuestionTile parentTile)
         {
             // Calculate mouse position in tile space
             Point mousePosition_tile_space = new Point(e.X - parentTile.GetBounds().X, e.Y - parentTile.GetBounds().Y);

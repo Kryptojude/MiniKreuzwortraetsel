@@ -10,21 +10,29 @@ namespace MiniKreuzwortraetsel
 {
     class BaseWordTile : Tile
     {
-        public BaseWordTile(Point position, int ts) : base(position, ts)
+        string Text;
+
+        public BaseWordTile(Point position) : base(position)
         {
+            Text = "";
         }
 
-        public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts)
+        public string GetText()
+        {
+            return Text;
+        }
+
+        public override void MouseClick(MouseEventArgs e, Tile[,] grid)
         {
             throw new NotImplementedException();
         }
 
-        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts)
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb)
         {
             throw new NotImplementedException();
         }
 
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Point[] directions, Tile[,] grid)
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, Point[] directions, Tile[,] grid)
         {
             throw new NotImplementedException();
         }

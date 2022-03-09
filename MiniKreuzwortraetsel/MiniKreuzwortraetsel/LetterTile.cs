@@ -16,16 +16,16 @@ namespace MiniKreuzwortraetsel
         readonly List<QuestionTile> parent_question_tiles = new List<QuestionTile>();
         public string Text = "";
 
-        public LetterTile(Point position, QuestionTile questionTile, string text, int ts) : base(position, ts)
+        public LetterTile(Point position, QuestionTile questionTile, string text) : base(position)
         {
             questionTile.AddLinkedLetterTile(this);
             Text = text;        }
 
-        public void ToEmptyTile(Tile[,] grid, QuestionTile questionTile, int ts)
+        public void ToEmptyTile(Tile[,] grid, QuestionTile questionTile)
         {
             // If the letterTile only belongs to this questionTile, then make into EmptyTile
             if (parent_question_tiles.Count == 1)
-                grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition(), ts);
+                grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
             // If the letterTile belongs to multiple QuestionTiles, just remove this QuestionTile from its question tile list
             else
                 parent_question_tiles.Remove(questionTile);
@@ -75,15 +75,15 @@ namespace MiniKreuzwortraetsel
             parent_question_tiles.Add(questionTile);
         }
 
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Point[] directions, Tile[,] grid)
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, Point[] directions, Tile[,] grid)
         {
         }
 
-        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts)
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb)
         {
 
         }        
-        public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts)
+        public override void MouseClick(MouseEventArgs e, Tile[,] grid)
         {
 
         }

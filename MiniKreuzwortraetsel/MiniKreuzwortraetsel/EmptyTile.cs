@@ -29,7 +29,7 @@ namespace MiniKreuzwortraetsel
         bool reserved = false;
         public SubTile[] SubTiles { get; } = new SubTile[2];
 
-        public EmptyTile(Point position, int ts) : base(position, ts)
+        public EmptyTile(Point position) : base(position)
         {
             MakeSubTiles();
         }
@@ -39,15 +39,21 @@ namespace MiniKreuzwortraetsel
             SubTiles[0] = new SubTile(direction: 0, parentTile: this);
             SubTiles[1] = new SubTile(direction: 1, parentTile: this);
         }
-        public LetterTile ToLetterTile(Tile[,] grid, QuestionTile questionTile, string text, int ts, PictureBox pb)
+        public LetterTile ToLetterTile(Tile[,] grid, QuestionTile questionTile, string text, PictureBox pb)
         {
-            grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), questionTile, text, ts);
+            grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), questionTile, text);
             return grid[GetPosition().Y, GetPosition().X] as LetterTile;
         }
-        public QuestionTile ToQuestionTile(Tile[,] grid, string question, int direction, int ts)
+        public QuestionTile ToQuestionTile(Tile[,] grid, string question, int direction)
         {
-            grid[GetPosition().Y, GetPosition().X] = new QuestionTile(GetPosition(), question, direction, ts);
+            grid[GetPosition().Y, GetPosition().X] = new QuestionTile(GetPosition(), question, direction);
             return grid[GetPosition().Y, GetPosition().X] as QuestionTile;
+        }
+
+        public BaseWordTile ToBaseWordTile(Tile[,] grid, string question, int direction)
+        {
+            grid[GetPosition().Y, GetPosition().X] = new BaseWordTile(GetPosition());
+            return grid[GetPosition().Y, GetPosition().X] as BaseWordTile;
         }
         public override void Paint(Graphics g)
         {
@@ -108,7 +114,7 @@ namespace MiniKreuzwortraetsel
             SubTiles[0].SetHoverFlag(false);
             SubTiles[1].SetHoverFlag(false);
         }
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, int ts, Point[] directions, Tile[,] grid)
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, Point[] directions, Tile[,] grid)
         {
             RemoveHoverFlagFromBothSubtiles();
             // Which subtile is mouse over?
@@ -145,8 +151,8 @@ namespace MiniKreuzwortraetsel
 
 
         }
-        public override void MouseClick(MouseEventArgs e, Tile[,] grid, int ts) { }
-        public override void MouseLeave(MouseEventArgs e, PictureBox pb, int ts) 
+        public override void MouseClick(MouseEventArgs e, Tile[,] grid) { }
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb)
         {
             RemoveHoverFlagFromBothSubtiles();
         }
