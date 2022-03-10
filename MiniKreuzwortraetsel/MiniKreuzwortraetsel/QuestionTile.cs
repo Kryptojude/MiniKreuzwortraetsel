@@ -137,10 +137,5 @@ namespace MiniKreuzwortraetsel
                 ToEmptyTile(grid);
             }
         }
-
-        public string GetText()
-        {
-            return Text;
-        }
     }
 }

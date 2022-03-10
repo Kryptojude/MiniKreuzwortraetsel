@@ -10,19 +10,15 @@ namespace MiniKreuzwortraetsel
 {
     class EmptyTile : Tile
     {
-        public static void RemoveAllHighlights(Tile[,] grid, Graphics g)
+        static public readonly List<EmptyTile> EmptyTileList = new List<EmptyTile>();
+
+        public static void RemoveAllHighlights()
         {
-            for (int y = 0; y < grid.GetLength(0); y++)
+            for (int i = 0; i < EmptyTileList.Count; i++)
             {
-                for (int x = 0; x < grid.GetLength(1); x++)
-                {
-                    if (grid[y, x] is EmptyTile)
-                    {
-                        EmptyTile emptyTile = grid[y, x] as EmptyTile;
-                        // Reset the Subtiles so highlights disappear
-                        emptyTile.MakeSubTiles();
-                    }
-                }
+                EmptyTile emptyTile = EmptyTileList[i];
+                // Reset the Subtiles so highlights disappear
+                emptyTile.MakeSubTiles();
             }
         }
 
@@ -31,6 +27,7 @@ namespace MiniKreuzwortraetsel
 
         public EmptyTile(Point position) : base(position)
         {
+            EmptyTileList.Add(this);
             MakeSubTiles();
         }
 
@@ -41,17 +38,20 @@ namespace MiniKreuzwortraetsel
         }
         public LetterTile ToLetterTile(Tile[,] grid, QuestionTile questionTile, string text, PictureBox pb)
         {
+            EmptyTileList.Remove(this);
             grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), questionTile, text);
             return grid[GetPosition().Y, GetPosition().X] as LetterTile;
         }
         public QuestionTile ToQuestionTile(Tile[,] grid, string question, int direction)
         {
+            EmptyTileList.Remove(this);
             grid[GetPosition().Y, GetPosition().X] = new QuestionTile(GetPosition(), question, direction);
             return grid[GetPosition().Y, GetPosition().X] as QuestionTile;
         }
 
         public BaseWordTile ToBaseWordTile(Tile[,] grid, string question, int direction)
         {
+            EmptyTileList.Remove(this);
             grid[GetPosition().Y, GetPosition().X] = new BaseWordTile(GetPosition());
             return grid[GetPosition().Y, GetPosition().X] as BaseWordTile;
         }

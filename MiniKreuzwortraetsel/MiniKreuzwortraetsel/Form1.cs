@@ -164,7 +164,7 @@ namespace MiniKreuzwortraetsel
                 tuple.Question = ReplaceUmlaute(tuple.Question);
 
                 // Reset Highlights
-                EmptyTile.RemoveAllHighlights(grid, myBuffer.Graphics);
+                EmptyTile.RemoveAllHighlights();
 
                 // Find all possible ways the answer can be placed
                 // and save how many letters are crossed ("matched")
