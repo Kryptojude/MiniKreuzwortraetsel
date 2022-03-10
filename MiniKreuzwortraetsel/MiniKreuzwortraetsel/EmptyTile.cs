@@ -135,15 +135,19 @@ namespace MiniKreuzwortraetsel
                     // Out of bounds check
                     if (letterX <= grid.GetUpperBound(1) && letterY <= grid.GetUpperBound(0))
                     {
+                        Tile tile = grid[letterY, letterX];
                         // End or middle outline
                         if (i < TupleToBeFilled.Answer.Length - 1)
-                            grid[letterY, letterX].extendedHover = ExtendedHover.Two_Outlines_Horizontal;
+                            tile.extendedHover = ExtendedHover.Two_Outlines_Horizontal;
                         else
-                            grid[letterY, letterX].extendedHover = ExtendedHover.Three_Outlines_Horizontal;
+                            tile.extendedHover = ExtendedHover.Three_Outlines_Horizontal;
 
                         // Vertical mode
                         if (directionPoint.Y == 1)
-                            grid[letterY, letterX].extendedHover += 2;
+                            tile.extendedHover += 2;
+
+                        // Save tile with extended hover in list
+                        tiles_with_extended_hover_list.Add(tile);
                     }
                 }
 

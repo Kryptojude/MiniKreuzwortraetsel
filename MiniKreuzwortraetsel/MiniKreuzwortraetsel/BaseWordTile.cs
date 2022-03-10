@@ -11,9 +11,16 @@ namespace MiniKreuzwortraetsel
     class BaseWordTile : Tile
     {
         string Text;
+        public int Direction;
+        readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
+        public EmptyTile LinkedReservedTile;
+        DeleteButton deleteButton;
 
-        public BaseWordTile(Point position) : base(position)
+        public BaseWordTile(Point position, int direction) : base(position)
         {
+            deleteButton = new DeleteButton(GetBounds().Location);
+            foregroundColor = Brushes.Red;
+            font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
             Text = "";
         }
 

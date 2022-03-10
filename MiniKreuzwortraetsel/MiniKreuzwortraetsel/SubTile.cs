@@ -14,17 +14,6 @@ namespace MiniKreuzwortraetsel
                                                                  { "horizontal", new Point[3] { new Point(0, 0), new Point(Form1.TS, 0),  new Point(Form1.TS, Form1.TS) } },
                                                                  { "vertical",   new Point[3] { new Point(0, 0), new Point(Form1.TS, Form1.TS), new Point(0, Form1.TS) } },
                                                               };
-        static readonly Dictionary<string, string> Arrows = new Dictionary<string, string>() {
-                                                                    { "horizontal", "►" },
-                                                                    { "vertical", "▼" } };
-        static public string GetArrow(string direction)
-        {
-            return Arrows[direction];
-        }
-        static public string GetArrow(int direction)
-        {
-            return Arrows.ElementAt(direction).Value;
-        }
 
         static readonly Dictionary<string, Point> arrowPositions = new Dictionary<string, Point>() {
                                                                        { "horizontal", new Point(Form1.TS / 3, 0) },

@@ -12,6 +12,7 @@ namespace MiniKreuzwortraetsel
     abstract class Tile
     {
         static public (string Question, string Answer) TupleToBeFilled;
+        static protected List<Tile> tiles_with_extended_hover_list = new List<Tile>();
         public enum ExtendedHover
         {
             Off = -1,
@@ -20,15 +21,25 @@ namespace MiniKreuzwortraetsel
             Two_Outlines_Vertical = 2,
             Three_Outlines_Vertical = 3,
         }
-        static public void RemoveAllExtendedHover(Tile[,] grid)
+        static public void RemoveAllExtendedHover()
         {
-            for (int y = 0; y < grid.GetLength(0); y++)
+            for (int i = 0; i < tiles_with_extended_hover_list.Count; i++)
             {
-                for (int x = 0; x < grid.GetLength(1); x++)
-                {
-                    grid[y, x].extendedHover = ExtendedHover.Off;
-                }
+                tiles_with_extended_hover_list[i].extendedHover = ExtendedHover.Off;
             }
+            tiles_with_extended_hover_list.Clear();
+        }
+
+        static readonly Dictionary<string, string> Arrows = new Dictionary<string, string>() {
+                                                                    { "horizontal", "►" },
+                                                                    { "vertical", "▼" } };
+        static public string GetArrow(string direction)
+        {
+            return Arrows[direction];
+        }
+        static public string GetArrow(int direction)
+        {
+            return Arrows.ElementAt(direction).Value;
         }
 
         Point Position;

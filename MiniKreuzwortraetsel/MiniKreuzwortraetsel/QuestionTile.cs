@@ -27,25 +27,15 @@ namespace MiniKreuzwortraetsel
             Text = "";
             Question = question;
             Direction = direction;
-            // normal question tile
-            string arrow = SubTile.GetArrow(direction);
-            if (!string.IsNullOrEmpty(Question))
-                QuestionTileList.Add(this);
+            QuestionTileList.Add(this);
 
             GenerateText();
         }
 
         private void GenerateText()
         {
-            // normal question tile
             string arrow = SubTile.GetArrow(Direction);
-            if (!string.IsNullOrEmpty(Question))
-            {
-                Text = QuestionTileList.IndexOf(this) + 1 + arrow;
-            }
-            // base word
-            else
-                Text = arrow;
+            Text = QuestionTileList.IndexOf(this) + 1 + arrow;
         }
 
         public void ToEmptyTile(Tile[,] grid)
