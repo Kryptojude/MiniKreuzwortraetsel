@@ -30,6 +30,11 @@ namespace MiniKreuzwortraetsel
             tiles_with_extended_hover_list.Clear();
         }
 
+        public interface ILikeQuestionTile
+        {
+            int GetDirection();
+        }
+
         static readonly Dictionary<string, string> Arrows = new Dictionary<string, string>() {
                                                                     { "horizontal", "►" },
                                                                     { "vertical", "▼" } };

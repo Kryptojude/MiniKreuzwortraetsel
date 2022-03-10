@@ -11,7 +11,7 @@ namespace MiniKreuzwortraetsel
     class BaseWordTile : Tile
     {
         string Text;
-        public int Direction;
+        int Direction;
         readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
         public EmptyTile LinkedReservedTile;
         DeleteButton deleteButton;
@@ -29,7 +29,10 @@ namespace MiniKreuzwortraetsel
         {
             return Text;
         }
-
+        public int GetDirection()
+        {
+            return Direction;
+        }
         public override void MouseClick(MouseEventArgs e, Tile[,] grid)
         {
             throw new NotImplementedException();

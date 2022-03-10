@@ -8,19 +8,20 @@ using System.Windows.Forms;
 
 namespace MiniKreuzwortraetsel
 {
-    class QuestionTile : Tile
+    class QuestionTile : Tile, Tile.ILikeQuestionTile
     {
         static public readonly List<QuestionTile> QuestionTileList = new List<QuestionTile>();
 
         public string Question;
         string Text;
-        public int Direction;
-        readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
+        int Direction;
+        List<LetterTile> LinkedLetterTiles;
         public EmptyTile LinkedReservedTile;
         DeleteButton deleteButton;
 
         public QuestionTile(Point position, string question, int direction) : base(position)
         {
+            LinkedLetterTiles = new List<LetterTile>();
             deleteButton = new DeleteButton(GetBounds().Location);
             foregroundColor = Brushes.Red;
             font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
@@ -32,7 +33,7 @@ namespace MiniKreuzwortraetsel
             GenerateText();
         }
 
-        private void GenerateText()
+        public void GenerateText()
         {
             string arrow = GetArrow(Direction);
             Text = QuestionTileList.IndexOf(this) + 1 + arrow;
@@ -131,6 +132,10 @@ namespace MiniKreuzwortraetsel
                 // Then delete this question
                 ToEmptyTile(grid);
             }
+        }
+        public int GetDirection()
+        {
+            return Direction;
         }
     }
 }
