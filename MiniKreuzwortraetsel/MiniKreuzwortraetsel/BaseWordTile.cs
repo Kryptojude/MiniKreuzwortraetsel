@@ -22,6 +22,18 @@ namespace MiniKreuzwortraetsel
             foregroundColor = Brushes.Red;
             font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
             Text = "";
+            Direction = direction;
+
+            GenerateText();
+        }
+
+        private void GenerateText()
+        {
+            string arrow = SubTile.GetArrow(Direction);
+            if (!string.IsNullOrEmpty(Question))
+            {
+                Text = QuestionTileList.IndexOf(this) + 1 + arrow;
+            }
         }
 
         public string GetText()
