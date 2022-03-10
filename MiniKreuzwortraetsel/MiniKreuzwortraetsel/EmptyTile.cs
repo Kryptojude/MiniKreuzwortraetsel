@@ -52,7 +52,7 @@ namespace MiniKreuzwortraetsel
         public BaseWordTile ToBaseWordTile(Tile[,] grid, string question, int direction)
         {
             EmptyTileList.Remove(this);
-            grid[GetPosition().Y, GetPosition().X] = new BaseWordTile(GetPosition());
+            grid[GetPosition().Y, GetPosition().X] = new BaseWordTile(GetPosition(), direction);
             return grid[GetPosition().Y, GetPosition().X] as BaseWordTile;
         }
         public override void Paint(Graphics g)

@@ -34,8 +34,13 @@ namespace MiniKreuzwortraetsel
 
         private void GenerateText()
         {
-            string arrow = SubTile.GetArrow(Direction);
+            string arrow = GetArrow(Direction);
             Text = QuestionTileList.IndexOf(this) + 1 + arrow;
+        }
+
+        public string GetText()
+        {
+            return Text;
         }
 
         public void ToEmptyTile(Tile[,] grid)
