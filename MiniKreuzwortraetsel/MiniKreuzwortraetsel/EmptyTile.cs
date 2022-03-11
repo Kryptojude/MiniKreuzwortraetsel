@@ -36,10 +36,10 @@ namespace MiniKreuzwortraetsel
             SubTiles[0] = new SubTile(direction: 0, parentTile: this);
             SubTiles[1] = new SubTile(direction: 1, parentTile: this);
         }
-        public LetterTile ToLetterTile(Tile[,] grid, QuestionTile questionTile, string text, PictureBox pb)
+        public LetterTile ToLetterTile(Tile[,] grid, ILikeQuestionTile likeQuestionTile, string text, PictureBox pb)
         {
             EmptyTileList.Remove(this);
-            grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), questionTile, text);
+            grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), likeQuestionTile, text);
             return grid[GetPosition().Y, GetPosition().X] as LetterTile;
         }
         public QuestionTile ToQuestionTile(Tile[,] grid, string question, int direction)
@@ -49,7 +49,7 @@ namespace MiniKreuzwortraetsel
             return grid[GetPosition().Y, GetPosition().X] as QuestionTile;
         }
 
-        public BaseWordTile ToBaseWordTile(Tile[,] grid, string question, int direction)
+        public BaseWordTile ToBaseWordTile(Tile[,] grid, int direction)
         {
             EmptyTileList.Remove(this);
             grid[GetPosition().Y, GetPosition().X] = new BaseWordTile(GetPosition(), direction);

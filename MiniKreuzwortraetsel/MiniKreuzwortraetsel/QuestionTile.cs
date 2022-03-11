@@ -43,7 +43,10 @@ namespace MiniKreuzwortraetsel
         {
             return Text;
         }
-
+        public void SetLinkedReservedTile(EmptyTile linkedReservedTile)
+        {
+            LinkedReservedTile = linkedReservedTile;
+        }
         public void ToEmptyTile(Tile[,] grid)
         {
             // Turn the letter tiles associated with this questionTile into emptyTiles

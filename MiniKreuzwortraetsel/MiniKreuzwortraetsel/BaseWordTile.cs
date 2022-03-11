@@ -8,14 +8,14 @@ using System.Windows.Forms;
 
 namespace MiniKreuzwortraetsel
 {
-    class BaseWordTile : Tile
+    class BaseWordTile : Tile, Tile.ILikeQuestionTile
     {
         string Text;
         int Direction;
         readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
-        public EmptyTile LinkedReservedTile;
+        EmptyTile LinkedReservedTile;
         DeleteButton deleteButton;
-
+        
         public BaseWordTile(Point position, int direction) : base(position)
         {
             deleteButton = new DeleteButton(GetBounds().Location);
@@ -32,6 +32,15 @@ namespace MiniKreuzwortraetsel
         public int GetDirection()
         {
             return Direction;
+        }
+        public void SetLinkedReservedTile(EmptyTile linkedReservedTile)
+        {
+            LinkedReservedTile = linkedReservedTile;
+        }
+        public void AddLinkedLetterTile(LetterTile letterTile)
+        {
+            LinkedLetterTiles.Add(letterTile);
+            letterTile.AddParentQuestionTile(this);
         }
         public override void MouseClick(MouseEventArgs e, Tile[,] grid)
         {

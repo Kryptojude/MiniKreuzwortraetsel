@@ -13,22 +13,23 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// The question tile(s) that this letter belongs to
         /// </summary>
-        readonly List<QuestionTile> parent_question_tiles = new List<QuestionTile>();
+        readonly List<ILikeQuestionTile> parent_like_question_tiles = new List<ILikeQuestionTile>();
         public string Text = "";
 
-        public LetterTile(Point position, QuestionTile questionTile, string text) : base(position)
+        public LetterTile(Point position, ILikeQuestionTile likeQuestionTile, string text) : base(position)
         {
-            questionTile.AddLinkedLetterTile(this);
-            Text = text;        }
+            likeQuestionTile.AddLinkedLetterTile(this);
+            Text = text;        
+        }
 
         public void ToEmptyTile(Tile[,] grid, QuestionTile questionTile)
         {
             // If the letterTile only belongs to this questionTile, then make into EmptyTile
-            if (parent_question_tiles.Count == 1)
+            if (parent_like_question_tiles.Count == 1)
                 grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
             // If the letterTile belongs to multiple QuestionTiles, just remove this QuestionTile from its question tile list
             else
-                parent_question_tiles.Remove(questionTile);
+                parent_like_question_tiles.Remove(questionTile);
         }
         public override void Paint(Graphics g)
         {
@@ -70,9 +71,9 @@ namespace MiniKreuzwortraetsel
             TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
         }
 
-        public void AddParentQuestionTile(QuestionTile questionTile)
+        public void AddParentQuestionTile(ILikeQuestionTile likeQuestionTile)
         {
-            parent_question_tiles.Add(questionTile);
+            parent_like_question_tiles.Add(likeQuestionTile);
         }
 
         public override void MouseMove(MouseEventArgs e, PictureBox pb, Point[] directions, Tile[,] grid)

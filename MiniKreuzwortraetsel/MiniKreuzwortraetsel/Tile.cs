@@ -33,6 +33,8 @@ namespace MiniKreuzwortraetsel
         public interface ILikeQuestionTile
         {
             int GetDirection();
+            void SetLinkedReservedTile(EmptyTile linkedReservedTile);
+            void AddLinkedLetterTile(LetterTile letterTile);
         }
 
         static readonly Dictionary<string, string> Arrows = new Dictionary<string, string>() {
