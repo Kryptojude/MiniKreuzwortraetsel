@@ -157,7 +157,15 @@ namespace MiniKreuzwortraetsel
         }
         public override void MouseClick(MouseEventArgs e, Tile[,] grid) 
         {
-
+            // Which subTile was clicked?
+            int subTileIdx = (e.X -  > e.Y>) ? 0:1;
+            // Am I hovering over a Highlight?
+            RemoveAllHighlights();
+            Tile.RemoveAllExtendedHover(grid);
+            EmptyTile emptyTile = SubTile.HoverSubTile.ParentTile;
+            QuestionTile questionTile = emptyTile.ToQuestionTile(grid, Tile.TupleToBeFilled.Question, SubTile.HoverSubTile.Direction);
+            SubTile.HoverSubTile = null;
+            FillAnswer(questionTile, Tile.TupleToBeFilled);
         }
         public override void MouseLeave(MouseEventArgs e, PictureBox pb)
         {

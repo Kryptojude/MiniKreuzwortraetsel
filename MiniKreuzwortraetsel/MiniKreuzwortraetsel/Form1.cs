@@ -601,6 +601,7 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         private void GridPB_MouseClick(object sender, MouseEventArgs e)
         {
+            // Determine clicked tile
             Tile clickedTile = grid[e.Y / TS, e.X / TS];
             // Hand down event
             clickedTile.MouseClick(e, grid);
