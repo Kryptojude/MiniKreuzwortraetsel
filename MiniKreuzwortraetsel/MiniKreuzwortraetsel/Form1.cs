@@ -229,7 +229,7 @@ namespace MiniKreuzwortraetsel
                                             // What type of tile is selected?
                                             Tile potentialLetterTile = grid[letterPoint.Y, letterPoint.X];
                                             // Tile is QuestionTile
-                                            if (potentialLetterTile is QuestionTile)
+                                            if (potentialLetterTile is Tile.ILikeQuestionTile)
                                                 // Answer can't go over a QuestionTile
                                                 answerFits = false;
                                             // Tile is EmptyTile

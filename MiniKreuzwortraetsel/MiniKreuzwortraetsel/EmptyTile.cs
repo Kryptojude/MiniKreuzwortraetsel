@@ -62,7 +62,7 @@ namespace MiniKreuzwortraetsel
 
             // Call subtile painting routines
             SubTiles[0].Paint(g);
-            SubTiles[0].Paint(g);
+            SubTiles[1].Paint(g);
 
             // Draw Rectangle
             // Condition: At least one subtile is highlighted
@@ -155,7 +155,10 @@ namespace MiniKreuzwortraetsel
 
 
         }
-        public override void MouseClick(MouseEventArgs e, Tile[,] grid) { }
+        public override void MouseClick(MouseEventArgs e, Tile[,] grid) 
+        {
+
+        }
         public override void MouseLeave(MouseEventArgs e, PictureBox pb)
         {
             RemoveHoverFlagFromBothSubtiles();
