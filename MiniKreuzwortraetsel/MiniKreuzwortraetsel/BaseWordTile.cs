@@ -8,40 +8,15 @@ using System.Windows.Forms;
 
 namespace MiniKreuzwortraetsel
 {
-    class BaseWordTile : Tile, Tile.IQuestionTileInterface
+    class BaseWordTile : QuestionOrBaseWordTile
     {
-        string Text;
-        int Direction;
-        readonly List<LetterTile> LinkedLetterTiles = new List<LetterTile>();
-        EmptyTile LinkedReservedTile;
-        DeleteButton deleteButton;
-        
-        public BaseWordTile(Point position, int direction) : base(position)
+
+        public BaseWordTile(Point position, int direction) : base(position, direction)
         {
-            deleteButton = new DeleteButton(GetBounds().Location);
             foregroundColor = Brushes.Red;
-            font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
-            Direction = direction;
             Text = GetArrow(Direction);
         }
 
-        public string GetText()
-        {
-            return Text;
-        }
-        public int GetDirection()
-        {
-            return Direction;
-        }
-        public void SetLinkedReservedTile(EmptyTile linkedReservedTile)
-        {
-            LinkedReservedTile = linkedReservedTile;
-        }
-        public void AddLinkedLetterTile(LetterTile letterTile)
-        {
-            LinkedLetterTiles.Add(letterTile);
-            letterTile.AddParentQuestionTile(this);
-        }
         public void MouseClick(MouseEventArgs e, Tile[,] grid)
         {
             // If the click was on the deleteButton

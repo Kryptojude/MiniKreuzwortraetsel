@@ -229,7 +229,7 @@ namespace MiniKreuzwortraetsel
                                             // What type of tile is selected?
                                             Tile potentialLetterTile = grid[letterPoint.Y, letterPoint.X];
                                             // Tile is QuestionTile
-                                            if (potentialLetterTile is Tile.IQuestionTileInterface)
+                                            if (potentialLetterTile is QuestionOrBaseWordTile)
                                                 // Answer can't go over a QuestionTile
                                                 answerFits = false;
                                             // Tile is EmptyTile
@@ -278,13 +278,13 @@ namespace MiniKreuzwortraetsel
                 else if (candidates.Count == 1)
                 {
                     // Fill answer into that position, convert the EmptyTile to QuestionTile
-                    Tile.IQuestionTileInterface likeQuestionTile;
+                    QuestionOrBaseWordTile questionOrBaseWordTile;
                     if (baseWord)
-                        likeQuestionTile = candidates[0].potentialQuestionTile.ToBaseWordTile(grid, candidates[0].direction);
+                        questionOrBaseWordTile = candidates[0].potentialQuestionTile.ToBaseWordTile(grid, candidates[0].direction);
                     else
-                        likeQuestionTile = candidates[0].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[0].direction);
+                        questionOrBaseWordTile = candidates[0].potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[0].direction);
                     
-                    FillAnswer(likeQuestionTile, tuple);
+                    FillAnswer(questionOrBaseWordTile, tuple);
                 }
                 else if (candidates.Count > 1)
                 {
@@ -315,13 +315,13 @@ namespace MiniKreuzwortraetsel
                         // Pick a random index
                         int randomIndex = maxMatchesIndeces[random.Next(maxMatchesIndeces.Count)];
                         EmptyTile potentialQuestionTile = candidates[randomIndex].potentialQuestionTile;
-                        Tile.IQuestionTileInterface likeQuestionTile;
+                        QuestionOrBaseWordTile questionOrBaseWordTile;
                         if (baseWord)
-                            likeQuestionTile = potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[randomIndex].direction);
+                            questionOrBaseWordTile = potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[randomIndex].direction);
                         else
-                            likeQuestionTile = potentialQuestionTile.ToBaseWordTile(grid, candidates[randomIndex].direction);
+                            questionOrBaseWordTile = potentialQuestionTile.ToBaseWordTile(grid, candidates[randomIndex].direction);
 
-                        FillAnswer(likeQuestionTile, tuple);
+                        FillAnswer(questionOrBaseWordTile, tuple);
                     }
                 }
             }
@@ -329,13 +329,13 @@ namespace MiniKreuzwortraetsel
             RepaintAllTiles();
         }
 
-        private void FillAnswer(Tile.IQuestionTileInterface likeQuestionTile, (string Question, string Answer) tuple)
+        private void FillAnswer(QuestionOrBaseWordTile questionOrBaseWordTile, (string Question, string Answer) tuple)
         {
             // Generate Coordinates for the direction
-            Point directionPoint = directions[likeQuestionTile.GetDirection()];
+            Point directionPoint = directions[questionOrBaseWordTile.GetDirection()];
 
             // Get the tile after the answer
-            Point tileAfterAnswerPos = new Point(((Tile)likeQuestionTile).GetPosition().X + (directionPoint.X * (tuple.Answer.Length + 1)), ((Tile)likeQuestionTile).GetPosition().Y + (directionPoint.Y * (tuple.Answer.Length + 1)));
+            Point tileAfterAnswerPos = new Point(((Tile)questionOrBaseWordTile).GetPosition().X + (directionPoint.X * (tuple.Answer.Length + 1)), ((Tile)questionOrBaseWordTile).GetPosition().Y + (directionPoint.Y * (tuple.Answer.Length + 1)));
             // Out of bounds check
             if (tileAfterAnswerPos.Y < grid.GetLength(0) && tileAfterAnswerPos.X < grid.GetLength(1))
             {
@@ -346,15 +346,15 @@ namespace MiniKreuzwortraetsel
                     EmptyTile tileAfterAnswer = grid[tileAfterAnswerPos.Y, tileAfterAnswerPos.X] as EmptyTile;
                     // Reserve the tile and link to questionTile
                     tileAfterAnswer.Reserve();
-                    likeQuestionTile.SetLinkedReservedTile(tileAfterAnswer);
+                    questionOrBaseWordTile.SetLinkedReservedTile(tileAfterAnswer);
                 }
             }
 
             // Fill the answer into the grid letter by letter
             for (int c = 0; c < tuple.Answer.Length; c++)
             {
-                int letterX = ((Tile)likeQuestionTile).GetPosition().X + (directionPoint.X * (c + 1));
-                int letterY = ((Tile)likeQuestionTile).GetPosition().Y + (directionPoint.Y * (c + 1));
+                int letterX = ((Tile)questionOrBaseWordTile).GetPosition().X + (directionPoint.X * (c + 1));
+                int letterY = ((Tile)questionOrBaseWordTile).GetPosition().Y + (directionPoint.Y * (c + 1));
                 Tile tile = grid[letterY, letterX];
                 // Tile can be EmptyTile or (matching) LetterTile
                 if (tile is EmptyTile)
@@ -362,7 +362,7 @@ namespace MiniKreuzwortraetsel
                     EmptyTile emptyTile = tile as EmptyTile;
                     // Convert the EmptyTile to LetterTile
                     string text = tuple.Answer[c].ToString();
-                    emptyTile.ToLetterTile(grid, likeQuestionTile, text, gridPB);
+                    emptyTile.ToLetterTile(grid, questionOrBaseWordTile, text, gridPB);
                 }
                 else if (tile is LetterTile)
                 {
@@ -372,7 +372,7 @@ namespace MiniKreuzwortraetsel
                     else
                     {
                         // Link this LetterTile to the QuestionTile
-                        likeQuestionTile.AddLinkedLetterTile(letterTile);
+                        questionOrBaseWordTile.AddLinkedLetterTile(letterTile);
                     }
                 }
                 else if (tile is QuestionTile)
@@ -432,7 +432,7 @@ namespace MiniKreuzwortraetsel
                 List<QuestionTile> questionTileList = QuestionTile.QuestionTileList;
                 for (int i = 0; i < questionTileList.Count; i++)
                 {
-                    html += i + 1 + ". " + questionTileList[i].Question + "<br/>";
+                    html += i + 1 + ". " + questionTileList[i].GetQuestion() + "<br/>";
                 }
                 html += "</p>";
 
@@ -604,14 +604,14 @@ namespace MiniKreuzwortraetsel
             // Determine clicked tile
             Tile clickedTile = grid[e.Y / TS, e.X / TS];
             // Hand down event
-            if (clickedTile is Tile.IQuestionTileInterface)
-                (clickedTile as Tile.IQuestionTileInterface).MouseClick(e, grid);
+            if (clickedTile is QuestionOrBaseWordTile)
+                (clickedTile as QuestionOrBaseWordTile).MouseClick(e, grid);
             if (clickedTile is EmptyTile)
             {
                 EmptyTile emptyTile = clickedTile as EmptyTile;
                 if (emptyTile.MouseClick(e, out int direction))
                 {
-                    Tile.IQuestionTileInterface questionTileInterface;
+                    QuestionOrBaseWordTile questionTileInterface;
                     if (Tile.TupleToBeFilled.Question != "")
                         questionTileInterface = emptyTile.ToQuestionTile(grid, Tile.TupleToBeFilled.Question, direction);
                     else

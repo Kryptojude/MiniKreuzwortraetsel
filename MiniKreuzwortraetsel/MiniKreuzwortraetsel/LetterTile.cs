@@ -13,23 +13,23 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// The question tile(s) that this letter belongs to
         /// </summary>
-        readonly List<IQuestionTileInterface> parent_like_question_tiles = new List<IQuestionTileInterface>();
+        readonly List<QuestionOrBaseWordTile> parent_QuestionOrBaseWordTiles = new List<QuestionOrBaseWordTile>();
         public string Text = "";
 
-        public LetterTile(Point position, IQuestionTileInterface likeQuestionTile, string text) : base(position)
+        public LetterTile(Point position, QuestionOrBaseWordTile questionOrBaseWordTile, string text) : base(position)
         {
-            likeQuestionTile.AddLinkedLetterTile(this);
+            questionOrBaseWordTile.AddLinkedLetterTile(this);
             Text = text;        
         }
 
-        public void ToEmptyTile(Tile[,] grid, IQuestionTileInterface questionTileInterface)
+        public void ToEmptyTile(Tile[,] grid, QuestionOrBaseWordTile questionTileInterface)
         {
             // If the letterTile only belongs to this questionTile, then make into EmptyTile
-            if (parent_like_question_tiles.Count == 1)
+            if (parent_QuestionOrBaseWordTiles.Count == 1)
                 grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
             // If the letterTile belongs to multiple QuestionTiles, just remove this QuestionTile from its question tile list
             else
-                parent_like_question_tiles.Remove(questionTileInterface);
+                parent_QuestionOrBaseWordTiles.Remove(questionTileInterface);
         }
         public override void Paint(Graphics g)
         {
@@ -71,9 +71,9 @@ namespace MiniKreuzwortraetsel
             TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
         }
 
-        public void AddParentQuestionTile(IQuestionTileInterface likeQuestionTile)
+        public void AddParentQuestionOrBaseWordTile(QuestionOrBaseWordTile questionOrBaseWordTile)
         {
-            parent_like_question_tiles.Add(likeQuestionTile);
+            parent_QuestionOrBaseWordTiles.Add(questionOrBaseWordTile);
         }
 
         public override void MouseMove(MouseEventArgs e, PictureBox pb, Point[] directions, Tile[,] grid)

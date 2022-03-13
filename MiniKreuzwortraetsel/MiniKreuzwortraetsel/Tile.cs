@@ -30,14 +30,6 @@ namespace MiniKreuzwortraetsel
             tiles_with_extended_hover_list.Clear();
         }
 
-        public interface IQuestionTileInterface
-        {
-            int GetDirection();
-            void SetLinkedReservedTile(EmptyTile linkedReservedTile);
-            void AddLinkedLetterTile(LetterTile letterTile);
-            void MouseClick(MouseEventArgs e, Tile[,] grid);
-        }
-
         static readonly Dictionary<string, string> Arrows = new Dictionary<string, string>() {
                                                                     { "horizontal", "►" },
                                                                     { "vertical", "▼" } };

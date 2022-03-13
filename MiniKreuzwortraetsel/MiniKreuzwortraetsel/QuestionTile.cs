@@ -8,26 +8,15 @@ using System.Windows.Forms;
 
 namespace MiniKreuzwortraetsel
 {
-    class QuestionTile : Tile, Tile.IQuestionTileInterface
+    class QuestionTile : QuestionOrBaseWordTile
     {
         static public readonly List<QuestionTile> QuestionTileList = new List<QuestionTile>();
 
-        public string Question;
-        string Text;
-        int Direction;
-        List<LetterTile> LinkedLetterTiles;
-        public EmptyTile LinkedReservedTile;
-        DeleteButton deleteButton;
+        string Question;
 
-        public QuestionTile(Point position, string question, int direction) : base(position)
+        public QuestionTile(Point position, string question, int direction) : base(position, direction)
         {
-            LinkedLetterTiles = new List<LetterTile>();
-            deleteButton = new DeleteButton(GetBounds().Location);
-            foregroundColor = Brushes.Red;
-            font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
-            Text = "";
             Question = question;
-            Direction = direction;
             QuestionTileList.Add(this);
 
             GenerateText();
@@ -39,14 +28,11 @@ namespace MiniKreuzwortraetsel
             Text = QuestionTileList.IndexOf(this) + 1 + arrow;
         }
 
-        public string GetText()
+        public string GetQuestion()
         {
-            return Text;
+            return Question;
         }
-        public void SetLinkedReservedTile(EmptyTile linkedReservedTile)
-        {
-            LinkedReservedTile = linkedReservedTile;
-        }
+
         public void ToEmptyTile(Tile[,] grid)
         {
             // Turn the letter tiles associated with this questionTile into emptyTiles
@@ -91,11 +77,6 @@ namespace MiniKreuzwortraetsel
             deleteButton.Paint(g);
         }
 
-        public void AddLinkedLetterTile(LetterTile letterTile)
-        {
-            LinkedLetterTiles.Add(letterTile);
-            letterTile.AddParentQuestionTile(this);
-        }
         // What I did last time: Painting logic is pretty much done now, now fix why tiles aren't showing up properly after adding them
         // CheckVisualChange() method probably instead override GetHashCode() and in that go through all the fields that are relevant for visuals (even child elements)
         // and hash it before and after
@@ -135,10 +116,6 @@ namespace MiniKreuzwortraetsel
                 // Then delete this question
                 ToEmptyTile(grid);
             }
-        }
-        public int GetDirection()
-        {
-            return Direction;
         }
     }
 }

@@ -126,6 +126,7 @@
     <Compile Include="MySqlQueries.cs" />
     <Compile Include="NextPaintInstruction.cs" />
     <Compile Include="Popup.cs" />
+    <Compile Include="QuestionOrBaseWordTile.cs" />
     <Compile Include="QuestionTile.cs" />
     <Compile Include="ScreenBuffer.cs" />
     <Compile Include="SubTile.cs" />
