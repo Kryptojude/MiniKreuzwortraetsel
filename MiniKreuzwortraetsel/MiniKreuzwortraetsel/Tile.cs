@@ -30,11 +30,12 @@ namespace MiniKreuzwortraetsel
             tiles_with_extended_hover_list.Clear();
         }
 
-        public interface ILikeQuestionTile
+        public interface IQuestionTileInterface
         {
             int GetDirection();
             void SetLinkedReservedTile(EmptyTile linkedReservedTile);
             void AddLinkedLetterTile(LetterTile letterTile);
+            void MouseClick(MouseEventArgs e, Tile[,] grid);
         }
 
         static readonly Dictionary<string, string> Arrows = new Dictionary<string, string>() {
@@ -87,7 +88,6 @@ namespace MiniKreuzwortraetsel
         /// the called method belongs to the tile instance that the mouse was on before the movement
         /// </summary>
         public abstract void MouseLeave(MouseEventArgs e, PictureBox pb);
-        public abstract void MouseClick(MouseEventArgs e, Tile[,] grid);
         public abstract void Paint(Graphics g);
         /// <summary>
         /// Moves the origin of the grid

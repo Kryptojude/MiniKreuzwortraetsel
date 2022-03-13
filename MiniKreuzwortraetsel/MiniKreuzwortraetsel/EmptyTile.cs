@@ -36,7 +36,7 @@ namespace MiniKreuzwortraetsel
             SubTiles[0] = new SubTile(direction: 0, parentTile: this);
             SubTiles[1] = new SubTile(direction: 1, parentTile: this);
         }
-        public LetterTile ToLetterTile(Tile[,] grid, ILikeQuestionTile likeQuestionTile, string text, PictureBox pb)
+        public LetterTile ToLetterTile(Tile[,] grid, IQuestionTileInterface likeQuestionTile, string text, PictureBox pb)
         {
             EmptyTileList.Remove(this);
             grid[GetPosition().Y, GetPosition().X] = new LetterTile(GetPosition(), likeQuestionTile, text);
@@ -155,17 +155,23 @@ namespace MiniKreuzwortraetsel
 
 
         }
-        public override void MouseClick(MouseEventArgs e, Tile[,] grid) 
+        /// <returns>Returns whether FillAnswer() method should be called</returns>
+        public bool MouseClick(MouseEventArgs e, out int direction) 
         {
+            bool callFillAnswer = false;
             // Which subTile was clicked?
-            int subTileIdx = (e.X -  > e.Y>) ? 0:1;
-            // Am I hovering over a Highlight?
-            RemoveAllHighlights();
-            Tile.RemoveAllExtendedHover(grid);
-            EmptyTile emptyTile = SubTile.HoverSubTile.ParentTile;
-            QuestionTile questionTile = emptyTile.ToQuestionTile(grid, Tile.TupleToBeFilled.Question, SubTile.HoverSubTile.Direction);
-            SubTile.HoverSubTile = null;
-            FillAnswer(questionTile, Tile.TupleToBeFilled);
+            int subTileIdx = (e.X - GetBounds().Location.X > e.Y - GetBounds().Location.Y) ? 0:1;
+            direction = subTileIdx;
+            SubTile clickedSubTile = SubTiles[subTileIdx];
+            // Is clicked subTile highlighted?
+            if (clickedSubTile.IsHighlighted())
+            {
+                RemoveAllHighlights();
+                RemoveAllExtendedHover();
+                callFillAnswer = true;
+            }
+
+            return callFillAnswer;
         }
         public override void MouseLeave(MouseEventArgs e, PictureBox pb)
         {

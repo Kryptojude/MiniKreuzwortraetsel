@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace MiniKreuzwortraetsel
 {
-    class QuestionTile : Tile, Tile.ILikeQuestionTile
+    class QuestionTile : Tile, Tile.IQuestionTileInterface
     {
         static public readonly List<QuestionTile> QuestionTileList = new List<QuestionTile>();
 
@@ -127,7 +127,7 @@ namespace MiniKreuzwortraetsel
             deleteButton.SetVisible(false);
             deleteButton.SetHover(false, pb);
         }
-        public override void MouseClick(MouseEventArgs e, Tile[,] grid)
+        public void MouseClick(MouseEventArgs e, Tile[,] grid)
         {
             // If the click was on the deleteButton
             if (deleteButton.IsMouseOverMe(e, this))

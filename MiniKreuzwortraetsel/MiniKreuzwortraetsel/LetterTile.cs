@@ -13,23 +13,23 @@ namespace MiniKreuzwortraetsel
         /// <summary>
         /// The question tile(s) that this letter belongs to
         /// </summary>
-        readonly List<ILikeQuestionTile> parent_like_question_tiles = new List<ILikeQuestionTile>();
+        readonly List<IQuestionTileInterface> parent_like_question_tiles = new List<IQuestionTileInterface>();
         public string Text = "";
 
-        public LetterTile(Point position, ILikeQuestionTile likeQuestionTile, string text) : base(position)
+        public LetterTile(Point position, IQuestionTileInterface likeQuestionTile, string text) : base(position)
         {
             likeQuestionTile.AddLinkedLetterTile(this);
             Text = text;        
         }
 
-        public void ToEmptyTile(Tile[,] grid, QuestionTile questionTile)
+        public void ToEmptyTile(Tile[,] grid, IQuestionTileInterface questionTileInterface)
         {
             // If the letterTile only belongs to this questionTile, then make into EmptyTile
             if (parent_like_question_tiles.Count == 1)
                 grid[GetPosition().Y, GetPosition().X] = new EmptyTile(GetPosition());
             // If the letterTile belongs to multiple QuestionTiles, just remove this QuestionTile from its question tile list
             else
-                parent_like_question_tiles.Remove(questionTile);
+                parent_like_question_tiles.Remove(questionTileInterface);
         }
         public override void Paint(Graphics g)
         {
@@ -71,7 +71,7 @@ namespace MiniKreuzwortraetsel
             TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
         }
 
-        public void AddParentQuestionTile(ILikeQuestionTile likeQuestionTile)
+        public void AddParentQuestionTile(IQuestionTileInterface likeQuestionTile)
         {
             parent_like_question_tiles.Add(likeQuestionTile);
         }
@@ -84,10 +84,5 @@ namespace MiniKreuzwortraetsel
         {
 
         }        
-        public override void MouseClick(MouseEventArgs e, Tile[,] grid)
-        {
-
-        }
-
     }
 }
