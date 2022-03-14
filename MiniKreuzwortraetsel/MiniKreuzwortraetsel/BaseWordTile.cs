@@ -13,7 +13,6 @@ namespace MiniKreuzwortraetsel
 
         public BaseWordTile(Point position, int direction) : base(position, direction)
         {
-            foregroundColor = Brushes.Red;
             Text = GetArrow(Direction);
         }
 
