@@ -335,7 +335,7 @@ namespace MiniKreuzwortraetsel
             Point directionPoint = directions[questionOrBaseWordTile.GetDirection()];
 
             // Get the tile after the answer
-            Point tileAfterAnswerPos = new Point(((Tile)questionOrBaseWordTile).GetPosition().X + (directionPoint.X * (tuple.Answer.Length + 1)), ((Tile)questionOrBaseWordTile).GetPosition().Y + (directionPoint.Y * (tuple.Answer.Length + 1)));
+            Point tileAfterAnswerPos = new Point(questionOrBaseWordTile.GetPosition().X + (directionPoint.X * (tuple.Answer.Length + 1)), questionOrBaseWordTile.GetPosition().Y + (directionPoint.Y * (tuple.Answer.Length + 1)));
             // Out of bounds check
             if (tileAfterAnswerPos.Y < grid.GetLength(0) && tileAfterAnswerPos.X < grid.GetLength(1))
             {
@@ -353,8 +353,8 @@ namespace MiniKreuzwortraetsel
             // Fill the answer into the grid letter by letter
             for (int c = 0; c < tuple.Answer.Length; c++)
             {
-                int letterX = ((Tile)questionOrBaseWordTile).GetPosition().X + (directionPoint.X * (c + 1));
-                int letterY = ((Tile)questionOrBaseWordTile).GetPosition().Y + (directionPoint.Y * (c + 1));
+                int letterX = questionOrBaseWordTile.GetPosition().X + (directionPoint.X * (c + 1));
+                int letterY = questionOrBaseWordTile.GetPosition().Y + (directionPoint.Y * (c + 1));
                 Tile tile = grid[letterY, letterX];
                 // Tile can be EmptyTile or (matching) LetterTile
                 if (tile is EmptyTile)
@@ -582,7 +582,6 @@ namespace MiniKreuzwortraetsel
             // 7,892 ms
             Action action = () =>
             {
-                // Draw white background
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
                     for (int y = 0; y < grid.GetLength(0); y++)
@@ -596,9 +595,6 @@ namespace MiniKreuzwortraetsel
             action.Invoke();
             //TimeLogger.TimeLogger.Benchmark(action, TimeLogger.TimeLogger.TimeUnit.Millisecond);
         }
-        /// <summary>
-        /// Calls FillAnswer if in bounds and on hover tile
-        /// </summary>
         private void GridPB_MouseClick(object sender, MouseEventArgs e)
         {
             // Determine clicked tile
@@ -606,7 +602,7 @@ namespace MiniKreuzwortraetsel
             // Hand down event
             if (clickedTile is QuestionOrBaseWordTile)
                 (clickedTile as QuestionOrBaseWordTile).MouseClick(e, grid);
-            if (clickedTile is EmptyTile)
+            else if (clickedTile is EmptyTile)
             {
                 EmptyTile emptyTile = clickedTile as EmptyTile;
                 if (emptyTile.MouseClick(e, out int direction))
@@ -618,11 +614,10 @@ namespace MiniKreuzwortraetsel
                         questionTileInterface = emptyTile.ToBaseWordTile(grid, direction);
 
                     FillAnswer(questionTileInterface, Tile.TupleToBeFilled);
-
                 }
             }
 
-
+            RepaintAllTiles();
         }
 
         // Methods that call DetermineCandidateSubtiles()

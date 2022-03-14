@@ -33,18 +33,9 @@ namespace MiniKreuzwortraetsel
             return Question;
         }
 
-        public void ToEmptyTile(Tile[,] grid)
+        public override void ToEmptyTile(Tile[,] grid)
         {
-            // Turn the letter tiles associated with this questionTile into emptyTiles
-            foreach (LetterTile letterTile in LinkedLetterTiles)
-                letterTile.ToEmptyTile(grid, this);
-
-            // Unreserve the reserved tile of the questionTile
-            LinkedReservedTile?.Unreserve();
-
-            // Insert a new EmptyTile instance into the grid at this tile's position, 
-            Point position = GetPosition();
-            grid[position.Y, position.X] = new EmptyTile(position);
+            base.ToEmptyTile(grid);
 
             // Save this index
             int indexOfThisQuestionTile = QuestionTileList.IndexOf(this);
@@ -53,68 +44,8 @@ namespace MiniKreuzwortraetsel
             // Now indexOfThisQuestionTile points to the next questionTile
             // Lower the number of every questionTile that comes after this one
             for (int i = indexOfThisQuestionTile; i < QuestionTileList.Count; i++)
-                QuestionTileList[i].GenerateText();
-        }
-
-        public override void Paint(Graphics g)
-        {
-            TranslateTransformGraphics(g, GetBounds().Location);
-            int ts = Form1.TS;
-
-            // Clear
-            g.FillRectangle(Brushes.White, 0, 0, ts, ts);
-            // Draw text
-            Size textSize = TextRenderer.MeasureText(Text, font);
-            //g.DrawString(Text, font, foregroundColor, GetBounds().Location.X + (ts / 2 - textSize.Width / 2), GetBounds().Location.Y + (ts / 2 - textSize.Height / 2));
-            g.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
-
-            // Draw Rectangle
-            g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
-
-            TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
-
-            // Draw X
-            deleteButton.Paint(g);
-        }
-
-        // What I did last time: Painting logic is pretty much done now, now fix why tiles aren't showing up properly after adding them
-        // CheckVisualChange() method probably instead override GetHashCode() and in that go through all the fields that are relevant for visuals (even child elements)
-        // and hash it before and after
-        public override void MouseMove(MouseEventArgs e, PictureBox pb, Point[] directions, Tile[,] grid)
-        {
-            /* What can happen when you move the mouse onto a questionTile, or within a questionTile?
-             * deleteButton could appear, it can't disappear
-             * cursor could become hand or arrow (not currently being hashed) but doesnt need refresh anyway
-             * 
-             * */
-
-            // Calculate the fields of this instance based on mouse position (this may or may not result in any changes to this object)
-            // Is mouse hovering over this tile? (This check will become redundant when MouseLeave is implemented
-            // Set deleteButton to visible
-            deleteButton.SetVisible(true);
-            // Is mouse hovering over deleteButton?
-            if (deleteButton.IsMouseOverMe(e, this))
-                // Call delete button hover logic
-                deleteButton.SetHover(true, pb);
-            else
-                // Mouse is not over deleteButton, 
-                // so undo deleteButton hover
-                deleteButton.SetHover(false, pb);
-        }
-
-        public override void MouseLeave(MouseEventArgs e, PictureBox pb)
-        {
-            // deleteButton is not visible
-            deleteButton.SetVisible(false);
-            deleteButton.SetHover(false, pb);
-        }
-        public void MouseClick(MouseEventArgs e, Tile[,] grid)
-        {
-            // If the click was on the deleteButton
-            if (deleteButton.IsMouseOverMe(e, this))
             {
-                // Then delete this question
-                ToEmptyTile(grid);
+                QuestionTileList[i].GenerateText();
             }
         }
     }

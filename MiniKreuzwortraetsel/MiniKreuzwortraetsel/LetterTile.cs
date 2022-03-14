@@ -37,7 +37,7 @@ namespace MiniKreuzwortraetsel
             int ts = Form1.TS;
 
             // Draw background
-            g.FillRectangle(Brushes.White, GetBounds());
+            g.FillRectangle(Brushes.White, 0, 0, ts, ts);
             // Draw text
             Size textSize = TextRenderer.MeasureText(Text, font);
             g.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);

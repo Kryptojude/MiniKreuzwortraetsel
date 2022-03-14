@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace MiniKreuzwortraetsel
 {
@@ -42,6 +43,70 @@ namespace MiniKreuzwortraetsel
         {
             LinkedLetterTiles.Add(letterTile);
             letterTile.AddParentQuestionOrBaseWordTile(this);
+        }
+        public void MouseClick(MouseEventArgs e, Tile[,] grid)
+        {
+            // If the click was on the deleteButton
+            if (deleteButton.IsMouseOverMe(e, this))
+            {
+                // Then delete this question
+                ToEmptyTile(grid);
+            }
+        }
+        public virtual void ToEmptyTile(Tile[,] grid)
+        {
+            // Turn the letter tiles associated with this questionTile into emptyTiles
+            foreach (LetterTile letterTile in LinkedLetterTiles)
+                letterTile.ToEmptyTile(grid, this);
+
+            // Unreserve the reserved tile of the questionTile
+            LinkedReservedTile?.Unreserve();
+
+            // Insert a new EmptyTile instance into the grid at this tile's position, 
+            Point position = GetPosition();
+            grid[position.Y, position.X] = new EmptyTile(position);
+        }
+
+        public override void MouseLeave(MouseEventArgs e, PictureBox pb)
+        {
+            // deleteButton is not visible
+            deleteButton.SetVisible(false);
+            deleteButton.SetHover(false, pb);
+        }
+
+        public override void Paint(Graphics g)
+        {
+            TranslateTransformGraphics(g, GetBounds().Location);
+            int ts = Form1.TS;
+
+            // Clear
+            g.FillRectangle(Brushes.White, 0, 0, ts, ts);
+            // Draw text
+            Size textSize = TextRenderer.MeasureText(Text, font);
+            //g.DrawString(Text, font, foregroundColor, GetBounds().Location.X + (ts / 2 - textSize.Width / 2), GetBounds().Location.Y + (ts / 2 - textSize.Height / 2));
+            g.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
+
+            // Draw Rectangle
+            g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
+
+            TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
+
+            // Draw X
+            deleteButton.Paint(g);
+        }
+
+        public override void MouseMove(MouseEventArgs e, PictureBox pb, Point[] directions, Tile[,] grid)
+        {
+            // Set deleteButton to visible
+            deleteButton.SetVisible(true);
+            // Is mouse hovering over deleteButton?
+            if (deleteButton.IsMouseOverMe(e, this))
+                // Call delete button hover logic
+                deleteButton.SetHover(true, pb);
+            else
+                // Mouse is not over deleteButton, 
+                // so undo deleteButton hover
+                deleteButton.SetHover(false, pb);
         }
     }
 }
