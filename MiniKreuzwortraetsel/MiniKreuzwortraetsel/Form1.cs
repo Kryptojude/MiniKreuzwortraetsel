@@ -316,7 +316,7 @@ namespace MiniKreuzwortraetsel
                         int randomIndex = maxMatchesIndeces[random.Next(maxMatchesIndeces.Count)];
                         EmptyTile potentialQuestionTile = candidates[randomIndex].potentialQuestionTile;
                         QuestionOrBaseWordTile questionOrBaseWordTile;
-                        if (baseWord)
+                        if (!baseWord)
                             questionOrBaseWordTile = potentialQuestionTile.ToQuestionTile(grid, tuple.Question, candidates[randomIndex].direction);
                         else
                             questionOrBaseWordTile = potentialQuestionTile.ToBaseWordTile(grid, candidates[randomIndex].direction);
