@@ -562,8 +562,7 @@ namespace MiniKreuzwortraetsel
                 oldMouseTile.Paint(myBuffer.Graphics);
             }
 
-            // Render the potential visual changes that were drawn into buffered graphics
-            myBuffer.Render();
+            RepaintFlaggedTiles();
 
             // Update old mouse position
             oldMousePosition = new Point(e.X, e.Y);
@@ -577,23 +576,40 @@ namespace MiniKreuzwortraetsel
             //    e.Graphics.DrawString(popup.GetText(), Font, Brushes.Black, popup.GetPosition());
 
         }
-        private void RepaintAllTiles()
+        //private void RepaintAllTiles()
+        //{
+        //    // 7,892 ms
+        //    Action action = () =>
+        //    {
+        //        for (int x = 0; x < grid.GetLength(1); x++)
+        //        {
+        //            for (int y = 0; y < grid.GetLength(0); y++)
+        //            {
+        //                Tile tile = grid[x, y];
+        //                tile.Paint(myBuffer.Graphics);
+        //            }
+        //        }
+        //        myBuffer.Render();
+        //    };
+        //    action.Invoke();
+        //    //TimeLogger.TimeLogger.Benchmark(action, TimeLogger.TimeLogger.TimeUnit.Millisecond);
+        //}
+        private void RepaintFlaggedTiles()
         {
-            // 7,892 ms
-            Action action = () =>
+            for (int y = 0; y < grid.GetLength(0); y++)
             {
                 for (int x = 0; x < grid.GetLength(1); x++)
                 {
-                    for (int y = 0; y < grid.GetLength(0); y++)
+                    Tile tile = grid[y, x];
+                    if (tile.GetRepaintFlag())
                     {
-                        Tile tile = grid[x, y];
                         tile.Paint(myBuffer.Graphics);
+                        tile.SetRepaintFlag(false);
                     }
                 }
-                myBuffer.Render();
-            };
-            action.Invoke();
-            //TimeLogger.TimeLogger.Benchmark(action, TimeLogger.TimeLogger.TimeUnit.Millisecond);
+            }
+
+            myBuffer.Render();
         }
         private void GridPB_MouseClick(object sender, MouseEventArgs e)
         {

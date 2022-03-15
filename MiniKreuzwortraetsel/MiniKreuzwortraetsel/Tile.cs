@@ -52,12 +52,22 @@ namespace MiniKreuzwortraetsel
         /// </summary>
         public ExtendedHover extendedHover = ExtendedHover.Off;
         protected Pen extendedHoverPen = new Pen(Brushes.Red, 5);
+        bool RepaintFlag;
 
         public Tile(Point position)
         {
             int ts = Form1.TS;
             Position = position;
             Bounds = new Rectangle(Position.X * ts, Position.Y * ts, ts, ts);
+            RepaintFlag = false;
+        }
+        public bool GetRepaintFlag()
+        {
+            return RepaintFlag;
+        }
+        public void SetRepaintFlag(bool repaintFlag)
+        {
+           RepaintFlag = repaintFlag;
         }
         public Rectangle GetBounds()
         {

@@ -146,6 +146,8 @@ namespace MiniKreuzwortraetsel
                         if (directionPoint.Y == 1)
                             tile.extendedHover += 2;
 
+                        tile.SetRepaintFlag(true);
+
                         // Save tile with extended hover in list
                         tiles_with_extended_hover_list.Add(tile);
                     }
