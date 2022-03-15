@@ -601,7 +601,7 @@ namespace MiniKreuzwortraetsel
             Tile clickedTile = grid[e.Y / TS, e.X / TS];
             // Hand down event
             if (clickedTile is QuestionOrBaseWordTile)
-                (clickedTile as QuestionOrBaseWordTile).MouseClick(e, grid);
+                (clickedTile as QuestionOrBaseWordTile).MouseClick(e, grid, gridPB);
             else if (clickedTile is EmptyTile)
             {
                 EmptyTile emptyTile = clickedTile as EmptyTile;
@@ -659,11 +659,22 @@ namespace MiniKreuzwortraetsel
         }
         private void ShowMatchesBTN_Click(object sender, EventArgs e)
         {
-            if (tuplesListBox.SelectedItem != null)
+            // Check whether to use tuplesListBox or questionAnswerPanel
+            if (UI_mode == UI_mode_enum.normal)
             {
-                string selectedItem = tuplesListBox.SelectedItem.ToString();
-                string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
-                (string Question, string Answer) tuple = (array[0], array[1]);
+                // Use tuplesListBox
+                if (tuplesListBox.SelectedItem != null)
+                {
+                    string selectedItem = tuplesListBox.SelectedItem.ToString();
+                    string[] array = selectedItem.Split(new string[] { " <---> " }, StringSplitOptions.None);
+                    (string Question, string Answer) tuple = (array[0], array[1]);
+                    DetermineCandidateSubtiles(tuple, highlightCandidates: true, baseWord: false);
+                }
+            }
+            else
+            {
+                // Use questionAnswerPanel
+                (string Question, string Answer) tuple = (QuestionTBox.Text, AnswerTBox.Text);
                 DetermineCandidateSubtiles(tuple, highlightCandidates: true, baseWord: false);
             }
         }

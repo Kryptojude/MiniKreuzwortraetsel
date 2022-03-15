@@ -362,7 +362,7 @@ namespace MiniKreuzwortraetsel
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
-            this.Text = "KreuzworträtselMacher";
+            this.Text = "KreuzworträtselGenerator";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.UIContainerPanel.ResumeLayout(false);
             this.collectionsPanel.ResumeLayout(false);

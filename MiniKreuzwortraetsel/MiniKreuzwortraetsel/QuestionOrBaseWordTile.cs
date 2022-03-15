@@ -44,13 +44,15 @@ namespace MiniKreuzwortraetsel
             LinkedLetterTiles.Add(letterTile);
             letterTile.AddParentQuestionOrBaseWordTile(this);
         }
-        public void MouseClick(MouseEventArgs e, Tile[,] grid)
+        public void MouseClick(MouseEventArgs e, Tile[,] grid, PictureBox pb)
         {
             // If the click was on the deleteButton
             if (deleteButton.IsMouseOverMe(e, this))
             {
                 // Then delete this question
                 ToEmptyTile(grid);
+                // Turn mouse normal
+                pb.Cursor = Cursors.Default;
             }
         }
         public virtual void ToEmptyTile(Tile[,] grid)
