@@ -21,7 +21,7 @@ namespace MiniKreuzwortraetsel
             Two_Outlines_Vertical = 2,
             Three_Outlines_Vertical = 3,
         }
-        static public void RemoveAllExtendedHover()
+        static protected void RemoveAllExtendedHover()
         {
             for (int i = 0; i < tiles_with_extended_hover_list.Count; i++)
                 tiles_with_extended_hover_list[i].SetExtendedHover(ExtendedHover.Off);
@@ -48,7 +48,7 @@ namespace MiniKreuzwortraetsel
         /// Determines if this tile should have red outline based on question tile hover pointing to it, 
         /// -1 = off, 0 = 2 outlines horizontal, 1 = 3 outlines horizontal, 2 = 2 outlines vertical, 3 = 3 outlines vertical
         /// </summary>
-        public ExtendedHover extendedHover = ExtendedHover.Off;
+        ExtendedHover extendedHover = ExtendedHover.Off;
         protected Pen extendedHoverPen = new Pen(Brushes.Red, 5);
         bool RepaintFlag;
 
@@ -59,7 +59,11 @@ namespace MiniKreuzwortraetsel
             Bounds = new Rectangle(Position.X * ts, Position.Y * ts, ts, ts);
             RepaintFlag = true;
         }
-        private void SetExtendedHover(ExtendedHover _extendedHover)
+        public ExtendedHover GetExtendedHover()
+        {
+            return extendedHover;
+        }
+        public void SetExtendedHover(ExtendedHover _extendedHover)
         {
             extendedHover = _extendedHover;
             SetRepaintFlag(true);

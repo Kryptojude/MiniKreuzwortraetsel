@@ -574,24 +574,6 @@ namespace MiniKreuzwortraetsel
             //    e.Graphics.DrawString(popup.GetText(), Font, Brushes.Black, popup.GetPosition());
 
         }
-        //private void RepaintAllTiles()
-        //{
-        //    // 7,892 ms
-        //    Action action = () =>
-        //    {
-        //        for (int x = 0; x < grid.GetLength(1); x++)
-        //        {
-        //            for (int y = 0; y < grid.GetLength(0); y++)
-        //            {
-        //                Tile tile = grid[x, y];
-        //                tile.Paint(myBuffer.Graphics);
-        //            }
-        //        }
-        //        myBuffer.Render();
-        //    };
-        //    action.Invoke();
-        //    //TimeLogger.TimeLogger.Benchmark(action, TimeLogger.TimeLogger.TimeUnit.Millisecond);
-        //}
         private void RepaintFlaggedTiles()
         {
             for (int y = 0; y < grid.GetLength(0); y++)

@@ -46,7 +46,7 @@ namespace MiniKreuzwortraetsel
             g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
 
             // Draw extendedHover
-            switch (extendedHover)
+            switch (GetExtendedHover())
             {
                 case ExtendedHover.Two_Outlines_Horizontal:
                     g.DrawLine(extendedHoverPen, 0, 0, ts, 0);

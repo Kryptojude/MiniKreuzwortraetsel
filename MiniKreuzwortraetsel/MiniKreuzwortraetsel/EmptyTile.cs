@@ -67,7 +67,7 @@ namespace MiniKreuzwortraetsel
                 g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
 
             // Draw extendedHover
-            switch (extendedHover)
+            switch (GetExtendedHover())
             {
                 case ExtendedHover.Two_Outlines_Horizontal:
                     g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
@@ -114,6 +114,7 @@ namespace MiniKreuzwortraetsel
         public override void MouseMove(MouseEventArgs e, PictureBox pb, Point[] directions, Tile[,] grid)
         {
             RemoveHoverFlagFromBothSubtiles();
+            RemoveAllExtendedHover(); // This needs to be moved to Tile.MouseMove()
             // Which subtile is mouse over?
             int mouseSubtile = (e.X - GetBounds().X < e.Y - GetBounds().Y) ? 1 : 0;
             SubTile hoverSubTile = SubTiles[mouseSubtile];
@@ -135,15 +136,13 @@ namespace MiniKreuzwortraetsel
                         Tile tile = grid[letterY, letterX];
                         // End or middle outline
                         if (i < TupleToBeFilled.Answer.Length - 1)
-                            tile.extendedHover = ExtendedHover.Two_Outlines_Horizontal;
+                            tile.SetExtendedHover(ExtendedHover.Two_Outlines_Horizontal);
                         else
-                            tile.extendedHover = ExtendedHover.Three_Outlines_Horizontal;
+                            tile.SetExtendedHover(ExtendedHover.Three_Outlines_Horizontal);
 
                         // Vertical mode
                         if (directionPoint.Y == 1)
-                            tile.extendedHover += 2;
-
-                        tile.SetRepaintFlag(true);
+                            tile.SetExtendedHover(tile.GetExtendedHover() + 2);
 
                         // Save tile with extended hover in list
                         tiles_with_extended_hover_list.Add(tile);
