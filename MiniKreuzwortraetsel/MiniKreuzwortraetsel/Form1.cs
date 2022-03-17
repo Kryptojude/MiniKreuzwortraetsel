@@ -326,7 +326,7 @@ namespace MiniKreuzwortraetsel
                 }
             }
 
-            RepaintAllTiles();
+            RepaintFlaggedTiles();
         }
 
         private void FillAnswer(QuestionOrBaseWordTile questionOrBaseWordTile, (string Question, string Answer) tuple)
@@ -552,14 +552,12 @@ namespace MiniKreuzwortraetsel
             Tile newMouseTile = grid[e.Y / TS, e.X / TS];
             // This will always be called, whether mouse movement was intra-tile or inter-tile
             newMouseTile.MouseMove(e, gridPB, directions, grid);
-            newMouseTile.Paint(myBuffer.Graphics);
             // Check if new mouse tile is different from old mouse tile
             if (oldMouseTile != newMouseTile)
             {
                 // If they are different, then the mouse has moved from one tile to another, 
                 // so also call MouseLeave for old tile
                 oldMouseTile.MouseLeave(e, gridPB);
-                oldMouseTile.Paint(myBuffer.Graphics);
             }
 
             RepaintFlaggedTiles();
@@ -633,7 +631,7 @@ namespace MiniKreuzwortraetsel
                 }
             }
 
-            RepaintAllTiles();
+            RepaintFlaggedTiles();
         }
 
         // Methods that call DetermineCandidateSubtiles()

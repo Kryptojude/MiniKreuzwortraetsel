@@ -18,7 +18,6 @@ namespace MiniKreuzwortraetsel
         {
             Question = question;
             QuestionTileList.Add(this);
-
             GenerateText();
         }
 

@@ -74,6 +74,8 @@ namespace MiniKreuzwortraetsel
             // deleteButton is not visible
             deleteButton.SetVisible(false);
             deleteButton.SetHover(false, pb);
+
+            SetRepaintFlag(true);
         }
 
         public override void Paint(Graphics g)
@@ -109,6 +111,8 @@ namespace MiniKreuzwortraetsel
                 // Mouse is not over deleteButton, 
                 // so undo deleteButton hover
                 deleteButton.SetHover(false, pb);
+
+            SetRepaintFlag(true);
         }
     }
 }

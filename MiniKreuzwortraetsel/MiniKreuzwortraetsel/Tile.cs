@@ -24,9 +24,7 @@ namespace MiniKreuzwortraetsel
         static public void RemoveAllExtendedHover()
         {
             for (int i = 0; i < tiles_with_extended_hover_list.Count; i++)
-            {
-                tiles_with_extended_hover_list[i].extendedHover = ExtendedHover.Off;
-            }
+                tiles_with_extended_hover_list[i].SetExtendedHover(ExtendedHover.Off);
             tiles_with_extended_hover_list.Clear();
         }
 
@@ -59,7 +57,12 @@ namespace MiniKreuzwortraetsel
             int ts = Form1.TS;
             Position = position;
             Bounds = new Rectangle(Position.X * ts, Position.Y * ts, ts, ts);
-            RepaintFlag = false;
+            RepaintFlag = true;
+        }
+        private void SetExtendedHover(ExtendedHover _extendedHover)
+        {
+            extendedHover = _extendedHover;
+            SetRepaintFlag(true);
         }
         public bool GetRepaintFlag()
         {

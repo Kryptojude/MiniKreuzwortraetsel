@@ -18,7 +18,8 @@ namespace MiniKreuzwortraetsel
             {
                 EmptyTile emptyTile = EmptyTileList[i];
                 // Reset the Subtiles so highlights disappear
-                emptyTile.MakeSubTiles();
+                emptyTile.SubTiles[0].RemoveHighlight();
+                emptyTile.SubTiles[1].RemoveHighlight();
             }
         }
 
@@ -28,14 +29,10 @@ namespace MiniKreuzwortraetsel
         public EmptyTile(Point position) : base(position)
         {
             EmptyTileList.Add(this);
-            MakeSubTiles();
-        }
-
-        void MakeSubTiles()
-        {
             SubTiles[0] = new SubTile(direction: 0, parentTile: this);
             SubTiles[1] = new SubTile(direction: 1, parentTile: this);
         }
+
         public LetterTile ToLetterTile(Tile[,] grid, QuestionOrBaseWordTile questionOrBaseWordTile, string text, PictureBox pb)
         {
             EmptyTileList.Remove(this);
@@ -155,7 +152,7 @@ namespace MiniKreuzwortraetsel
 
             }
 
-
+            SetRepaintFlag(true);
         }
         /// <returns>Returns whether FillAnswer() method should be called</returns>
         public bool MouseClick(MouseEventArgs e, out int direction) 
@@ -178,6 +175,7 @@ namespace MiniKreuzwortraetsel
         public override void MouseLeave(MouseEventArgs e, PictureBox pb)
         {
             RemoveHoverFlagFromBothSubtiles();
+            SetRepaintFlag(true);
         }
     }
 }
