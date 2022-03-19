@@ -49,7 +49,7 @@ namespace MiniKreuzwortraetsel
         /// -1 = off, 0 = 2 outlines horizontal, 1 = 3 outlines horizontal, 2 = 2 outlines vertical, 3 = 3 outlines vertical
         /// </summary>
         ExtendedHover extendedHover = ExtendedHover.Off;
-        protected Pen extendedHoverPen = new Pen(Brushes.Red, 5);
+        protected Pen extendedHoverPen = new Pen(Brushes.Red, 1);
         bool RepaintFlag;
 
         public Tile(Point position)
@@ -104,6 +104,32 @@ namespace MiniKreuzwortraetsel
         static public void TranslateTransformGraphics(Graphics g, Point location)
         {
             g.TranslateTransform(location.X, location.Y);
+        }
+        protected void DrawExtendedHover(Graphics g)
+        {
+            int ts = Form1.TS - 1;
+            // Draw extendedHover
+            switch (GetExtendedHover())
+            {
+                case ExtendedHover.Two_Outlines_Horizontal:
+                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
+                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    break;
+                case ExtendedHover.Three_Outlines_Horizontal:
+                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
+                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    break;
+                case ExtendedHover.Two_Outlines_Vertical:
+                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
+                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                    break;
+                case ExtendedHover.Three_Outlines_Vertical:
+                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
+                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    break;
+            }
         }
     }
 }

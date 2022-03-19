@@ -66,28 +66,7 @@ namespace MiniKreuzwortraetsel
             if (SubTiles[0].IsHighlighted() || SubTiles[1].IsHighlighted())
                 g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
 
-            // Draw extendedHover
-            switch (GetExtendedHover())
-            {
-                case ExtendedHover.Two_Outlines_Horizontal:
-                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                    break;
-                case ExtendedHover.Three_Outlines_Horizontal:
-                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                    break;
-                case ExtendedHover.Two_Outlines_Vertical:
-                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                    break;
-                case ExtendedHover.Three_Outlines_Vertical:
-                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                    break;
-            }
+            DrawExtendedHover(g);
 
             TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
         }
@@ -114,7 +93,7 @@ namespace MiniKreuzwortraetsel
         public override void MouseMove(MouseEventArgs e, PictureBox pb, Point[] directions, Tile[,] grid)
         {
             RemoveHoverFlagFromBothSubtiles();
-            RemoveAllExtendedHover(); // This needs to be moved to Tile.MouseMove()
+            RemoveAllExtendedHover();
             // Which subtile is mouse over?
             int mouseSubtile = (e.X - GetBounds().X < e.Y - GetBounds().Y) ? 1 : 0;
             SubTile hoverSubTile = SubTiles[mouseSubtile];
@@ -175,6 +154,7 @@ namespace MiniKreuzwortraetsel
         {
             RemoveHoverFlagFromBothSubtiles();
             SetRepaintFlag(true);
+            RemoveAllExtendedHover();
         }
     }
 }

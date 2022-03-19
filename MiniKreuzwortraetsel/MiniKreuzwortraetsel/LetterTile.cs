@@ -37,7 +37,7 @@ namespace MiniKreuzwortraetsel
             int ts = Form1.TS;
 
             // Draw background
-            g.FillRectangle(Brushes.White, 0, 0, ts, ts);
+            g.FillRectangle(Brushes.White, 0, 0, ts - 1, ts - 1);
             // Draw text
             Size textSize = TextRenderer.MeasureText(Text, font);
             g.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
@@ -45,28 +45,7 @@ namespace MiniKreuzwortraetsel
             // Draw Rectangle
             g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
 
-            // Draw extendedHover
-            switch (GetExtendedHover())
-            {
-                case ExtendedHover.Two_Outlines_Horizontal:
-                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                    break;
-                case ExtendedHover.Three_Outlines_Horizontal:
-                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                    break;
-                case ExtendedHover.Two_Outlines_Vertical:
-                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                    break;
-                case ExtendedHover.Three_Outlines_Vertical:
-                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
-                    break;
-            }
+            DrawExtendedHover(g);
 
             TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
         }

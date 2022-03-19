@@ -84,7 +84,7 @@ namespace MiniKreuzwortraetsel
             int ts = Form1.TS;
 
             // Clear
-            g.FillRectangle(Brushes.White, 0, 0, ts, ts);
+            g.FillRectangle(Brushes.White, 0, 0, ts - 1, ts - 1);
             // Draw text
             Size textSize = TextRenderer.MeasureText(Text, font);
             //g.DrawString(Text, font, foregroundColor, GetBounds().Location.X + (ts / 2 - textSize.Width / 2), GetBounds().Location.Y + (ts / 2 - textSize.Height / 2));
