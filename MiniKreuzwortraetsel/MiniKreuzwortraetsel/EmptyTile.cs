@@ -54,8 +54,8 @@ namespace MiniKreuzwortraetsel
         }
         public override void Paint(Graphics g)
         {
-            TranslateTransformGraphics(g, GetBounds().Location);
-            Rectangle Bounds = GetBounds();
+            Rectangle GlobalBounds = GetGlobalBounds();
+            TranslateTransformGraphics(g, GlobalBounds.Location);
 
             // Call subtile painting routines
             SubTiles[0].Paint(g);
@@ -64,11 +64,11 @@ namespace MiniKreuzwortraetsel
             // Draw Rectangle
             // Condition: At least one subtile is highlighted
             if (SubTiles[0].IsHighlighted() || SubTiles[1].IsHighlighted())
-                g.DrawRectangle(Pens.Black, Bounds);
+                g.DrawRectangle(Pens.Black, GetLocalBounds());
 
             DrawExtendedHover(g);
 
-            TranslateTransformGraphics(g, new Point(-Bounds.Location.X, -Bounds.Location.Y));
+            TranslateTransformGraphics(g, new Point(-GlobalBounds.Location.X, -GlobalBounds.Location.Y));
         }
 
         public void Reserve()
@@ -95,7 +95,7 @@ namespace MiniKreuzwortraetsel
             RemoveHoverFlagFromBothSubtiles();
             RemoveAllExtendedHover();
             // Which subtile is mouse over?
-            int mouseSubtile = (e.X - GetBounds().X < e.Y - GetBounds().Y) ? 1 : 0;
+            int mouseSubtile = (e.X - GetGlobalBounds().X < e.Y - GetGlobalBounds().Y) ? 1 : 0;
             SubTile hoverSubTile = SubTiles[mouseSubtile];
             // Check if that subtile has a highlight
             if (hoverSubTile.IsHighlighted())
@@ -137,7 +137,7 @@ namespace MiniKreuzwortraetsel
         {
             bool callFillAnswer = false;
             // Which subTile was clicked?
-            int subTileIdx = (e.X - GetBounds().Location.X > e.Y - GetBounds().Location.Y) ? 0:1;
+            int subTileIdx = (e.X - GetGlobalBounds().Location.X > e.Y - GetGlobalBounds().Location.Y) ? 0:1;
             direction = subTileIdx;
             SubTile clickedSubTile = SubTiles[subTileIdx];
             // Is clicked subTile highlighted?

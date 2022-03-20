@@ -41,7 +41,8 @@ namespace MiniKreuzwortraetsel
         }
 
         Point Position;
-        Rectangle Bounds;
+        Rectangle Bounds_global;
+        Rectangle Bounds_local;
         protected Font font = new Font("Verdana", 9.75f, FontStyle.Bold);
         protected Brush foregroundColor = Brushes.Blue;
         /// <summary>
@@ -56,7 +57,8 @@ namespace MiniKreuzwortraetsel
         {
             int ts = Form1.TS;
             Position = position;
-            Bounds = new Rectangle(Position.X * ts, Position.Y * ts, ts, ts);
+            Bounds_global = new Rectangle(Position.X * ts, Position.Y * ts, ts, ts);
+            Bounds_local = new Rectangle(0, 0, ts, ts);
             RepaintFlag = true;
         }
         public ExtendedHover GetExtendedHover()
@@ -76,9 +78,13 @@ namespace MiniKreuzwortraetsel
         {
            RepaintFlag = repaintFlag;
         }
-        public Rectangle GetBounds()
+        public Rectangle GetGlobalBounds()
         {
-            return Bounds;
+            return Bounds_global;
+        }
+        public Rectangle GetLocalBounds()
+        {
+            return Bounds_local;
         }
         /// <summary>
         /// Refers to the position in grid[,] array
@@ -97,13 +103,18 @@ namespace MiniKreuzwortraetsel
         /// the called method belongs to the tile instance that the mouse was on before the movement
         /// </summary>
         public abstract void MouseLeave(MouseEventArgs e, PictureBox pb);
-        public virtual void Paint(Graphics g)
+        public abstract void Paint(Graphics g);
+        protected void BeginPaint(Graphics g)
         {
+            TranslateTransformGraphics(g, Bounds_global.Location);
             // Clear
-            g.FillRectangle(Brushes.White, Bounds);
-
-            // Draw Rectangle
-            g.DrawRectangle(Pens.Black, Bounds);
+            g.FillRectangle(Brushes.White, Bounds_local);
+        }
+        protected void EndPaint(Graphics g)
+        {
+            // Draw outline Rectangle
+            g.DrawRectangle(Pens.Black, Bounds_local);
+            TranslateTransformGraphics(g, new Point(-Bounds_global.Location.X, -Bounds_global.Location.Y));
         }
         /// <summary>
         /// Moves the origin of the grid

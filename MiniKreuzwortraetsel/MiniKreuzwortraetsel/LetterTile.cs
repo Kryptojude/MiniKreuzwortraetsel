@@ -33,18 +33,14 @@ namespace MiniKreuzwortraetsel
         }
         public override void Paint(Graphics g)
         {
-            TranslateTransformGraphics(g, GetBounds().Location);
-            int ts = Form1.TS;
-            Rectangle Bounds = GetBounds();
-
-            base.Paint(g);
+            BeginPaint(g);
             // Draw text
             Size textSize = TextRenderer.MeasureText(Text, font);
-            g.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
+            g.DrawString(Text, font, foregroundColor, Form1.TS / 2 - textSize.Width / 2, Form1.TS / 2 - textSize.Height / 2);
 
             DrawExtendedHover(g);
 
-            TranslateTransformGraphics(g, new Point(-Bounds.Location.X, -Bounds.Location.Y));
+            EndPaint(g);
         }
 
         public void AddParentQuestionOrBaseWordTile(QuestionOrBaseWordTile questionOrBaseWordTile)

@@ -60,17 +60,15 @@ namespace MiniKreuzwortraetsel
         public void Paint (Graphics g)
         {
             // Hover flag set to true?
-            if (GetHoverFlag())
+            if (hover_flag)
             {
                 // Draw hover effect
                 g.FillPolygon(Brushes.Blue, subTilePolygons[Direction]);
                 g.DrawString(Tile.GetArrow(Direction), HOVER_ARROW_FONT, Brushes.Red, arrowPositions[Direction]);
             }
-            // No hover flag, so draw highlight
+            // No hover flag, draw background color
             else
-                // Draw highlight
                 g.FillPolygon(GetColor(), subTilePolygons[Direction]);
-
         }
     }
 }

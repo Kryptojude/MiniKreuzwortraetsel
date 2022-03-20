@@ -20,7 +20,7 @@ namespace MiniKreuzwortraetsel
         {
             Direction = direction;
             LinkedLetterTiles = new List<LetterTile>();
-            deleteButton = new DeleteButton(GetBounds().Location);
+            deleteButton = new DeleteButton(GetGlobalBounds().Location);
 
             foregroundColor = Brushes.Red;
             font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
@@ -80,17 +80,13 @@ namespace MiniKreuzwortraetsel
 
         public override void Paint(Graphics g)
         {
-            TranslateTransformGraphics(g, GetBounds().Location);
-            int ts = Form1.TS;
-            Rectangle Bounds = GetBounds();
-
-            base.Paint(g);
+            BeginPaint(g);
             // Draw text
             Size textSize = TextRenderer.MeasureText(Text, font);
             //g.DrawString(Text, font, foregroundColor, GetBounds().Location.X + (ts / 2 - textSize.Width / 2), GetBounds().Location.Y + (ts / 2 - textSize.Height / 2));
-            g.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
+            g.DrawString(Text, font, foregroundColor, Form1.TS / 2 - textSize.Width / 2, Form1.TS / 2 - textSize.Height / 2);
 
-            TranslateTransformGraphics(g, new Point(-Bounds.Location.X, -Bounds.Location.Y));
+            EndPaint(g);
 
             // Draw X
             deleteButton.Paint(g);
