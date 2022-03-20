@@ -82,18 +82,15 @@ namespace MiniKreuzwortraetsel
         {
             TranslateTransformGraphics(g, GetBounds().Location);
             int ts = Form1.TS;
+            Rectangle Bounds = GetBounds();
 
-            // Clear
-            g.FillRectangle(Brushes.White, 0, 0, ts - 1, ts - 1);
+            base.Paint(g);
             // Draw text
             Size textSize = TextRenderer.MeasureText(Text, font);
             //g.DrawString(Text, font, foregroundColor, GetBounds().Location.X + (ts / 2 - textSize.Width / 2), GetBounds().Location.Y + (ts / 2 - textSize.Height / 2));
             g.DrawString(Text, font, foregroundColor, ts / 2 - textSize.Width / 2, ts / 2 - textSize.Height / 2);
 
-            // Draw Rectangle
-            g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
-
-            TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
+            TranslateTransformGraphics(g, new Point(-Bounds.Location.X, -Bounds.Location.Y));
 
             // Draw X
             deleteButton.Paint(g);

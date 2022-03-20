@@ -97,7 +97,14 @@ namespace MiniKreuzwortraetsel
         /// the called method belongs to the tile instance that the mouse was on before the movement
         /// </summary>
         public abstract void MouseLeave(MouseEventArgs e, PictureBox pb);
-        public abstract void Paint(Graphics g);
+        public virtual void Paint(Graphics g)
+        {
+            // Clear
+            g.FillRectangle(Brushes.White, Bounds);
+
+            // Draw Rectangle
+            g.DrawRectangle(Pens.Black, Bounds);
+        }
         /// <summary>
         /// Moves the origin of the grid
         /// </summary>

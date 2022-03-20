@@ -55,7 +55,7 @@ namespace MiniKreuzwortraetsel
         public override void Paint(Graphics g)
         {
             TranslateTransformGraphics(g, GetBounds().Location);
-            int ts = Form1.TS;
+            Rectangle Bounds = GetBounds();
 
             // Call subtile painting routines
             SubTiles[0].Paint(g);
@@ -64,11 +64,11 @@ namespace MiniKreuzwortraetsel
             // Draw Rectangle
             // Condition: At least one subtile is highlighted
             if (SubTiles[0].IsHighlighted() || SubTiles[1].IsHighlighted())
-                g.DrawRectangle(Pens.Black, 0, 0, ts - 1, ts - 1);
+                g.DrawRectangle(Pens.Black, Bounds);
 
             DrawExtendedHover(g);
 
-            TranslateTransformGraphics(g, new Point(-GetBounds().Location.X, -GetBounds().Location.Y));
+            TranslateTransformGraphics(g, new Point(-Bounds.Location.X, -Bounds.Location.Y));
         }
 
         public void Reserve()
