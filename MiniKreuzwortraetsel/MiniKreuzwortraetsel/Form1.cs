@@ -11,7 +11,7 @@ namespace MiniKreuzwortraetsel
 {
     public partial class Form1 : Form
     {
-        Tile[,] grid = new Tile[20,20];
+        Tile[,] grid = new Tile[20, 20];
         public const int TS = 30;
         Point[] directions = new Point[2] { new Point(1, 0), new Point(0, 1) };
         Popup popup;
