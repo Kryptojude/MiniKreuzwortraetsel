@@ -50,7 +50,7 @@ namespace MiniKreuzwortraetsel
         /// -1 = off, 0 = 2 outlines horizontal, 1 = 3 outlines horizontal, 2 = 2 outlines vertical, 3 = 3 outlines vertical
         /// </summary>
         ExtendedHover extendedHover = ExtendedHover.Off;
-        protected Pen extendedHoverPen = new Pen(Brushes.Red, 1);
+        protected Pen extendedHoverPen = new Pen(Brushes.Red, 6);
         bool RepaintFlag;
 
         public Tile(Point position)
@@ -113,7 +113,7 @@ namespace MiniKreuzwortraetsel
         protected void EndPaint(Graphics g)
         {
             // Draw outline Rectangle
-            g.DrawRectangle(Pens.Black, Bounds_local);
+            g.DrawRectangle(Pens.Black, 0, 0, Bounds_local.Width - 1, Bounds_local.Height - 1);
             TranslateTransformGraphics(g, new Point(-Bounds_global.Location.X, -Bounds_global.Location.Y));
         }
         /// <summary>
@@ -125,27 +125,29 @@ namespace MiniKreuzwortraetsel
         }
         protected void DrawExtendedHover(Graphics g)
         {
-            int ts = Form1.TS - 1;
+            int stroke_length = Form1.TS - 1;
+            new System.Drawing.Drawing2D.Matrix();
+            g.MultiplyTransform(ma);
             // Draw extendedHover
             switch (GetExtendedHover())
             {
                 case ExtendedHover.Two_Outlines_Horizontal:
-                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    g.DrawLine(extendedHoverPen, 0, 0, stroke_length, 0);
+                    g.DrawLine(extendedHoverPen, 0, stroke_length, stroke_length, stroke_length);
                     break;
                 case ExtendedHover.Three_Outlines_Horizontal:
-                    g.DrawLine(extendedHoverPen, 0, 0, ts, 0);
-                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    g.DrawLine(extendedHoverPen, 0, 0, stroke_length, 0);
+                    g.DrawLine(extendedHoverPen, stroke_length, 0, stroke_length, stroke_length);
+                    g.DrawLine(extendedHoverPen, 0, stroke_length, stroke_length, stroke_length);
                     break;
                 case ExtendedHover.Two_Outlines_Vertical:
-                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
+                    g.DrawLine(extendedHoverPen, 0, 0, 0, stroke_length);
+                    g.DrawLine(extendedHoverPen, stroke_length, 0, stroke_length, stroke_length);
                     break;
                 case ExtendedHover.Three_Outlines_Vertical:
-                    g.DrawLine(extendedHoverPen, 0, 0, 0, ts);
-                    g.DrawLine(extendedHoverPen, ts, 0, ts, ts);
-                    g.DrawLine(extendedHoverPen, 0, ts, ts, ts);
+                    g.DrawLine(extendedHoverPen, 0, 0, 0, stroke_length);
+                    g.DrawLine(extendedHoverPen, stroke_length, 0, stroke_length, stroke_length);
+                    g.DrawLine(extendedHoverPen, 0, stroke_length, stroke_length, stroke_length);
                     break;
             }
         }

@@ -11,8 +11,8 @@ namespace MiniKreuzwortraetsel
     {
         static public readonly Font HOVER_ARROW_FONT = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
         static readonly Point[][] subTilePolygons = new Point[][] {
-            new Point[3] { new Point(0, 0), new Point(Form1.TS - 1, 0),  new Point(Form1.TS - 1, Form1.TS - 1) },
-            new Point[3] { new Point(0, 0), new Point(Form1.TS - 1, Form1.TS - 1), new Point(0, Form1.TS - 1) }
+            new Point[3] { new Point(0, 0), new Point(Form1.TS, 0),  new Point(Form1.TS, Form1.TS) },
+            new Point[3] { new Point(0, 0), new Point(Form1.TS, Form1.TS), new Point(0, Form1.TS) }
         };
 
         static readonly Point[] arrowPositions = new Point[] { new Point(Form1.TS / 3, 0), new Point(-3, 2 * (Form1.TS / 5)) };

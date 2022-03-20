@@ -54,7 +54,7 @@ namespace MiniKreuzwortraetsel
         public bool IsMouseOverMe(MouseEventArgs e, QuestionOrBaseWordTile parentTile)
         {
             // Calculate mouse position in tile space
-            Point mousePosition_tile_space = new Point(e.X - ((Tile)parentTile).GetGlobalBounds().X, e.Y - ((Tile)parentTile).GetGlobalBounds().Y);
+            Point mousePosition_tile_space = new Point(e.X - parentTile.GetGlobalBounds().X, e.Y - parentTile.GetGlobalBounds().Y);
             // Check if mouse is over deleteButton
             if (bounds_tile_space.X <= mousePosition_tile_space.X && bounds_tile_space.Height >= mousePosition_tile_space.Y)
                 return true;
@@ -68,7 +68,7 @@ namespace MiniKreuzwortraetsel
             {
                 Tile.TranslateTransformGraphics(g, bounds_global.Location);
 
-                g.DrawRectangle(pen, 0, 0, absoluteSize, absoluteSize - 1);
+                g.DrawRectangle(pen, 0, 0, absoluteSize - 1, absoluteSize - 1);
                 g.DrawLine(pen, 0, 0, absoluteSize, absoluteSize - 1);
                 g.DrawLine(pen, 0, absoluteSize - 1, absoluteSize, 0);
 

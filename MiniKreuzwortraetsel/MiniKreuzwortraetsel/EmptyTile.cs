@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace MiniKreuzwortraetsel
 {
@@ -55,6 +56,7 @@ namespace MiniKreuzwortraetsel
         public override void Paint(Graphics g)
         {
             Rectangle GlobalBounds = GetGlobalBounds();
+            Rectangle LocalBounds = GetLocalBounds();
             TranslateTransformGraphics(g, GlobalBounds.Location);
 
             // Call subtile painting routines
@@ -64,7 +66,7 @@ namespace MiniKreuzwortraetsel
             // Draw Rectangle
             // Condition: At least one subtile is highlighted
             if (SubTiles[0].IsHighlighted() || SubTiles[1].IsHighlighted())
-                g.DrawRectangle(Pens.Black, GetLocalBounds());
+                g.DrawRectangle(Pens.Black, 0, 0, LocalBounds.Width - 1, LocalBounds.Height - 1);
 
             DrawExtendedHover(g);
 
