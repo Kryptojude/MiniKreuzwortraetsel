@@ -106,6 +106,8 @@ namespace MiniKreuzwortraetsel
         public abstract void Paint(Graphics g);
         protected void BeginPaint(Graphics g)
         {
+            g.SetClip(g.VisibleClipBounds);
+            g.ExcludeClip(Bounds_global);
             TranslateTransformGraphics(g, Bounds_global.Location);
             // Clear
             g.FillRectangle(Brushes.White, Bounds_local);
@@ -115,6 +117,7 @@ namespace MiniKreuzwortraetsel
             // Draw outline Rectangle
             g.DrawRectangle(Pens.Black, 0, 0, Bounds_local.Width - 1, Bounds_local.Height - 1);
             TranslateTransformGraphics(g, new Point(-Bounds_global.Location.X, -Bounds_global.Location.Y));
+            g.ResetClip();
         }
         /// <summary>
         /// Moves the origin of the grid
@@ -126,8 +129,8 @@ namespace MiniKreuzwortraetsel
         protected void DrawExtendedHover(Graphics g)
         {
             int stroke_length = Form1.TS - 1;
-            new System.Drawing.Drawing2D.Matrix();
-            g.MultiplyTransform(ma);
+            //new System.Drawing.Drawing2D.Matrix();
+            //g.MultiplyTransform(ma);
             // Draw extendedHover
             switch (GetExtendedHover())
             {

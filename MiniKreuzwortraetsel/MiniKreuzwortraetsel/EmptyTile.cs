@@ -57,6 +57,8 @@ namespace MiniKreuzwortraetsel
         {
             Rectangle GlobalBounds = GetGlobalBounds();
             Rectangle LocalBounds = GetLocalBounds();
+            g.SetClip(g.VisibleClipBounds);
+            g.ExcludeClip(GlobalBounds) //Interacts with translation of the graphics
             TranslateTransformGraphics(g, GlobalBounds.Location);
 
             // Call subtile painting routines
@@ -71,6 +73,7 @@ namespace MiniKreuzwortraetsel
             DrawExtendedHover(g);
 
             TranslateTransformGraphics(g, new Point(-GlobalBounds.Location.X, -GlobalBounds.Location.Y));
+            g.ResetClip();
         }
 
         public void Reserve()
