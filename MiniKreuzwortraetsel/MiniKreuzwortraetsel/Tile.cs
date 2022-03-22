@@ -111,10 +111,10 @@ namespace MiniKreuzwortraetsel
             // Clear
             g.FillRectangle(Brushes.White, Bounds_local);
         }
-        protected void EndPaint(Graphics g)
+        public void EndPaint(Graphics g)
         {
             // Draw outline Rectangle
-            g.DrawRectangle(Pens.Black, 0, 0, Bounds_local.Width - 1, Bounds_local.Height - 1);
+            //g.DrawRectangle(Pens.Black, 0, 0, Bounds_local.Width - 1, Bounds_local.Height - 1);
             g.ResetTransform();
             g.ResetClip();
         }

@@ -81,10 +81,12 @@ namespace MiniKreuzwortraetsel
         public override void Paint(Graphics g)
         {
             BeginPaint(g);
+
+            Rectangle LocalBounds = GetLocalBounds();
             // Draw text
             Size textSize = TextRenderer.MeasureText(Text, font);
-            //g.DrawString(Text, font, foregroundColor, GetBounds().Location.X + (ts / 2 - textSize.Width / 2), GetBounds().Location.Y + (ts / 2 - textSize.Height / 2));
             g.DrawString(Text, font, foregroundColor, Form1.TS / 2 - textSize.Width / 2, Form1.TS / 2 - textSize.Height / 2);
+            g.DrawRectangle(Pens.Black, 0, 0, LocalBounds.Width - 1, LocalBounds.Height - 1);
 
             EndPaint(g);
 

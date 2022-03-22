@@ -55,10 +55,9 @@ namespace MiniKreuzwortraetsel
         }
         public override void Paint(Graphics g)
         {
-            Rectangle GlobalBounds = GetGlobalBounds();
+            BeginPaint(g);
+
             Rectangle LocalBounds = GetLocalBounds();
-            g.SetClip(GlobalBounds);
-            TranslateTransformGraphics(g, GlobalBounds.Location);
             // Call subtile painting routines
             SubTiles[0].Paint(g);
             SubTiles[1].Paint(g);
@@ -70,8 +69,7 @@ namespace MiniKreuzwortraetsel
 
             DrawExtendedHover(g);
 
-            g.ResetTransform();
-            g.ResetClip();
+            EndPaint(g);
         }
 
         public void Reserve()

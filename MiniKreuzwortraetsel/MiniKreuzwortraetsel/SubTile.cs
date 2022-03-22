@@ -20,29 +20,31 @@ namespace MiniKreuzwortraetsel
         static public readonly Color MinColor = Color.FromArgb(0x9be8a1);
         static public readonly Color MaxColor = Color.FromArgb(0x00ff14);
 
-        private bool hover_flag;
-        Brush color;
+        bool hover_flag;
+        Brush highlight_color;
+        bool highlight_flag;
         public int Direction { get; }
         public EmptyTile ParentTile { get; }
 
         public SubTile(int direction, EmptyTile parentTile)
         {
-            color = Brushes.White;
             Direction = direction;
             ParentTile = parentTile;
         }
         public void RemoveHighlight()
         {
-            color = Brushes.White;
+            highlight_color = null;
+            highlight_flag = false;
             ParentTile.SetRepaintFlag(true);
         }
         public void SetHighlight(float colorLevel)
         {
-            color = new SolidBrush(Color.FromArgb((int)(MinColor.R + (MaxColor.R - MinColor.R) * colorLevel), (int)(MinColor.G + (MaxColor.G - MinColor.G) * colorLevel), (int)(MinColor.B + (MaxColor.B - MinColor.B) * colorLevel)));
+            highlight_color = new SolidBrush(Color.FromArgb((int)(MinColor.R + (MaxColor.R - MinColor.R) * colorLevel), (int)(MinColor.G + (MaxColor.G - MinColor.G) * colorLevel), (int)(MinColor.B + (MaxColor.B - MinColor.B) * colorLevel)));
+            highlight_flag = true;
         }
         public bool IsHighlighted()
         {
-            return color != Brushes.White;
+            return highlight_flag;
         }
         public void SetHoverFlag(bool flag)
         {
@@ -54,7 +56,7 @@ namespace MiniKreuzwortraetsel
         }
         public Brush GetColor()
         {
-            return color;
+            return highlight_color;
         }
 
         public void Paint (Graphics g)
@@ -66,8 +68,8 @@ namespace MiniKreuzwortraetsel
                 g.FillPolygon(Brushes.Blue, subTilePolygons[Direction]);
                 g.DrawString(Tile.GetArrow(Direction), HOVER_ARROW_FONT, Brushes.Red, arrowPositions[Direction]);
             }
-            // No hover flag, draw background color
-            else
+            // If no hover effect, check highlight flag
+            else if (highlight_flag)
                 g.FillPolygon(GetColor(), subTilePolygons[Direction]);
         }
     }
