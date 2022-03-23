@@ -114,7 +114,6 @@ namespace MiniKreuzwortraetsel
         public void EndPaint(Graphics g)
         {
             // Draw outline Rectangle
-            //g.DrawRectangle(Pens.Black, 0, 0, Bounds_local.Width - 1, Bounds_local.Height - 1);
             g.ResetTransform();
             g.ResetClip();
         }
@@ -127,7 +126,7 @@ namespace MiniKreuzwortraetsel
         }
         protected void DrawExtendedHover(Graphics g)
         {
-            int stroke_length = Form1.TS - 1;
+            int stroke_length = Form1.TS;
             // Draw extendedHover
             switch (GetExtendedHover())
             {
